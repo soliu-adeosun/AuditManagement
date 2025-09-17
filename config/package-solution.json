@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "audit-management-client-side-solution",
+    "id": "88185bbc-b988-4eeb-be47-ed9e563023a2",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.19.0"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "audit-management description"
+      },
+      "longDescription": {
+        "default": "audit-management description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "audit-management Feature",
+        "description": "The feature that activates elements of the audit-management solution.",
+        "id": "8571b340-eebc-4217-a62b-9db6e8b03e3c",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/audit-management.sppkg"
+  }
+}

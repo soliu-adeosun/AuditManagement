@@ -1,0 +1,21 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "18.20.4",
+    "sdksVersions": {
+      "@microsoft/microsoft-graph-client": "3.0.2",
+      "@microsoft/teams-js": "2.12.0"
+    },
+    "version": "1.19.0",
+    "libraryName": "audit-management",
+    "libraryId": "88185bbc-b988-4eeb-be47-ed9e563023a2",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "audit-management",
+    "solutionShortDescription": "audit-management description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}
