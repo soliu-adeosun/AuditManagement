@@ -1,14 +1,14 @@
-AUDITMANAGEMENT.loadDashboardComponent = function () {
+loadDashboardComponent = function () {
     if (MainApplication.cachedState.mode) {
-		AUDITMANAGEMENT.whenDashboardDependeciesLoaded();
+		whenDashboardDependeciesLoaded();
 	}else{
-        MainApplication.cachedState.pageStateCall = AUDITMANAGEMENT.whenDashboardDependeciesLoaded;
+        MainApplication.cachedState.pageStateCall = whenDashboardDependeciesLoaded;
     }
 };
 
 
 
-AUDITMANAGEMENT.whenDashboardDependeciesLoaded = function () {
+whenDashboardDependeciesLoaded = function () {
     globalDefinitions.callLoader();
     console.log("BOOM!! Dashboard is up and running");
     setTimeout(function(){

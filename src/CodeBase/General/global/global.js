@@ -394,6 +394,10 @@ GlobalDefinitionsManager.prototype.AuditLogManager_SaveLog = function (userInfor
   data.Created = $spcontext.stringnifyDate({ includeTime : true });
 
   var logContent = JSON.stringify(data) + "\r\n";
+
+
+  console.log("Writing log with params:", "AuditLog", logContent, "AuditLogs", 1400000);
+
   speedctxRoot.logWriter(
     "AuditLog",
     logContent,

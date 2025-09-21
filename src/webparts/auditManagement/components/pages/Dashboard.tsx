@@ -10,7 +10,7 @@ export default class Dashboard extends React.Component<{}, {}> {
                 {/* Cards Section */}
                 <section className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-                        <div className="bg-white border card audit border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="border card audit border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow">
                             <div className="text-center">
                                 <h3 className="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">2</h3>
                                 <h3 className="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">
@@ -18,7 +18,7 @@ export default class Dashboard extends React.Component<{}, {}> {
                                 </h3>
                             </div>
                         </div>
-                        <div className="bg-white border card pending border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="border card pending border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow">
                             <div className="text-center">
                                 <h3 className="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">8</h3>
                                 <h3 className="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">
@@ -26,7 +26,7 @@ export default class Dashboard extends React.Component<{}, {}> {
                                 </h3>
                             </div>
                         </div>
-                        <div className="bg-white border card completed border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="border card completed border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow">
                             <div className="text-center">
                                 <h3 className="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">3</h3>
                                 <h3 className="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">
@@ -208,6 +208,6 @@ export default class Dashboard extends React.Component<{}, {}> {
     }
 
     public componentDidMount(): void {
-        window.AUDITMANAGEMENT.loadDashboardComponent();
+        window.loadDashboardComponent();
     }
 }

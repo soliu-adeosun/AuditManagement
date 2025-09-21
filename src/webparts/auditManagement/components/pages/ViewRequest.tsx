@@ -241,6 +241,6 @@ export default class ViewRequest extends React.Component<{}, {}> {
     }
 
     public componentDidMount(): void {
-        window.AUDITMANAGEMENT.loadViewRequestComponent();
+        window.loadViewRequestComponent();
     }
 }

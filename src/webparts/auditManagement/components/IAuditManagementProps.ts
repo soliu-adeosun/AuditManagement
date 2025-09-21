@@ -7,9 +7,9 @@ export interface IAuditManagementProps {
 }
 
 
-export interface IAuditManagement {
-  loadNewRequestComponent: Function;
-  loadApproveRequestComponent: Function;
-  loadViewRequestComponent: Function;
-  loadDashboardComponent: Function;
-}
+// export interface IAuditManagement {
+//   loadNewRequestComponent: Function;
+//   loadApproveRequestComponent: Function;
+//   loadViewRequestComponent: Function;
+//   loadDashboardComponent: Function;
+// }

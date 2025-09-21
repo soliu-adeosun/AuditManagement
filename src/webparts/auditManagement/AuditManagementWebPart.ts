@@ -37,6 +37,7 @@ export default class AuditManagementWebPart extends BaseClientSideWebPart<IAudit
   }
 
   protected onInit(): Promise<void> {
+    (window as any).globalProp = this;
     return this._getEnvironmentMessage().then(message => {
       this._environmentMessage = message;
     });
@@ -117,5 +118,11 @@ export default class AuditManagementWebPart extends BaseClientSideWebPart<IAudit
         }
       ]
     };
+  }
+
+  public async getClientIP() {
+    const response = await fetch('https://ipinfo.io/json');
+    const data = await response.json();
+    return data.ip;
   }
 }

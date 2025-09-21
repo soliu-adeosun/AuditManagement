@@ -7,9 +7,8 @@ import 'notyf/notyf.min.css';
 import Modal from "../Modals/Modal";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 import "bootstrap/dist/css/bootstrap.min.css";
-
-import '../Assets/css/dashboard.css';
 import '../Assets/css/style.css';
+import '../Assets/css/dashboard.css';
 import '../Assets/css/sharepointuifix.css';
 
 
@@ -19,6 +18,7 @@ require("workflowengine");
 require("global");
 require("notyf");
 require("jQueryUI");
+require("globalext");
 
 export const Layout = () => {
     return (

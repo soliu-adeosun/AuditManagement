@@ -1,6 +1,6 @@
 import * as React from 'react';
 // import styles from './AuditManagement.module.scss';
-import type { IAuditManagementProps, IAuditManagement } from './IAuditManagementProps';
+import type { IAuditManagementProps } from './IAuditManagementProps';
 // import { escape } from '@microsoft/sp-lodash-subset';
 import { Route, Routes, HashRouter } from "react-router-dom";
 
@@ -14,7 +14,11 @@ require('main');
 
 declare global {
   interface Window {
-    AUDITMANAGEMENT: IAuditManagement;
+    globalProp : any;
+    loadDashboardComponent : () => void;
+    loadNewRequestComponent : () => void;
+    loadApproveRequestComponent : () => void;
+    loadViewRequestComponent : () => void;
   }
 }
 

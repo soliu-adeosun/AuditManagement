@@ -242,6 +242,6 @@ export default class ApproveRequest extends React.Component<{}, {}> {
     }
 
     public componentDidMount(): void {
-        window.AUDITMANAGEMENT.loadApproveRequestComponent();
+        window.loadApproveRequestComponent();
     }
 }

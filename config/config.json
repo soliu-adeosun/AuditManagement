@@ -78,6 +78,15 @@
       "path": "src/codebase/general/global/global.js",
       "globalName": "global"
     },
+    "globalext": {
+      "path": "src/codebase/general/libraries/global.ext.js",
+      "globalName": "globalext",
+      "globalDependencies": [
+        "global",
+        "speedpoint_core",
+        "main"
+      ]
+    },
     "lists": {
       "path": "src/codebase/general/global/lists.js",
       "globalName": "lists",

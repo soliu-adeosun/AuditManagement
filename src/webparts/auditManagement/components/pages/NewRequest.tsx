@@ -174,6 +174,6 @@ export default class NewRequest extends React.Component<{}, {}> {
     }
 
     public componentDidMount(): void {
-        window.AUDITMANAGEMENT.loadNewRequestComponent();
+        window.loadNewRequestComponent();
     }
 }

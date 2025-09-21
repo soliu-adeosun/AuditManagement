@@ -1,14 +1,14 @@
-AUDITMANAGEMENT.loadApproveRequestComponent = function () {
+loadApproveRequestComponent = function () {
     if (MainApplication.cachedState.mode) {
-		AUDITMANAGEMENT.whenApproveRequestDependeciesLoaded();
+		whenApproveRequestDependeciesLoaded();
 	}else{
-        MainApplication.cachedState.pageStateCall = AUDITMANAGEMENT.whenApproveRequestDependeciesLoaded;
+        MainApplication.cachedState.pageStateCall = whenApproveRequestDependeciesLoaded;
     }
 };
 
 
 
-AUDITMANAGEMENT.whenApproveRequestDependeciesLoaded = function () {
+whenApproveRequestDependeciesLoaded = function () {
     globalDefinitions.callLoader();
     console.log("BOOM!! Approve page is up and running");
     setTimeout(function(){

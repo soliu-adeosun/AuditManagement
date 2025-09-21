@@ -1,14 +1,14 @@
-AUDITMANAGEMENT.loadViewRequestComponent = function () {
+loadViewRequestComponent = function () {
     if (MainApplication.cachedState.mode) {
-		AUDITMANAGEMENT.whenViewRequestDependeciesLoaded();
+		whenViewRequestDependeciesLoaded();
 	}else{
-        MainApplication.cachedState.pageStateCall = AUDITMANAGEMENT.whenViewRequestDependeciesLoaded;
+        MainApplication.cachedState.pageStateCall = whenViewRequestDependeciesLoaded;
     }
 };
 
 
 
-AUDITMANAGEMENT.whenViewRequestDependeciesLoaded = function () {
+whenViewRequestDependeciesLoaded = function () {
     globalDefinitions.callLoader();
     console.log("BOOM!! View page is up and running");
     setTimeout(function(){

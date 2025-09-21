@@ -68,6 +68,8 @@ function Speed(cxt, bolval) {
         window.speedRequestDigest = null;
     }
 
+    this.libraryDictionary = {};
+
     this.dynamicTableSettings = {};
     /**
      * Properties for the table to be created
@@ -1498,7 +1500,7 @@ Speed.prototype.bind = function (listObjects, bindClass, bindGroup) {
                 objproperties.push(this.getAttribute("speed-array-prop"));
             }
             else if (this.getAttribute("speed-array-func") !== null){
-                objproperties.push(this.getAttribute("speed-array-prop"));
+                objproperties.push(this.getAttribute("speed-array-func"));
             }
         });
 
@@ -4253,8 +4255,19 @@ Speed.prototype.getItem = function (listName, caml, onSuccess, onFailed, appCont
     var speedContext = this;
     var onFailedCall = (typeof onFailed === 'undefined' || onFailed == null) ? this.errorHandler : onFailed;
     var query = (typeof caml === '' || caml == null) ? this.camlBuilder() : caml;
+    var getListBy = (typeof listName === "string") ? "Title" : listName.getBy;
+    if(typeof listName === "object"){
+        listName = listName.checker;
+    }
+    
     var context = this.initiate();
-    var oList = context.get_web().get_lists().getByTitle(listName);
+    var oList;
+    if(getListBy === "Title"){
+        oList = context.get_web().get_lists().getByTitle(listName);
+    }
+    else{
+        oList = context.get_web().get_lists().getById(listName);
+    }
     var camlQuery = new SP.CamlQuery();
     camlQuery.set_viewXml(query);
     window.speedGlobal.push(oList.getItems(camlQuery));
@@ -4267,7 +4280,7 @@ Speed.prototype.getItem = function (listName, caml, onSuccess, onFailed, appCont
     window.speedGlobal[total].ListName = listName;
     context.executeQueryAsync(function () {
         setTimeout(function () {
-            onSuccess(window.speedGlobal[total]);
+            onSuccess(window.speedGlobal[total], window.speedGlobal[total].ListName);
             speedContext.asyncManager(window.speedGlobal[total].ListName);
         }, speedContext.latency);
     }, function (sender, args) {
@@ -4407,56 +4420,51 @@ Speed.prototype.getListToControl = function (listName, caml, controls, onSuccess
  * @param {object} [appContext = {}] instance of the speedpoint app context created, used for o365 Cross Domain Request
  */
 Speed.prototype.getListToItems = function (listName, caml, controls, tableonly, conditions, onSuccess, onFailed, appContext) {
-    var speedContext = this;
-    //get from a specific table and not the forms
-    var tableId = (typeof controls.tableid !== "") ? controls.tableid : "";
+    var SpeedContext = this;
+    var tableId = typeof controls.tableid !== "" ? controls.tableid : "";
     var controlArray = [];
-    var pageControls = (typeof controls.useTableControls === "undefined") ? true : controls.useTableControls;
+    var pageControls = typeof controls.useTableControls === "undefined" ? true : controls.useTableControls;
     if (pageControls) {
         controlArray = this.getControls(tableonly, tableId);
     }
-    var mergeControls = (typeof controls.merge === "undefined") ? true : controls.merge;
+    var mergeControls = typeof controls.merge === "undefined" ? true : controls.merge;
     if (mergeControls) {
-        var controlsToUse = ($.isArray(controls.data)) ? $.merge(controlArray, controls.data) : controlArray;
+        var controlsToUse = $.isArray(controls.data) ? $.merge(controlArray, controls.data) : controlArray;
     } else {
         var controlsToUse = controls.data;
     }
 
     var requestCount = {
         expected: 2,
-        requested: 0
-    }
+        requested: 0,
+    };
 
-    var ignoreThreshold = (typeof controls.ignoreThreshold == "undefined") ? true : controls.ignoreThreshold
+    var ignoreThreshold = typeof controls.ignoreThreshold == "undefined" ? true : controls.ignoreThreshold;
 
-    var thresholdCount = (typeof controls.threshold == "undefined") ? 5000 : controls.threshold;
-    var feedback = (typeof controls.feedback == "undefined") ? null : controls.feedback;
-    var onFailedCall = (typeof onFailed === 'undefined' || onFailed == null) ? this.errorHandler : onFailed;
+    var thresholdCount = typeof controls.threshold == "undefined" ? 5000 : controls.threshold;
+    var feedback = typeof controls.feedback == "undefined" ? null : controls.feedback;
+    var onFailedCall = typeof onFailed === "undefined" || onFailed == null ? this.errorHandler : onFailed;
     if (ignoreThreshold) {
         getItemsInList();
-    }
-    else {
-
-        speedContext.SPListDetails(listName, function (_spListMeta) {
+    } else {
+        SpeedContext.SPListDetails(listName, function (_spListMeta) {
             var count = _spListMeta.get_itemCount();
             requestCount.itemCount = count;
             if (count < thresholdCount) {
                 getItemsInList();
-            }
-            else {
+            } else {
                 listDependenciesForLargeItems();
             }
         });
 
         var lastItemQuery = [
-            { rowlimit: 1, orderby: "ID", ascending: "FALSE" }
-        ]
-        speedContext.getItem(listName, speedContext.camlBuilder(lastItemQuery), function (itemProperties) {
+            { rowlimit: 1, orderby: "ID", ascending: "FALSE", viewScope: "RecursiveAll" }
+        ];
+        SpeedContext.getItem(listName, SpeedContext.camlBuilder(lastItemQuery), function (itemProperties) {
             var listEnumerator = itemProperties.getEnumerator();
             while (listEnumerator.moveNext()) {
                 requestCount.lastItemID = listEnumerator.get_current().get_item("ID");
             }
-
             listDependenciesForLargeItems();
         });
     }
@@ -4465,105 +4473,107 @@ Speed.prototype.getListToItems = function (listName, caml, controls, tableonly, 
         //the main array is used so that if the list items is greater than the threshold
         //the caml object can be modified
         if (Array.isArray(caml)) {
-            caml = speedContext.camlBuilder(caml);
+            caml = SpeedContext.camlBuilder(caml);
         }
 
-        speedContext.getItem(listName, caml, function (itemProperties) {
-            var listItems = [];
-            var listEnumerator = itemProperties.getEnumerator();
-            while (listEnumerator.moveNext()) {
-                var objectToReturn = {};
-                for (var i = 0; i <= (controlsToUse.length - 1); i++) {
-                    var SPFieldType;
-                    var nopropinJSEngine = false;
-                    try {
-                        SPFieldType = listEnumerator.get_current().get_item(controlsToUse[i]).__proto__.constructor.__typeName.toLowerCase();
-                    } catch (ex) {
+        SpeedContext.getItem(
+            listName,
+            caml,
+            function (itemProperties) {
+                var listItems = [];
+                var listEnumerator = itemProperties.getEnumerator();
+                while (listEnumerator.moveNext()) {
+                    var objectToReturn = {};
+                    for (var i = 0; i <= controlsToUse.length - 1; i++) {
+                        var SPFieldType;
+                        var nopropinJSEngine = false;
                         try {
-                            nopropinJSEngine = true;
-                            SPFieldType = $.type(listEnumerator.get_current().get_item(controlsToUse[i]));
+                            SPFieldType = listEnumerator.get_current().get_item(controlsToUse[i]).__proto__.constructor.__typeName.toLowerCase();
                         } catch (ex) {
-                            SPFieldType = "string";
-                        }
-                    }
-                    if (SPFieldType.toLowerCase() === "sp.fielduservalue" || SPFieldType.toLowerCase() === "sp.fieldlookupvalue" || (nopropinJSEngine && SPFieldType.toLowerCase() === "object")) {
-                        var objProp = {};
-                        objProp.id = speedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]).get_lookupId());
-                        objProp.value = speedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]).get_lookupValue());
-                        if (SPFieldType.toLowerCase() === "sp.fielduservalue" || (nopropinJSEngine && SPFieldType.toLowerCase() === "object")) {
                             try {
-                                objProp.email = speedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]).get_email());
-                            } catch (e) {
-                                objProp.email = "";
-                            };
-                        }
-
-                        if (typeof conditions === "object" && conditions !== null) {
-                            if (typeof conditions[controlsToUse[i]] !== "undefined") {
-                                objProp = conditions[controlsToUse[i]](objProp);
+                                nopropinJSEngine = true;
+                                SPFieldType = $.type(listEnumerator.get_current().get_item(controlsToUse[i]));
+                            } catch (ex) {
+                                SPFieldType = "string";
                             }
                         }
-                        objectToReturn[controlsToUse[i]] = objProp;
-                    }
-                    else if (SPFieldType.toLowerCase() === "array") {
-                        var multiUser = listEnumerator.get_current().get_item(controlsToUse[i]);
-                        var arrayToSave = [];
-                        for (var j = 0; j <= (multiUser.length - 1); j++) {
-                            var objectOfUsers = {};
-                            objectOfUsers.id = multiUser[j].get_lookupId();
-                            objectOfUsers.value = multiUser[j].get_lookupValue();
+                        if (SPFieldType.toLowerCase() === "sp.fielduservalue" || SPFieldType.toLowerCase() === "sp.fieldlookupvalue" || (nopropinJSEngine && SPFieldType.toLowerCase() === "object")) {
+                            var objProp = {};
+                            objProp.id = SpeedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]).get_lookupId());
+                            objProp.value = SpeedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]).get_lookupValue());
+                            if (SPFieldType.toLowerCase() === "sp.fielduservalue" || (nopropinJSEngine && SPFieldType.toLowerCase() === "object")) {
+                                try {
+                                    objProp.email = SpeedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]).get_email());
+                                } catch (e) {
+                                    objProp.email = "";
+                                }
+                            }
+
+                            if (typeof conditions === "object" && conditions !== null) {
+                                if (typeof conditions[controlsToUse[i]] !== "undefined") {
+                                    objProp = conditions[controlsToUse[i]](objProp);
+                                }
+                            }
+                            objectToReturn[controlsToUse[i]] = objProp;
+                        } else if (SPFieldType.toLowerCase() === "array") {
+                            var multiUser = listEnumerator.get_current().get_item(controlsToUse[i]);
+                            var arrayToSave = [];
+                            for (var j = 0; j <= multiUser.length - 1; j++) {
+                                var objectOfUsers = {};
+                                objectOfUsers.id = multiUser[j].get_lookupId();
+                                objectOfUsers.value = multiUser[j].get_lookupValue();
+                                try {
+                                    objectOfUsers.email = multiUser[j].get_email();
+                                } catch (e) {
+                                    objectOfUsers.email = "";
+                                }
+                                arrayToSave.push(objectOfUsers);
+                            }
+
+                            if (typeof conditions === "object" && conditions !== null) {
+                                if (typeof conditions[controlsToUse[i]] !== "undefined") {
+                                    arrayToSave = conditions[controlsToUse[i]](arrayToSave);
+                                }
+                            }
+                            objectToReturn[controlsToUse[i]] = arrayToSave;
+                        } else if (SPFieldType.toLowerCase() === "sp.fieldurlvalue") {
+                            var columnValue = SpeedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]).get_url());
+                            if (typeof conditions === "object" && conditions !== null) {
+                                if (typeof conditions[controlsToUse[i]] !== "undefined") {
+                                    columnValue = conditions[controlsToUse[i]](columnValue);
+                                }
+                            }
+                            objectToReturn[controlsToUse[i]] = columnValue;
+                        } else {
                             try {
-                                objectOfUsers.email = multiUser[j].get_email();
+                                listEnumerator.get_current().get_item(controlsToUse[i]);
                             } catch (e) {
-                                objectOfUsers.email = "";
-                            };
-                            arrayToSave.push(objectOfUsers);
+                                throw `${controlsToUse[i]} doesnt exist in this list`;
+                            }
+                            var columnValue = SpeedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]));
+                            if (typeof conditions === "object" && conditions !== null) {
+                                if (typeof conditions[controlsToUse[i]] !== "undefined") {
+                                    columnValue = conditions[controlsToUse[i]](columnValue);
+                                }
+                            }
+                            objectToReturn[controlsToUse[i]] = columnValue;
                         }
+                    }
 
-                        if (typeof conditions === "object" && conditions !== null) {
-                            if (typeof conditions[controlsToUse[i]] !== "undefined") {
-                                arrayToSave = conditions[controlsToUse[i]](arrayToSave);
-                            }
-                        }
-                        objectToReturn[controlsToUse[i]] = arrayToSave;
+                    if (conditions !== null && typeof conditions === "function") {
+                        objectToReturn = conditions(objectToReturn);
                     }
-                    else if (SPFieldType.toLowerCase() === "sp.fieldurlvalue") {
-                        var columnValue = speedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]).get_url());
-                        if (typeof conditions === "object" && conditions !== null) {
-                            if (typeof conditions[controlsToUse[i]] !== "undefined") {
-                                columnValue = conditions[controlsToUse[i]](columnValue);
-                            }
-                        }
-                        objectToReturn[controlsToUse[i]] = columnValue;
-                    }
-                    else {
-                        try {
-                            listEnumerator.get_current().get_item(controlsToUse[i]);
-                        }
-                        catch (e) {
-                            throw `${controlsToUse[i]} doesnt exist in this list`;
-                        }
-                        var columnValue = speedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]));
-                        if (typeof conditions === "object" && conditions !== null) {
-                            if (typeof conditions[controlsToUse[i]] !== "undefined") {
-                                columnValue = conditions[controlsToUse[i]](columnValue);
-                            }
-                        }
-                        objectToReturn[controlsToUse[i]] = columnValue;
+
+                    //includes non empty objects
+                    if (!$.isEmptyObject(objectToReturn)) {
+                        listItems.push(objectToReturn);
                     }
                 }
-
-                if (conditions !== null && typeof conditions === "function") {
-                    objectToReturn = conditions(objectToReturn);
-                }
-
-                //includes non empty objects
-                if (!$.isEmptyObject(objectToReturn)) {
-                    listItems.push(objectToReturn);
-                }
-            }
-            onSuccess(listItems, itemProperties.ListName);
-        }, onFailedCall, appContext);
+                onSuccess(listItems, itemProperties.ListName);
+            },
+            onFailedCall,
+            appContext
+        );
     }
 
     function listDependenciesForLargeItems() {
@@ -4575,168 +4585,174 @@ Speed.prototype.getListToItems = function (listName, caml, controls, tableonly, 
                 itemsInList: requestCount.itemCount,
                 lastItemID: requestCount.lastItemID,
                 conditions: conditions,
-                feedback: feedback
-            }
-            speedContext.getItemsMaxThreshold(listName, caml, data, onSuccess, onFailed, appContext);
+                feedback: feedback,
+            };
+            SpeedContext.getItemsMaxThreshold(listName, caml, data, onSuccess, onFailed, appContext);
         }
     }
-}
+};
 
 /*
 Used to retreive data from list that has passed the threshold capacity
 */
 Speed.prototype.getItemsMaxThreshold = function (listName, caml, listSearchData, onSuccess, onFailed, appContext) {
-    var speedContext = this;
+    var SpeedContext = this;
     var numberOfIterations = Math.ceil(listSearchData.lastItemID / listSearchData.threshold);
     var conditions = listSearchData.conditions;
-    speedContext.thresholdListSettings[listName] = {
+    SpeedContext.thresholdListSettings[listName] = {
         //start : 1,
         iterationCalls: 0,
         expectedCalls: numberOfIterations,
         items: [],
         ascending: false,
-        orderby: "ID"
-    }
+        orderby: "ID",
+    };
 
     var controlsToUse = listSearchData.controlsToUse;
-    for (var i = 1; i <= numberOfIterations; i++) {
-        //this is used to let the system knows where to continue the query from the next time it iterates
-        var idVal = (i == 1) ? listSearchData.lastItemID : (listSearchData.lastItemID - (listSearchData.threshold * (i - 1)));
+    makeListCalls(1, numberOfIterations);
+
+    function makeListCalls(pos, iterations) {
+        var idVal = pos == 1 ? listSearchData.lastItemID : listSearchData.lastItemID - listSearchData.threshold * (pos - 1);
         var item = {
-            operator: 'Leq',
-            field: 'ID',
-            type: 'Number',
-            val: idVal
-        }
-        var camlModified = speedContext.deferenceObject(caml);
-        camlModified[0].rowlimit = (listSearchData.threshold);
+            operator: "Leq",
+            field: "ID",
+            type: "Number",
+            val: idVal,
+        };
+        var camlModified = SpeedContext.deferenceObject(caml);
+        camlModified[0].rowlimit = listSearchData.threshold;
         camlModified.splice(1, 0, item);
         camlModified[0].orderby = "ID";
         camlModified[0].ascending = "FALSE";
-        speedContext.thresholdListSettings[listName].ascending = "FALSE";
-        speedContext.thresholdListSettings[listName].orderby = camlModified[0].orderby;
-        speedContext.thresholdListSettings[listName].feedback = listSearchData.feedback;
+        SpeedContext.thresholdListSettings[listName].ascending = "FALSE";
+        SpeedContext.thresholdListSettings[listName].orderby = camlModified[0].orderby;
+        SpeedContext.thresholdListSettings[listName].feedback = listSearchData.feedback;
 
-        speedContext.getItem(listName, speedContext.camlBuilder(camlModified), function (itemProperties) {
-            var listItems = [];
-            var listEnumerator = itemProperties.getEnumerator();
-            while (listEnumerator.moveNext()) {
-                var objectToReturn = {};
-                for (var i = 0; i <= (controlsToUse.length - 1); i++) {
-                    var SPFieldType;
-                    var nopropinJSEngine = false;
-                    try {
-                        SPFieldType = listEnumerator.get_current().get_item(controlsToUse[i]).__proto__.constructor.__typeName.toLowerCase();
-                    }
-                    catch (ex) {
+        SpeedContext.getItem(
+            listName,
+            SpeedContext.camlBuilder(camlModified),
+            function (itemProperties) {
+                var listItems = [];
+                var listEnumerator = itemProperties.getEnumerator();
+                while (listEnumerator.moveNext()) {
+                    var objectToReturn = {};
+                    for (var i = 0; i <= controlsToUse.length - 1; i++) {
+                        var SPFieldType;
+                        var nopropinJSEngine = false;
                         try {
-                            nopropinJSEngine = true;
-                            SPFieldType = $.type(listEnumerator.get_current().get_item(controlsToUse[i]));
+                            SPFieldType = listEnumerator.get_current().get_item(controlsToUse[i]).__proto__.constructor.__typeName.toLowerCase();
                         } catch (ex) {
-                            SPFieldType = "string";
-                        }
-                    }
-                    if (SPFieldType.toLowerCase() === "sp.fielduservalue" || SPFieldType.toLowerCase() === "sp.fieldlookupvalue" || (nopropinJSEngine && SPFieldType.toLowerCase() === "object")) {
-                        var objProp = {};
-                        objProp.id = speedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]).get_lookupId());
-                        objProp.value = speedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]).get_lookupValue());
-                        if (SPFieldType.toLowerCase() === "sp.fielduservalue" || (nopropinJSEngine && SPFieldType.toLowerCase() === "object")) {
                             try {
-                                objProp.email = speedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]).get_email());
-                            } catch (e) {
-                                objProp.email = "";
-                            };
-                        }
-
-                        if (typeof conditions === "object" && conditions !== null) {
-                            if (typeof conditions[controlsToUse[i]] !== "undefined") {
-                                objProp = conditions[controlsToUse[i]](objProp);
+                                nopropinJSEngine = true;
+                                SPFieldType = $.type(listEnumerator.get_current().get_item(controlsToUse[i]));
+                            } catch (ex) {
+                                SPFieldType = "string";
                             }
                         }
-                        objectToReturn[controlsToUse[i]] = objProp;
-                    }
-                    else if (SPFieldType.toLowerCase() === "array") {
-                        var multiUser = listEnumerator.get_current().get_item(controlsToUse[i]);
-                        var arrayToSave = [];
-                        for (var j = 0; j <= (multiUser.length - 1); j++) {
-                            var objectOfUsers = {};
-                            objectOfUsers.id = multiUser[j].get_lookupId();
-                            objectOfUsers.value = multiUser[j].get_lookupValue();
+                        if (SPFieldType.toLowerCase() === "sp.fielduservalue" || SPFieldType.toLowerCase() === "sp.fieldlookupvalue" || (nopropinJSEngine && SPFieldType.toLowerCase() === "object")) {
+                            var objProp = {};
+                            objProp.id = SpeedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]).get_lookupId());
+                            objProp.value = SpeedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]).get_lookupValue());
+                            if (SPFieldType.toLowerCase() === "sp.fielduservalue" || (nopropinJSEngine && SPFieldType.toLowerCase() === "object")) {
+                                try {
+                                    objProp.email = SpeedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]).get_email());
+                                } catch (e) {
+                                    objProp.email = "";
+                                }
+                            }
+
+                            if (typeof conditions === "object" && conditions !== null) {
+                                if (typeof conditions[controlsToUse[i]] !== "undefined") {
+                                    objProp = conditions[controlsToUse[i]](objProp);
+                                }
+                            }
+                            objectToReturn[controlsToUse[i]] = objProp;
+                        } else if (SPFieldType.toLowerCase() === "array") {
+                            var multiUser = listEnumerator.get_current().get_item(controlsToUse[i]);
+                            var arrayToSave = [];
+                            for (var j = 0; j <= multiUser.length - 1; j++) {
+                                var objectOfUsers = {};
+                                objectOfUsers.id = multiUser[j].get_lookupId();
+                                objectOfUsers.value = multiUser[j].get_lookupValue();
+                                try {
+                                    objectOfUsers.email = multiUser[j].get_email();
+                                } catch (e) {
+                                    objectOfUsers.email = "";
+                                }
+                                arrayToSave.push(objectOfUsers);
+                            }
+
+                            if (typeof conditions === "object" && conditions !== null) {
+                                if (typeof conditions[controlsToUse[i]] !== "undefined") {
+                                    arrayToSave = conditions[controlsToUse[i]](arrayToSave);
+                                }
+                            }
+                            objectToReturn[controlsToUse[i]] = arrayToSave;
+                        } else {
                             try {
-                                objectOfUsers.email = multiUser[j].get_email();
+                                listEnumerator.get_current().get_item(controlsToUse[i]);
                             } catch (e) {
-                                objectOfUsers.email = "";
-                            };
-                            arrayToSave.push(objectOfUsers);
-                        }
-
-                        if (typeof conditions === "object" && conditions !== null) {
-                            if (typeof conditions[controlsToUse[i]] !== "undefined") {
-                                arrayToSave = conditions[controlsToUse[i]](arrayToSave);
+                                throw `${controlsToUse[i]} doesnt exist in this list`;
                             }
+                            var columnValue = SpeedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]));
+                            if (typeof conditions === "object" && conditions !== null) {
+                                if (typeof conditions[controlsToUse[i]] !== "undefined") {
+                                    columnValue = conditions[controlsToUse[i]](columnValue);
+                                }
+                            }
+                            objectToReturn[controlsToUse[i]] = columnValue;
                         }
-                        objectToReturn[controlsToUse[i]] = arrayToSave;
                     }
-                    else {
-                        try {
-                            listEnumerator.get_current().get_item(controlsToUse[i]);
-                        }
-                        catch (e) {
-                            throw `${controlsToUse[i]} doesnt exist in this list`;
-                        }
-                        var columnValue = speedContext.checkNull(listEnumerator.get_current().get_item(controlsToUse[i]));
-                        if (typeof conditions === "object" && conditions !== null) {
-                            if (typeof conditions[controlsToUse[i]] !== "undefined") {
-                                columnValue = conditions[controlsToUse[i]](columnValue);
-                            }
-                        }
-                        objectToReturn[controlsToUse[i]] = columnValue;
+
+                    if (conditions !== null && typeof conditions === "function") {
+                        objectToReturn = conditions(objectToReturn);
+                    }
+
+                    //includes non empty objects
+                    if (!$.isEmptyObject(objectToReturn)) {
+                        listItems.push(objectToReturn);
                     }
                 }
 
-                if (conditions !== null && typeof conditions === "function") {
-                    objectToReturn = conditions(objectToReturn);
+                if (pos <= iterations) {
+                    pos++;
+                    makeListCalls(pos, iterations);
                 }
 
-                //includes non empty objects
-                if (!$.isEmptyObject(objectToReturn)) {
-                    listItems.push(objectToReturn);
-                }
-            }
-            checkThresholdCount(listName, listItems, onSuccess);
-        }, onFailed, appContext)
+                checkThresholdCount(listName, listItems, onSuccess);
+            },
+            onFailed,
+            appContext
+        );
     }
 
     function checkThresholdCount(list, items, callback) {
-        speedContext.thresholdListSettings[list].items = speedContext.thresholdListSettings[list].items.concat(items)
-        speedContext.thresholdListSettings[list].iterationCalls++;
-        if (speedContext.thresholdListSettings[list].expectedCalls == speedContext.thresholdListSettings[list].iterationCalls) {
-            var itemsToSend = getUniqueListBy(speedContext.thresholdListSettings[list].items, "ID");
-            if (speedContext.thresholdListSettings[list].ascending) {
-                itemsToSend.sort((a, b) => (b[speedContext.thresholdListSettings[list].orderby] < a[speedContext.thresholdListSettings[list].orderby]) ? 1 : -1);
-            }
-            else {
-                itemsToSend.sort((a, b) => (a[speedContext.thresholdListSettings[list].orderby] < b[speedContext.thresholdListSettings[list].orderby]) ? 1 : -1);
+        SpeedContext.thresholdListSettings[list].items = SpeedContext.thresholdListSettings[list].items.concat(items);
+        SpeedContext.thresholdListSettings[list].iterationCalls++;
+        if (SpeedContext.thresholdListSettings[list].expectedCalls == SpeedContext.thresholdListSettings[list].iterationCalls) {
+            var itemsToSend = getUniqueListBy(SpeedContext.thresholdListSettings[list].items, "ID");
+            if (SpeedContext.thresholdListSettings[list].ascending) {
+                itemsToSend.sort((a, b) => (b[SpeedContext.thresholdListSettings[list].orderby] < a[SpeedContext.thresholdListSettings[list].orderby] ? 1 : -1));
+            } else {
+                itemsToSend.sort((a, b) => (a[SpeedContext.thresholdListSettings[list].orderby] < b[SpeedContext.thresholdListSettings[list].orderby] ? 1 : -1));
             }
             callback(itemsToSend);
-        }
-        else if (speedContext.thresholdListSettings[listName].feedback !== null) {
+        } else if (SpeedContext.thresholdListSettings[listName].feedback !== null) {
             //feedback to the user
-            var itemsToSend = getUniqueListBy(speedContext.thresholdListSettings[list].items, "ID");
-            if (speedContext.thresholdListSettings[list].ascending) {
-                itemsToSend.sort((a, b) => (b[speedContext.thresholdListSettings[list].orderby] < a[speedContext.thresholdListSettings[list].orderby]) ? 1 : -1);
+            var itemsToSend = getUniqueListBy(SpeedContext.thresholdListSettings[list].items, "ID");
+            if (SpeedContext.thresholdListSettings[list].ascending) {
+                itemsToSend.sort((a, b) => (b[SpeedContext.thresholdListSettings[list].orderby] < a[SpeedContext.thresholdListSettings[list].orderby] ? 1 : -1));
+            } else {
+                itemsToSend.sort((a, b) => (a[SpeedContext.thresholdListSettings[list].orderby] < b[SpeedContext.thresholdListSettings[list].orderby] ? 1 : -1));
             }
-            else {
-                itemsToSend.sort((a, b) => (a[speedContext.thresholdListSettings[list].orderby] < b[speedContext.thresholdListSettings[list].orderby]) ? 1 : -1);
-            }
-            speedContext.thresholdListSettings[listName].feedback(itemsToSend);
+            SpeedContext.thresholdListSettings[listName].feedback(itemsToSend);
         }
     }
 
     function getUniqueListBy(arr, key) {
-        return [...new Map(arr.map(item => [item[key], item])).values()]
+        return [...new Map(arr.map((item) => [item[key], item])).values()];
     }
-}
+};
 
 /**
  * Exports a List to an Array. All list items is returned based on the query
@@ -6870,9 +6886,9 @@ Speed.prototype.convertArrayBufferToBinary = function (data, isUint8) {
  */
 Speed.prototype.getDocumentsInFolder = function (libraryInformation, albumLink, caml, onSuccess, onFailed, appContext) {
     var speedContext = this;
-    var onFailedCall = (typeof onFailed === 'undefined' || onFailed == null) ? this.errorHandler : onFailed;
-    libraryInformation = (typeof libraryInformation == "string") ? { listName: libraryInformation } : libraryInformation;
-    libraryInformation.columns = (typeof libraryInformation.columns == "undefined") ? [] : libraryInformation.columns;
+    var onFailedCall = typeof onFailed === "undefined" || onFailed == null ? this.errorHandler : onFailed;
+    libraryInformation = typeof libraryInformation == "string" ? { listName: libraryInformation } : libraryInformation;
+    libraryInformation.columns = typeof libraryInformation.columns == "undefined" ? [] : libraryInformation.columns;
     var columns = ["Title", "FileLeafRef", "ContentType", "File"];
     for (var i = 0; i < libraryInformation.columns.length; i++) {
         if ($.inArray(libraryInformation.columns[i], columns) < 0) {
@@ -6883,70 +6899,66 @@ Speed.prototype.getDocumentsInFolder = function (libraryInformation, albumLink, 
     var conditions = libraryInformation.conditions;
     //columns = columns.toString();
 
-    requestCount = {
+    speedContext.libraryDictionary[libraryInformation.listName] = {
         expected: 2,
-        requested: 0
-    }
+        requested: 0,
+    };
 
-    var ignoreThreshold = (typeof libraryInformation.ignoreThreshold == "undefined") ? true : libraryInformation.ignoreThreshold
-    var thresholdCount = (typeof libraryInformation.threshold == "undefined") ? 5000 : libraryInformation.threshold;
-    var feedback = (typeof libraryInformation.feedback == "undefined") ? null : libraryInformation.feedback;
+    var ignoreThreshold = typeof libraryInformation.ignoreThreshold == "undefined" ? true : libraryInformation.ignoreThreshold;
+    var thresholdCount = typeof libraryInformation.threshold == "undefined" ? 5000 : libraryInformation.threshold;
+    var feedback = typeof libraryInformation.feedback == "undefined" ? null : libraryInformation.feedback;
     if (ignoreThreshold) {
         getItemsinLibrary();
-    }
-    else {
+    } else {
         speedContext.SPListDetails(libraryInformation.listName, function (_spListMeta) {
             var count = _spListMeta.get_itemCount();
-            requestCount.itemCount = count;
+            var title = _spListMeta.get_title();
+            speedContext.libraryDictionary[title].itemCount = count;
             if (count === 0) {
                 onSuccess([]);
             }
-            if (count < thresholdCount) {
+            else if (count < thresholdCount) {
                 getItemsinLibrary();
-            }
-            else {
-                libraryDependenciesForLargeItems();
+            } else {
+                libraryDependenciesForLargeItems(title);
             }
         });
 
         var lastItemQuery = [
-            { rowlimit: 1, orderby: "ID", ascending: "FALSE" }
-        ]
-        speedContext.getItem(libraryInformation.listName, speedContext.camlBuilder(lastItemQuery), function (itemProperties) {
+            { rowlimit: 1, orderby: "ID", ascending: "FALSE", viewScope: "RecursiveAll" },
+            { operator: "Eq", field: "FSObjType", type: "Number", val: "0" }
+        ];
+        speedContext.getItem(libraryInformation.listName, speedContext.camlBuilder(lastItemQuery), function (itemProperties,listname) {
             var listEnumerator = itemProperties.getEnumerator();
             while (listEnumerator.moveNext()) {
-                requestCount.lastItemID = listEnumerator.get_current().get_item("ID");
+                speedContext.libraryDictionary[listname].lastItemID = listEnumerator.get_current().get_item("ID");
             }
 
-            libraryDependenciesForLargeItems();
+            libraryDependenciesForLargeItems(listname);
         });
     }
 
-
-
-    function libraryDependenciesForLargeItems() {
-        requestCount.requested++;
-        if (requestCount.requested === requestCount.expected) {
+    function libraryDependenciesForLargeItems(listname) {
+        speedContext.libraryDictionary[listname].requested++;
+        if (speedContext.libraryDictionary[listname].requested === speedContext.libraryDictionary[listname].expected) {
             var data = {
                 albumLink: albumLink,
                 columns: libraryInformation.columns,
                 mergeColumns: columns,
                 threshold: thresholdCount,
-                itemsInList: requestCount.itemCount,
-                lastItemID: requestCount.lastItemID,
-                feedback: feedback
-            }
+                itemsInList: speedContext.libraryDictionary[listname].itemCount,
+                lastItemID: speedContext.libraryDictionary[listname].lastItemID,
+                feedback: feedback,
+            };
             speedContext.getItemsInLibraryMaxThreshold(libraryInformation.listName, caml, data, onSuccess, onFailed, appContext);
         }
     }
 
-
     function getItemsinLibrary() {
         var camlQuery = null;
-        if (typeof caml === '' || caml == null) {
-            camlQuery = SP.CamlQuery.createAllItemsQuery()
-        }
-        else {
+        if (typeof caml === "" || caml == null) {
+            camlQuery = SP.CamlQuery.createAllItemsQuery();
+        } else {
             if (Array.isArray(caml)) {
                 camlModified = speedContext.deferenceObject(caml);
                 camlModified = speedContext.camlBuilder(camlModified);
@@ -6961,314 +6973,322 @@ Speed.prototype.getDocumentsInFolder = function (libraryInformation, albumLink, 
         window.speedGlobal.push(oList.getItems(camlQuery));
         var total = window.speedGlobal.length;
         total--;
-        if (typeof appContext !== 'undefined') {
+        if (typeof appContext !== "undefined") {
             context = appContext.initiate();
         }
         context.load(window.speedGlobal[total], `Include(${columns.toString()})`);
         //window.speedGlobal[total].ListName = listName;
-        context.executeQueryAsync(function () {
-            setTimeout(function () {
-                var items = [];
-                var ListEnumerator = window.speedGlobal[total].getEnumerator();
-                while (ListEnumerator.moveNext()) {
-                    var documentItem = {}
-                    var currentItem = ListEnumerator.get_current();
-                    var _contentType = currentItem.get_contentType();
-                    documentItem.ItemType = _contentType.get_name();
-                    documentItem.FileName = currentItem.get_item("FileLeafRef");
-                    if (documentItem.ItemType !== 'Folder') {
-                        var File = currentItem.get_file();
-                        if (File != null) {
-                            documentItem.FileUrl = File.get_serverRelativeUrl();
+        context.executeQueryAsync(
+            function () {
+                setTimeout(function () {
+                    var items = [];
+                    var ListEnumerator = window.speedGlobal[total].getEnumerator();
+                    while (ListEnumerator.moveNext()) {
+                        var documentItem = {};
+                        var currentItem = ListEnumerator.get_current();
+                        var _contentType = currentItem.get_contentType();
+                        documentItem.ItemType = _contentType.get_name();
+                        documentItem.FileName = currentItem.get_item("FileLeafRef");
+                        if (documentItem.ItemType !== "Folder") {
+                            var File = currentItem.get_file();
+                            if (File != null) {
+                                documentItem.FileUrl = File.get_serverRelativeUrl();
+                            }
                         }
-                    }
-                    documentItem.ID = currentItem.get_item('ID');
-                    documentItem.Title = currentItem.get_item('Title');
-                    for (var i = 0; i <= (libraryInformation.columns.length - 1); i++) {
-                        var SPFieldType;
-                        var nopropinJSEngine = false;
-                        try {
-                            SPFieldType = ListEnumerator.get_current().get_item(libraryInformation.columns[i]).__proto__.constructor.__typeName.toLowerCase();
-                        }
-                        catch (ex) {
+                        documentItem.ID = currentItem.get_item("ID");
+                        documentItem.Title = currentItem.get_item("Title");
+                        for (var i = 0; i <= libraryInformation.columns.length - 1; i++) {
+                            var SPFieldType;
+                            var nopropinJSEngine = false;
                             try {
-                                nopropinJSEngine = true;
-                                SPFieldType = $.type(ListEnumerator.get_current().get_item(libraryInformation.columns[i]));
+                                SPFieldType = ListEnumerator.get_current().get_item(libraryInformation.columns[i]).__proto__.constructor.__typeName.toLowerCase();
                             } catch (ex) {
-                                SPFieldType = "string";
-                            }
-                        }
-                        if (SPFieldType.toLowerCase() === "sp.fielduservalue" || SPFieldType.toLowerCase() === "sp.fieldlookupvalue" || (nopropinJSEngine && SPFieldType.toLowerCase() === "object")) {
-                            var objProp = {};
-                            objProp.id = speedContext.checkNull(ListEnumerator.get_current().get_item(libraryInformation.columns[i]).get_lookupId());
-                            objProp.value = speedContext.checkNull(ListEnumerator.get_current().get_item(libraryInformation.columns[i]).get_lookupValue());
-                            if (SPFieldType.toLowerCase() === "sp.fielduservalue" || (nopropinJSEngine && SPFieldType.toLowerCase() === "object")) {
                                 try {
-                                    objProp.email = speedContext.checkNull(ListEnumerator.get_current().get_item(libraryInformation.columns[i]).get_email());
-                                } catch (e) {
-                                    objProp.email = "";
-                                };
-                            }
-
-                            if (typeof conditions === "object" && conditions !== null) {
-                                if (typeof conditions[libraryInformation.columns[i]] !== "undefined") {
-                                    objProp = conditions[libraryInformation.columns[i]](objProp);
+                                    nopropinJSEngine = true;
+                                    SPFieldType = $.type(ListEnumerator.get_current().get_item(libraryInformation.columns[i]));
+                                } catch (ex) {
+                                    SPFieldType = "string";
                                 }
                             }
-                            documentItem[libraryInformation.columns[i]] = objProp;
-                        }
-                        else if (SPFieldType.toLowerCase() === "array") {
-                            var multiUser = ListEnumerator.get_current().get_item(libraryInformation.columns[i]);
-                            var arrayToSave = [];
-                            for (var j = 0; j <= (multiUser.length - 1); j++) {
-                                var objectOfUsers = {};
-                                objectOfUsers.id = multiUser[j].get_lookupId();
-                                objectOfUsers.value = multiUser[j].get_lookupValue();
+                            if (
+                                SPFieldType.toLowerCase() === "sp.fielduservalue" ||
+                                SPFieldType.toLowerCase() === "sp.fieldlookupvalue" ||
+                                (nopropinJSEngine && SPFieldType.toLowerCase() === "object")
+                            ) {
+                                var objProp = {};
+                                objProp.id = SpeedContext.checkNull(ListEnumerator.get_current().get_item(libraryInformation.columns[i]).get_lookupId());
+                                objProp.value = SpeedContext.checkNull(ListEnumerator.get_current().get_item(libraryInformation.columns[i]).get_lookupValue());
+                                if (SPFieldType.toLowerCase() === "sp.fielduservalue" || (nopropinJSEngine && SPFieldType.toLowerCase() === "object")) {
+                                    try {
+                                        objProp.email = SpeedContext.checkNull(ListEnumerator.get_current().get_item(libraryInformation.columns[i]).get_email());
+                                    } catch (e) {
+                                        objProp.email = "";
+                                    }
+                                }
+
+                                if (typeof conditions === "object" && conditions !== null) {
+                                    if (typeof conditions[libraryInformation.columns[i]] !== "undefined") {
+                                        objProp = conditions[libraryInformation.columns[i]](objProp);
+                                    }
+                                }
+                                documentItem[libraryInformation.columns[i]] = objProp;
+                            } else if (SPFieldType.toLowerCase() === "array") {
+                                var multiUser = ListEnumerator.get_current().get_item(libraryInformation.columns[i]);
+                                var arrayToSave = [];
+                                for (var j = 0; j <= multiUser.length - 1; j++) {
+                                    var objectOfUsers = {};
+                                    objectOfUsers.id = multiUser[j].get_lookupId();
+                                    objectOfUsers.value = multiUser[j].get_lookupValue();
+                                    try {
+                                        objectOfUsers.email = multiUser[j].get_email();
+                                    } catch (e) {
+                                        objectOfUsers.email = "";
+                                    }
+                                    arrayToSave.push(objectOfUsers);
+                                }
+
+                                if (typeof conditions === "object" && conditions !== null) {
+                                    if (typeof conditions[libraryInformation.columns[i]] !== "undefined") {
+                                        arrayToSave = conditions[libraryInformation.columns[i]](arrayToSave);
+                                    }
+                                }
+                                documentItem[libraryInformation.columns[i]] = arrayToSave;
+                            } else {
                                 try {
-                                    objectOfUsers.email = multiUser[j].get_email();
+                                    ListEnumerator.get_current().get_item(libraryInformation.columns[i]);
                                 } catch (e) {
-                                    objectOfUsers.email = "";
-                                };
-                                arrayToSave.push(objectOfUsers);
-                            }
-
-                            if (typeof conditions === "object" && conditions !== null) {
-                                if (typeof conditions[libraryInformation.columns[i]] !== "undefined") {
-                                    arrayToSave = conditions[libraryInformation.columns[i]](arrayToSave);
+                                    throw `${libraryInformation.columns[i]} doesnt exist in this list`;
                                 }
+                                var columnValue = speedContext.checkNull(ListEnumerator.get_current().get_item(libraryInformation.columns[i]));
+                                if (typeof conditions === "object" && conditions !== null) {
+                                    if (typeof conditions[libraryInformation.columns[i]] !== "undefined") {
+                                        columnValue = conditions[libraryInformation.columns[i]](columnValue);
+                                    }
+                                }
+                                documentItem[libraryInformation.columns[i]] = columnValue;
                             }
-                            documentItem[libraryInformation.columns[i]] = arrayToSave;
                         }
-                        else {
-                            try {
-                                ListEnumerator.get_current().get_item(libraryInformation.columns[i]);
-                            }
-                            catch (e) {
-                                throw `${libraryInformation.columns[i]} doesnt exist in this list`;
-                            }
-                            var columnValue = speedContext.checkNull(ListEnumerator.get_current().get_item(libraryInformation.columns[i]));
-                            if (typeof conditions === "object" && conditions !== null) {
-                                if (typeof conditions[libraryInformation.columns[i]] !== "undefined") {
-                                    columnValue = conditions[libraryInformation.columns[i]](columnValue);
-                                }
-                            }
-                            documentItem[libraryInformation.columns[i]] = columnValue;
+
+                        if (conditions !== null && typeof conditions === "function") {
+                            documentItem = conditions(documentItem);
+                        }
+
+                        //includes non empty objects
+                        if (!$.isEmptyObject(documentItem)) {
+                            items.push(documentItem);
                         }
                     }
-
-                    if (conditions !== null && typeof conditions === "function") {
-                        documentItem = conditions(documentItem);
-                    }
-
-                    //includes non empty objects
-                    if (!$.isEmptyObject(documentItem)) {
-                        items.push(documentItem);
-                    }
-                }
-                onSuccess(items);
-            }, speedContext.latency);
-        }, function (sender, args) {
-            speedContext.checkConnectionLatency();
-            onFailedCall(sender, args, {
-                name: "getDocumentsInFolder",
-                context: speedContext,
-                err_description: "",
-                resource: albumLink
-            });
-        });
+                    onSuccess(items);
+                }, 1000);
+            },
+            function (sender, args) {
+                onFailedCall(sender, args, {
+                    name: "getDocumentsInFolder",
+                    context: speedContext,
+                    err_description: "",
+                    resource: albumLink,
+                });
+            }
+        );
     }
-}
+};
 
 Speed.prototype.getItemsInLibraryMaxThreshold = function (listName, caml, listSearchData, onSuccess, onFailed, appContext) {
-    var speedContext = this;
+    var SpeedContext = this;
     var numberOfIterations = Math.ceil(listSearchData.lastItemID / listSearchData.threshold);
     var conditions = listSearchData.conditions;
     var albumLink = listSearchData.albumLink;
-    speedContext.thresholdListSettings[listName] = {
+    SpeedContext.thresholdListSettings[listName] = {
         //start : 1,
         iterationCalls: 0,
         expectedCalls: numberOfIterations,
         items: [],
         ascending: false,
-        orderby: "ID"
-    }
+        orderby: "ID",
+    };
 
     var columns = listSearchData.columns;
     var mergeColumns = listSearchData.mergeColumns;
-    for (var i = 1; i <= numberOfIterations; i++) {
-        var idVal = (i == 1) ? listSearchData.lastItemID : (listSearchData.lastItemID - (listSearchData.threshold * (i - 1)));
+
+    makeLibraryCalls(1, numberOfIterations,listName);
+
+    function makeLibraryCalls(pos, iterations,listname) {
+        var idVal = pos == 1 ? listSearchData.lastItemID : listSearchData.lastItemID - listSearchData.threshold * (pos - 1);
         var item = {
-            operator: 'Leq',
-            field: 'ID',
-            type: 'Number',
-            val: idVal
-        }
-        var camlModified = speedContext.deferenceObject(caml);
-        camlModified[0].rowlimit = (listSearchData.threshold);
+            operator: "Leq",
+            field: "ID",
+            type: "Number",
+            val: idVal,
+        };
+        var camlModified = SpeedContext.deferenceObject(caml);
+        camlModified[0].rowlimit = listSearchData.threshold;
         camlModified.splice(1, 0, item);
         camlModified[0].orderby = "ID";
         camlModified[0].ascending = "FALSE";
-        speedContext.thresholdListSettings[listName].ascending = "FALSE";
-        speedContext.thresholdListSettings[listName].orderby = camlModified[0].orderby;
-        speedContext.thresholdListSettings[listName].feedback = listSearchData.feedback;
+        SpeedContext.thresholdListSettings[listName].ascending = "FALSE";
+        SpeedContext.thresholdListSettings[listName].orderby = camlModified[0].orderby;
+        SpeedContext.thresholdListSettings[listName].feedback = listSearchData.feedback;
 
         camlQuery = new SP.CamlQuery();
-        camlQuery.set_viewXml(speedContext.camlBuilder(camlModified));
+        camlQuery.set_viewXml(SpeedContext.camlBuilder(camlModified));
         camlQuery.set_folderServerRelativeUrl(albumLink);
-        var context = speedContext.initiate();
+        var context = SpeedContext.initiate();
         var oList = context.get_web().get_lists().getByTitle(listName);
 
         window.speedGlobal.push(oList.getItems(camlQuery));
         var total = window.speedGlobal.length;
         total--;
-        if (typeof appContext !== 'undefined') {
+        if (typeof appContext !== "undefined") {
             context = appContext.initiate();
         }
         context.load(window.speedGlobal[total], `Include(${mergeColumns.toString()})`);
         //window.speedGlobal[total].ListName = listName;
-        context.executeQueryAsync(function () {
-            setTimeout(function () {
-                var items = [];
-                var ListEnumerator = window.speedGlobal[total].getEnumerator();
-                while (ListEnumerator.moveNext()) {
-                    var documentItem = {}
-                    var currentItem = ListEnumerator.get_current();
-                    var _contentType = currentItem.get_contentType();
-                    documentItem.ItemType = _contentType.get_name();
-                    if (documentItem.ItemType !== 'Folder') {
-                        var File = currentItem.get_file();
-                        if (File != null) {
-                            documentItem.FileName = currentItem.get_item('FileLeafRef');
-                            documentItem.FileUrl = File.get_serverRelativeUrl();
+        context.executeQueryAsync(
+            function () {
+                setTimeout(function () {
+                    var items = [];
+                    var ListEnumerator = window.speedGlobal[total].getEnumerator();
+                    while (ListEnumerator.moveNext()) {
+                        var documentItem = {};
+                        var currentItem = ListEnumerator.get_current();
+                        var _contentType = currentItem.get_contentType();
+                        documentItem.ItemType = _contentType.get_name();
+                        if (documentItem.ItemType !== "Folder") {
+                            var File = currentItem.get_file();
+                            if (File != null) {
+                                documentItem.FileName = currentItem.get_item("FileLeafRef");
+                                documentItem.FileUrl = File.get_serverRelativeUrl();
+                            }
                         }
-                    }
-                    documentItem.ID = currentItem.get_item('ID');
-                    documentItem.Title = currentItem.get_item('Title');
+                        documentItem.ID = currentItem.get_item("ID");
+                        documentItem.Title = currentItem.get_item("Title");
 
-                    for (var i = 0; i <= (columns.length - 1); i++) {
-                        var SPFieldType;
-                        var nopropinJSEngine = false;
-                        try {
-                            SPFieldType = ListEnumerator.get_current().get_item(columns[i]).__proto__.constructor.__typeName.toLowerCase();
-                        }
-                        catch (ex) {
+                        for (var i = 0; i <= columns.length - 1; i++) {
+                            var SPFieldType;
+                            var nopropinJSEngine = false;
                             try {
-                                nopropinJSEngine = true;
-                                SPFieldType = $.type(ListEnumerator.get_current().get_item(columns[i]));
+                                SPFieldType = ListEnumerator.get_current().get_item(columns[i]).__proto__.constructor.__typeName.toLowerCase();
                             } catch (ex) {
-                                SPFieldType = "string";
-                            }
-                        }
-                        if (SPFieldType.toLowerCase() === "sp.fielduservalue" || SPFieldType.toLowerCase() === "sp.fieldlookupvalue" || (nopropinJSEngine && SPFieldType.toLowerCase() === "object")) {
-                            var objProp = {};
-                            objProp.id = speedContext.checkNull(ListEnumerator.get_current().get_item(columns[i]).get_lookupId());
-                            objProp.value = speedContext.checkNull(ListEnumerator.get_current().get_item(columns[i]).get_lookupValue());
-                            if (SPFieldType.toLowerCase() === "sp.fielduservalue" || (nopropinJSEngine && SPFieldType.toLowerCase() === "object")) {
                                 try {
-                                    objProp.email = speedContext.checkNull(ListEnumerator.get_current().get_item(columns[i]).get_email());
-                                } catch (e) {
-                                    objProp.email = "";
-                                };
-                            }
-
-                            if (typeof conditions === "object" && conditions !== null) {
-                                if (typeof conditions[columns[i]] !== "undefined") {
-                                    objProp = conditions[columns[i]](objProp);
+                                    nopropinJSEngine = true;
+                                    SPFieldType = $.type(ListEnumerator.get_current().get_item(columns[i]));
+                                } catch (ex) {
+                                    SPFieldType = "string";
                                 }
                             }
-                            documentItem[columns[i]] = objProp;
-                        }
-                        else if (SPFieldType.toLowerCase() === "array") {
-                            var multiUser = ListEnumerator.get_current().get_item(columns[i]);
-                            var arrayToSave = [];
-                            for (var j = 0; j <= (multiUser.length - 1); j++) {
-                                var objectOfUsers = {};
-                                objectOfUsers.id = multiUser[j].get_lookupId();
-                                objectOfUsers.value = multiUser[j].get_lookupValue();
+                            if (
+                                SPFieldType.toLowerCase() === "sp.fielduservalue" ||
+                                SPFieldType.toLowerCase() === "sp.fieldlookupvalue" ||
+                                (nopropinJSEngine && SPFieldType.toLowerCase() === "object")
+                            ) {
+                                var objProp = {};
+                                objProp.id = SpeedContext.checkNull(ListEnumerator.get_current().get_item(columns[i]).get_lookupId());
+                                objProp.value = SpeedContext.checkNull(ListEnumerator.get_current().get_item(columns[i]).get_lookupValue());
+                                if (SPFieldType.toLowerCase() === "sp.fielduservalue" || (nopropinJSEngine && SPFieldType.toLowerCase() === "object")) {
+                                    try {
+                                        objProp.email = SpeedContext.checkNull(ListEnumerator.get_current().get_item(columns[i]).get_email());
+                                    } catch (e) {
+                                        objProp.email = "";
+                                    }
+                                }
+
+                                if (typeof conditions === "object" && conditions !== null) {
+                                    if (typeof conditions[columns[i]] !== "undefined") {
+                                        objProp = conditions[columns[i]](objProp);
+                                    }
+                                }
+                                documentItem[columns[i]] = objProp;
+                            } else if (SPFieldType.toLowerCase() === "array") {
+                                var multiUser = ListEnumerator.get_current().get_item(columns[i]);
+                                var arrayToSave = [];
+                                for (var j = 0; j <= multiUser.length - 1; j++) {
+                                    var objectOfUsers = {};
+                                    objectOfUsers.id = multiUser[j].get_lookupId();
+                                    objectOfUsers.value = multiUser[j].get_lookupValue();
+                                    try {
+                                        objectOfUsers.email = multiUser[j].get_email();
+                                    } catch (e) {
+                                        objectOfUsers.email = "";
+                                    }
+                                    arrayToSave.push(objectOfUsers);
+                                }
+
+                                if (typeof conditions === "object" && conditions !== null) {
+                                    if (typeof conditions[columns[i]] !== "undefined") {
+                                        arrayToSave = conditions[columns[i]](arrayToSave);
+                                    }
+                                }
+                                documentItem[columns[i]] = arrayToSave;
+                            } else {
                                 try {
-                                    objectOfUsers.email = multiUser[j].get_email();
+                                    ListEnumerator.get_current().get_item(columns[i]);
                                 } catch (e) {
-                                    objectOfUsers.email = "";
-                                };
-                                arrayToSave.push(objectOfUsers);
-                            }
-
-                            if (typeof conditions === "object" && conditions !== null) {
-                                if (typeof conditions[columns[i]] !== "undefined") {
-                                    arrayToSave = conditions[columns[i]](arrayToSave);
+                                    throw `${columns[i]} doesnt exist in this list`;
                                 }
+                                var columnValue = SpeedContext.checkNull(ListEnumerator.get_current().get_item(columns[i]));
+                                if (typeof conditions === "object" && conditions !== null) {
+                                    if (typeof conditions[columns[i]] !== "undefined") {
+                                        columnValue = conditions[columns[i]](columnValue);
+                                    }
+                                }
+                                documentItem[columns[i]] = columnValue;
                             }
-                            documentItem[columns[i]] = arrayToSave;
                         }
-                        else {
-                            try {
-                                ListEnumerator.get_current().get_item(columns[i]);
-                            }
-                            catch (e) {
-                                throw `${columns[i]} doesnt exist in this list`;
-                            }
-                            var columnValue = speedContext.checkNull(ListEnumerator.get_current().get_item(columns[i]));
-                            if (typeof conditions === "object" && conditions !== null) {
-                                if (typeof conditions[columns[i]] !== "undefined") {
-                                    columnValue = conditions[columns[i]](columnValue);
-                                }
-                            }
-                            documentItem[columns[i]] = columnValue;
+
+                        if (conditions !== null && typeof conditions === "function") {
+                            documentItem = conditions(documentItem);
+                        }
+
+                        //includes non empty objects
+                        if (!$.isEmptyObject(documentItem)) {
+                            items.push(documentItem);
                         }
                     }
-
-                    if (conditions !== null && typeof conditions === "function") {
-                        documentItem = conditions(documentItem);
+                    if (pos <= iterations) {
+                        pos++;
+                        makeLibraryCalls(pos, iterations,listname);
                     }
-
-                    //includes non empty objects
-                    if (!$.isEmptyObject(documentItem)) {
-                        items.push(documentItem);
-                    }
-                }
-                checkThresholdCount(listName, items, onSuccess);
-            }, speedContext.latency);
-        }, function (sender, args) {
-            speedContext.checkConnectionLatency();
-            onFailedCall(sender, args, {
-                name: "getDocumentsInFolder",
-                context: speedContext,
-                err_description: "",
-                resource: albumLink
-            });
-        });
+                    checkThresholdCount(listName, items, onSuccess);
+                }, 1000);
+            },
+            function (sender, args) {
+                onFailed(sender, args, {
+                    name: "getDocumentsInFolder",
+                    context: SpeedContext,
+                    err_description: "",
+                    resource: albumLink,
+                });
+            }
+        );
     }
 
     function checkThresholdCount(list, items, callback) {
-        speedContext.thresholdListSettings[list].items = speedContext.thresholdListSettings[list].items.concat(items)
-        speedContext.thresholdListSettings[list].iterationCalls++;
-        if (speedContext.thresholdListSettings[list].expectedCalls == speedContext.thresholdListSettings[list].iterationCalls) {
-            var itemsToSend = getUniqueListBy(speedContext.thresholdListSettings[list].items, "ID");
-            if (speedContext.thresholdListSettings[list].ascending) {
-                itemsToSend.sort((a, b) => (b[speedContext.thresholdListSettings[list].orderby] < a[speedContext.thresholdListSettings[list].orderby]) ? 1 : -1);
-            }
-            else {
-                itemsToSend.sort((a, b) => (a[speedContext.thresholdListSettings[list].orderby] < b[speedContext.thresholdListSettings[list].orderby]) ? 1 : -1);
+        SpeedContext.thresholdListSettings[list].items = SpeedContext.thresholdListSettings[list].items.concat(items);
+        SpeedContext.thresholdListSettings[list].iterationCalls++;
+        if (SpeedContext.thresholdListSettings[list].expectedCalls == SpeedContext.thresholdListSettings[list].iterationCalls) {
+            var itemsToSend = getUniqueListBy(SpeedContext.thresholdListSettings[list].items, "ID");
+            if (SpeedContext.thresholdListSettings[list].ascending) {
+                itemsToSend.sort((a, b) => (b[SpeedContext.thresholdListSettings[list].orderby] < a[SpeedContext.thresholdListSettings[list].orderby] ? 1 : -1));
+            } else {
+                itemsToSend.sort((a, b) => (a[SpeedContext.thresholdListSettings[list].orderby] < b[SpeedContext.thresholdListSettings[list].orderby] ? 1 : -1));
             }
             callback(itemsToSend);
-        }
-        else if (speedContext.thresholdListSettings[listName].feedback !== null) {
+        } else if (SpeedContext.thresholdListSettings[listName].feedback !== null) {
             //feedback to the user
-            var itemsToSend = getUniqueListBy(speedContext.thresholdListSettings[list].items, "ID");
-            if (speedContext.thresholdListSettings[list].ascending) {
-                itemsToSend.sort((a, b) => (b[speedContext.thresholdListSettings[list].orderby] < a[speedContext.thresholdListSettings[list].orderby]) ? 1 : -1);
+            var itemsToSend = getUniqueListBy(SpeedContext.thresholdListSettings[list].items, "ID");
+            if (SpeedContext.thresholdListSettings[list].ascending) {
+                itemsToSend.sort((a, b) => (b[SpeedContext.thresholdListSettings[list].orderby] < a[SpeedContext.thresholdListSettings[list].orderby] ? 1 : -1));
+            } else {
+                itemsToSend.sort((a, b) => (a[SpeedContext.thresholdListSettings[list].orderby] < b[SpeedContext.thresholdListSettings[list].orderby] ? 1 : -1));
             }
-            else {
-                itemsToSend.sort((a, b) => (a[speedContext.thresholdListSettings[list].orderby] < b[speedContext.thresholdListSettings[list].orderby]) ? 1 : -1);
-            }
-            speedContext.thresholdListSettings[listName].feedback(itemsToSend);
+            SpeedContext.thresholdListSettings[listName].feedback(itemsToSend);
         }
     }
 
     function getUniqueListBy(arr, key) {
-        return [...new Map(arr.map(item => [item[key], item])).values()]
+        return [...new Map(arr.map((item) => [item[key], item])).values()];
     }
-}
+};
 
 /* @example
 * // returns a normal context related to the current site
