@@ -12,6 +12,7 @@ var configPropertiesRoot = {
 
 var speedctxRoot;
 var globalDefinitions;
+var popContext;
 
 function MainStartPoint() {
   this.url = window.location.href;
@@ -35,6 +36,8 @@ function MainStartPoint() {
       }
     ]
   });
+  this.profilephoto = `/_layouts/15/userphoto.aspx?size=M&accountname=`;
+  this.profilephotoLarge = `/_layouts/15/userphoto.aspx?size=L&accountname=`;
   this.messageTemplate = {};
   this.cachedState = {
     mode: false,
@@ -45,9 +48,6 @@ function MainStartPoint() {
     isAdmin: false,
     isReportAdmin: false,
     ipaddress: "",
-    isVendor: false,
-    vendorStatus : "",
-    vendorRequestID : "NA",
     departments: [],
     hods: {},
     currentUserIsHod: {
@@ -66,6 +66,8 @@ function MainStartPoint() {
     documentupload: {},
     corporatedocumentupload: {}
   };
+  this.staffDetails = {};
+  this.staffList = [];
 
   this.configuredTaskMembers = {};
   this.isUserAnActor = false;
@@ -78,6 +80,9 @@ function MainStartPoint() {
   this.ViewRequestComponent = {};
 
   this.CurrentPageSubmitFunction = null;
+  this.auditType = [];
+  this.process = [];
+  this.procedure = [];
 
   this.auditNavigationClicks = function(clicklocation){
     globalDefinitions.AuditLogManager_SaveLog({
@@ -116,18 +121,6 @@ function whenLayoutLoaded() {
          checkAppDependency();
       })
 
-      // MainApplication._ConfigurationSettings($spcontext, tempConfigProperties, function () {
-      //       speedctxRoot = new Speed(tempConfigProperties.AUDITMANAGEMENTURL.setting);
-      //       speedctxRoot.errorHandler = globalDefinitions.errorHandler;
-      //       $spcontext.errorHandler = globalDefinitions.errorHandler;
-
-      //       MainApplication._ConfigurationSettings(speedctxRoot, configPropertiesRoot, function () {
-      //           checkAppDependency();
-      //       });
-
-      //   });
-      // window.checkAppDependency = checkAppDependency;
-
       $spcontext.currentUserDetails((user) => {
         CurrentUserProperties.email = user.get_email();
         CurrentUserProperties.email = CurrentUserProperties.email.toLowerCase();
@@ -160,6 +153,8 @@ function whenLayoutLoaded() {
           }
         }
 
+        popContext = new Speed(configPropertiesRoot.POPCONTEXT.setting);
+
         speedctxRoot = new Speed(configPropertiesRoot.AUDITMANAGEMENTURL.setting);
         speedctxRoot.errorHandler = globalDefinitions.errorHandler;
         $spcontext.errorHandler = globalDefinitions.errorHandler;
@@ -184,6 +179,91 @@ function whenLayoutLoaded() {
             $("#versioneffectivedateMobile").text(configProperties.VERSIONEFFECTIVEDATE.setting);
 
           });
+
+          var basicQuery = [
+                {
+                    ascending: "TRUE",  //ascending or descending
+                    orderby: "Title", //Column Name to order by
+                }
+            ];
+
+          speedctxRoot.getItem("AuditType", $spcontext.camlBuilder(basicQuery), function (_spMeta) {
+              var listEnumerator = _spMeta.getEnumerator();
+              MainApplication.auditType = [];
+              while (listEnumerator.moveNext()) {
+                  var title = listEnumerator.get_current().get_item("Title");
+                  MainApplication.auditType.push(title);
+              }
+          })
+
+          speedctxRoot.getItem("Process", $spcontext.camlBuilder(basicQuery), function (_spMeta) {
+              var listEnumerator = _spMeta.getEnumerator();
+              MainApplication.process = [];
+              while (listEnumerator.moveNext()) {
+                  var title = listEnumerator.get_current().get_item("Title");
+                  MainApplication.process.push(title);
+              }
+          })
+
+          speedctxRoot.getItem("Procedure", $spcontext.camlBuilder(basicQuery), function (_spMeta) {
+              var listEnumerator = _spMeta.getEnumerator();
+              MainApplication.procedure = [];
+              while (listEnumerator.moveNext()) {
+                  var title = listEnumerator.get_current().get_item("Title");
+                  MainApplication.procedure.push(title);
+              }
+          })
+
+          var employeeInfoColumns = [
+            "ID",
+            "Title",
+            "EMAIL_x0020_ADDRESS",
+            "DESIGNATION",
+            "SUPERVISOR",
+            "PERSONAL_x0020_NUMBER",
+            "DEPARTMENT",
+            "EID",
+            "D_x002e_O_x002e_E_x0020__x002f__",
+            "Job_x0020_Role"
+        ];
+
+        popContext.getListToItems(
+            "Staff List",
+            [{}],
+            {
+                ignoreThreshold: false,
+                data: employeeInfoColumns,
+                merge: false,
+            },
+            false,
+            function (item) {
+                // Transform item to use new field names
+                const transformedItem = {
+                    ID: item.ID || '',
+                    Title: item.Title || '',
+                    Email: item.EMAIL_x0020_ADDRESS || '',
+                    Designation: item.DESIGNATION || '',
+                    Supervisor: item.SUPERVISOR || '',
+                    PersonalNumber: item.PERSONAL_x0020_NUMBER || '',
+                    Department: item.DEPARTMENT || '',
+                    EmployeeId: item.EID || '',
+                    DateOfEmployment: item.D_x002e_O_x002e_E_x0020__x002f__ || '',
+                    JobRole: item.Job_x0020_Role || ''
+                };
+
+                if (transformedItem.Emailmail !== "") {
+                    if (typeof MainApplication.staffDetails[transformedItem.Email.toLowerCase()] === "undefined") {
+                        MainApplication.staffDetails[transformedItem.Email.toLowerCase()] = transformedItem;
+                        MainApplication.staffList.push(transformedItem);
+                    }
+                }
+
+                return transformedItem;
+            },
+            function (items) {
+                MainApplication.staffList = items
+            }
+        );
 
         checkAppDependency();
       });
@@ -211,36 +291,6 @@ function whenLayoutLoaded() {
   );
 }
 
-// MainApplication._ConfigurationSettings = function (spParamsContext, configParameters, callback) {
-//     spParamsContext.getItem("Configuration", $spcontext.camlBuilder(), function (configObjects) {
-//         var restrictedCount = 0;
-//         var listEnumerator = configObjects.getEnumerator();
-//         while (listEnumerator.moveNext()) {
-//             var settingType = listEnumerator.get_current().get_item("SettingType");
-//             var configObj = {};
-//             configObj.title = listEnumerator.get_current().get_item("Title");
-//             configObj.setting = listEnumerator.get_current().get_item("Setting");
-//             if (settingType == "Restricted") {
-//                 configParameters.restrictedlinks.push(configObj);
-//             } else {
-//                 configParameters[configObj.title] = configObj;
-//             }
-//         }
-
-//         $("#auditmanagementversion").text(configParameters.AUDMGTVERSION.setting);
-//         $("#versioneffectivedate").text(configParameters.VERSIONEFFECTIVEDATE.setting);
-//         $("#auditmanagementversionMobile").text(configParameters.AUDMGTVERSION.setting);
-//         $("#versioneffectivedateMobile").text(configParameters.VERSIONEFFECTIVEDATE.setting);
-
-//         speedctxRoot = new Speed(configParameters.AUDITMANAGEMENTURL.setting);
-//         speedctxRoot.errorHandler = globalDefinitions.errorHandler;
-//         $spcontext.errorHandler = globalDefinitions.errorHandler;
-
-//         if (typeof callback == "function") {
-//             callback();
-//         }
-//     });
-// };
 
 whenLayoutLoaded();
 

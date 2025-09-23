@@ -37,7 +37,7 @@ PeoplePicker.initializePeoplePickers = function (peopleListMap, pickerEvents, at
     const modalParent = $picker.closest('.modal');
     var options = {
       placeholder: placeholderText,
-      allowClear: true,
+      allowClear: !$picker.prop("multiple"),//removes the clear button on multiple picker only
       minimumInputLength: 3,
       templateResult: formatOption,
       templateSelection: formatOption,
@@ -131,10 +131,11 @@ PeoplePicker.getValue = function (customAttr = "custom-people") {
       const $picker = $(picker);
       const selected = $picker.val();
 
+
       if ($picker.prop("multiple")) {
           if (!Array.isArray(selected)) return;
-
           for(var x = 0; x < selected.length; x++){
+            if (!selected[x]) continue;
             if (valueType === "people") {
               results[pickerId] = results[pickerId] || [];
               results[pickerId].push(SP.FieldUserValue.fromUser(selected[x]));
@@ -213,6 +214,10 @@ PeoplePicker.reset = function (pickerId) {
 
   const isMultiple = $picker.prop("multiple");
   $picker.val(isMultiple ? [] : null).trigger("change");
+
+  $picker.find('option').filter(function () {
+    return !this.value; // catches "" or undefined
+  }).remove();
 };
 
 PeoplePicker.resetAll = function (attr = "custom-people") {
@@ -221,5 +226,9 @@ PeoplePicker.resetAll = function (attr = "custom-people") {
     const $picker = $(picker);
     const isMultiple = $picker.prop("multiple");
     $picker.val(isMultiple ? [] : null).trigger("change");
+
+    $picker.find('option').filter(function () {
+      return !this.value;
+    }).remove();
   });
 };

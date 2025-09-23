@@ -4,8 +4,10 @@ GlobalDefinitionsManager.prototype.extendStages = function () {
     // this.stageDefinitions.workflowcode = "AUDMGT-";
 
     this.stageDefinitions.author = "Author";
-    this.stageDefinitions.hod = configProperties.HEADOFDEPARTMENT.setting;
-    this.stageDefinitions.ceo = configProperties.CEO.setting;
+    // this.stageDefinitions.hod = configProperties.HEADOFDEPARTMENT.setting;
+    // this.stageDefinitions.ceo = configProperties.CEO.setting;
+    this.stageDefinitions.hod = "HOD";
+    this.stageDefinitions.ceo = "CEO";
 };
 
 
@@ -62,7 +64,6 @@ GlobalDefinitionsManager.prototype.SetWorkflowRouting = function (customWorkflow
         }
     ];
 }
-
 
 GlobalDefinitionsManager.prototype.EmailSetup = function (customWorkflowEngine, requestProperties, callback) {
     var body = "";

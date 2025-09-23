@@ -532,7 +532,7 @@
  }
 
  .focus\:border-transparent:focus {
-     border-color: transparent;
+     border-color: var(--blue-500);
  }
 
  .p-2 {
@@ -553,6 +553,10 @@
 
  .-right-1 {
      right: -0.25rem;
+ }
+
+ .right-0 {
+    right: 0;
  }
 
  .w-3 {
@@ -1519,4 +1523,30 @@
   background: #e5edea;
   color: #026AA2;
   border: 1px solid #e5edea;
+}
+
+/* Select2 forced custom styles :) */
+
+.select2-container--default .select2-selection--multiple,
+.select2-container--default .select2-selection--single{
+    border-radius: 1px !important;
+    border: 1px solid #38679c !important;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--multiple,
+.select2-container--default.select2-container--focus .select2-selection--single{
+    border: 1px solid #38679c !important;
+}
+
+/* Style the selection box */
+#auditees + .select2-container .select2-selection--multiple {
+    border-radius: 1px !important;
+    border: 1px solid #38679c !important;
+    padding: .5rem 1rem !important;
+}
+
+#otherauditors + .select2-container .select2-selection--multiple {
+    border-radius: 1px !important;
+    border: 1px solid #38679c !important;
+    padding: .5rem 1rem !important;
 }
