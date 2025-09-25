@@ -14,21 +14,27 @@ PeoplePicker.initializePeoplePickers = function (peopleListMap, pickerEvents, at
   const pickers = document.querySelectorAll(`[${attr}]`);
 
   pickers.forEach(picker => {
+    const $picker = $(picker);
+    // Destroy existing Select2 instance
+    if ($picker.data('select2')) {
+      $picker.select2('destroy');
+    }
+
     const pickerId = picker.getAttribute(attr);
     let peopleList;
-    if(Array.isArray(peopleListMap)){
+    if (Array.isArray(peopleListMap)) {
       peopleList = peopleListMap;
-    }
-    else{
+    } else {
       peopleList = peopleListMap?.[pickerId];
       if (!Array.isArray(peopleList)) return;
     }
-    
-    const $picker = $(picker);
+
+    // Remove duplicates based on Email
+    const uniquePeopleList = Array.from(new Map(peopleList.map(item => [item.Email, item])).values());
+
     $picker.empty().append('<option></option>');
 
-    peopleList.forEach(person => {
-      //const option = new Option(person.Title, person.Email, false, false);
+    uniquePeopleList.forEach(person => {
       var str = `<option value="${person.Email}" data-image="${MainApplication.profilephoto}${person.Email}">${person.Title}</option>`;
       $picker.append(str);
     });
@@ -37,30 +43,21 @@ PeoplePicker.initializePeoplePickers = function (peopleListMap, pickerEvents, at
     const modalParent = $picker.closest('.modal');
     var options = {
       placeholder: placeholderText,
-      allowClear: !$picker.prop("multiple"),//removes the clear button on multiple picker only
+      allowClear: !$picker.prop("multiple"),
       minimumInputLength: 3,
       templateResult: formatOption,
       templateSelection: formatOption,
       matcher: function (params, data) {
-        // If there's no search term, return all data
         if ($.trim(params.term) === '') {
           return data;
         }
-    
-        // Normalize and lowercase for comparison
         const term = params.term.toLowerCase();
-    
-        // Search by visible text (Title)
         if (data.text && data.text.toLowerCase().includes(term)) {
           return data;
         }
-    
-        // Search by email (value is in data.id)
         if (data.id && data.id.toLowerCase().includes(term)) {
           return data;
         }
-    
-        // Not matched
         return null;
       },
       ...(modalParent.length && { dropdownParent: modalParent })
@@ -68,55 +65,50 @@ PeoplePicker.initializePeoplePickers = function (peopleListMap, pickerEvents, at
 
     $picker.select2(options);
 
-    if(typeof pickerEvents !== "undefined"){
+    if (typeof pickerEvents !== "undefined") {
       PeoplePicker.pickerEventDefinitions = pickerEvents;
       $(picker).on('select2:select', function (e) {
         var selectedValue = e.params.data.id;
         var prop = e.target.getAttribute("custom-people");
-        if(typeof PeoplePicker.pickerEventDefinitions[prop] == "function"){
+        if (typeof PeoplePicker.pickerEventDefinitions[prop] == "function") {
           PeoplePicker.pickerEventDefinitions[prop](selectedValue);
         }
 
         var selectionOrder = e.target.getAttribute("disable-selection-order");
-        selectionOrder = (selectionOrder == "true") ? true : false;
-        if($(e.target).prop("multiple") && selectionOrder){
-          var element = e.params.data.element; // Get the selected option
+        selectionOrder = selectionOrder === "true";
+        if ($(e.target).prop("multiple") && selectionOrder) {
+          var element = e.params.data.element;
           var $element = $(element);
-
-          // Detach the option and append it to the end of the select
-          $element.detach();
-          $(this).append($element);
-
-          // Trigger change to update Select2
+          if (!$(this).find(`option[value="${$element.val()}"]`).length) {
+            $element.detach();
+            $(this).append($element);
+          }
           $(this).trigger('change');
         }
       });
     }
-      // Set the value if it exists in the default values
+
     const defaultVal = PeoplePicker.defaultValues?.[pickerId];
     if (defaultVal) {
       let selectid = picker.getAttribute("id");
       let selectionOrder = picker.getAttribute("disable-selection-order");
-      selectionOrder = (selectionOrder == "true") ? true : false;
-      if($picker.prop("multiple") && selectionOrder){
-        defaultVal.forEach(function(item) {
-            var option = $('select#'+ selectid +' option[value="' + item + '"]');
-            option.detach();
-            $('select#'+ selectid).append(option);
+      selectionOrder = selectionOrder === "true";
+      if ($picker.prop("multiple") && selectionOrder) {
+        defaultVal.forEach(function (item) {
+          var option = $('select#' + selectid + ' option[value="' + item + '"]');
+          option.detach();
+          $('select#' + selectid).append(option);
         });
         $picker.val(defaultVal).trigger('change');
-      }
-      else{
+      } else {
         $picker.val(defaultVal).trigger("change");
       }
     }
 
     function formatOption(option) {
-      if (!option.id) return option.text; // Skip placeholder or no selection
+      if (!option.id) return option.text;
       var imageUrl = $(option.element).data('image');
-      return $(
-        `<span><img src="${imageUrl}" class="custom-picker-li-image"> ${option.text}</span>`
-      );
+      return $(`<span><img src="${imageUrl}" class="custom-picker-li-image"> ${option.text}</span>`);
     }
   });
 };
@@ -201,11 +193,21 @@ PeoplePicker.getTitle = function (customAttr = "custom-people") {
   return results;
 };
 
+// PeoplePicker.disablePicker = function (pickerId) {
+//   const $picker = $(`[custom-people="${pickerId}"]`);
+//   if (!$picker.length) return;
+
+//   $($picker).prop('disabled', true);
+// };
+
 PeoplePicker.disablePicker = function (pickerId) {
   const $picker = $(`[custom-people="${pickerId}"]`);
   if (!$picker.length) return;
 
-  $($picker).prop('disabled', true);
+  // Disable the underlying select element
+  $picker.prop('disabled', true);
+  // Notify Select2 to disable the UI
+  $picker.select2('enable', false);
 };
 
 PeoplePicker.reset = function (pickerId) {

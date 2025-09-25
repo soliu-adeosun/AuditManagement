@@ -81,8 +81,8 @@ function MainStartPoint() {
 
   this.CurrentPageSubmitFunction = null;
   this.auditType = [];
-  this.process = [];
-  this.procedure = [];
+  this.processes = [];
+  // this.procedures = [];
 
   this.auditNavigationClicks = function(clicklocation){
     globalDefinitions.AuditLogManager_SaveLog({
@@ -106,8 +106,8 @@ function whenLayoutLoaded() {
 
       globalDefinitions.callLoader();
       
-      globalDefinitions.stageDefinitions.workflowcode = "AUD-MGT-";
-      globalDefinitions.stageDefinitions.workflow = "Audit Management";
+      // globalDefinitions.stageDefinitions.workflowcode = "RSAUD-";
+      // globalDefinitions.stageDefinitions.workflow = "Audit Management";
       
 
       // speedctxRoot.errorHandler = globalDefinitions.errorHandler;
@@ -117,7 +117,6 @@ function whenLayoutLoaded() {
         MainApplication.cachedState.ipaddress = response;
         checkAppDependency();
       }).catch((error)=>{
-         console.log(error);
          checkAppDependency();
       })
 
@@ -157,7 +156,7 @@ function whenLayoutLoaded() {
 
         speedctxRoot = new Speed(configPropertiesRoot.AUDITMANAGEMENTURL.setting);
         speedctxRoot.errorHandler = globalDefinitions.errorHandler;
-        $spcontext.errorHandler = globalDefinitions.errorHandler;
+        // $spcontext.errorHandler = globalDefinitions.errorHandler;
 
           speedctxRoot.getItem("Configuration", speedctxRoot.camlBuilder(), function (configObjects) {
             var listEnumerator = configObjects.getEnumerator();
@@ -173,12 +172,27 @@ function whenLayoutLoaded() {
               }
             }
 
+            globalDefinitions.stageDefinitions.workflowcode = configProperties.WORKFLOWCODE.setting;
+            globalDefinitions.stageDefinitions.workflow = configProperties.WORKFLOWNAME.setting;
+
             $("#auditmanagementversion").text(configProperties.AUDMGTVERSION.setting);
             $("#versioneffectivedate").text(configProperties.VERSIONEFFECTIVEDATE.setting);
             $("#auditmanagementversionMobile").text(configProperties.AUDMGTVERSION.setting);
             $("#versioneffectivedateMobile").text(configProperties.VERSIONEFFECTIVEDATE.setting);
 
+            // speedctxRoot.isUserMemberOfGroup([configProperties.MANAGEMENT.setting, configProperties.CEO.setting],
+            //   { email : CurrentUserProperties.email, groupEmails: true },function(isUserMember, groupUserProperties){
+            //       MainApplication.isUserAnActor = isUserMember;
+            //       MainApplication.configuredTaskMembers = groupUserProperties;
+            //   })
+
+            // speedctxRoot.isCurrentUserMemberOfGroup(configProperties.REPORTADMIN.setting, function (isAdmin) {
+            //     MainApplication.cachedState.isReportAdmin = isAdmin;
+            // });
+
           });
+
+
 
           var basicQuery = [
                 {
@@ -187,7 +201,7 @@ function whenLayoutLoaded() {
                 }
             ];
 
-          speedctxRoot.getItem("AuditType", $spcontext.camlBuilder(basicQuery), function (_spMeta) {
+          speedctxRoot.getItem("AuditType", speedctxRoot.camlBuilder(basicQuery), function (_spMeta) {
               var listEnumerator = _spMeta.getEnumerator();
               MainApplication.auditType = [];
               while (listEnumerator.moveNext()) {
@@ -196,23 +210,48 @@ function whenLayoutLoaded() {
               }
           })
 
-          speedctxRoot.getItem("Process", $spcontext.camlBuilder(basicQuery), function (_spMeta) {
+          speedctxRoot.getItem("Processes", speedctxRoot.camlBuilder(basicQuery), function (_spMeta) {
               var listEnumerator = _spMeta.getEnumerator();
-              MainApplication.process = [];
+              MainApplication.processes = [];
               while (listEnumerator.moveNext()) {
                   var title = listEnumerator.get_current().get_item("Title");
-                  MainApplication.process.push(title);
+                  MainApplication.processes.push(title);
               }
           })
 
-          speedctxRoot.getItem("Procedure", $spcontext.camlBuilder(basicQuery), function (_spMeta) {
-              var listEnumerator = _spMeta.getEnumerator();
-              MainApplication.procedure = [];
-              while (listEnumerator.moveNext()) {
-                  var title = listEnumerator.get_current().get_item("Title");
-                  MainApplication.procedure.push(title);
-              }
-          })
+          // speedctxRoot.getItem("Procedure", $spcontext.camlBuilder(basicQuery), function (_spMeta) {
+          //     var listEnumerator = _spMeta.getEnumerator();
+          //     MainApplication.procedure = [];
+          //     while (listEnumerator.moveNext()) {
+          //         var title = listEnumerator.get_current().get_item("Title");
+          //         MainApplication.procedure.push(title);
+          //     }
+          // })
+          var fieldProperties = {
+                ignoreThreshold: false,
+                merge: false,
+                data: ["ID","Title", "Processes"]
+            };
+
+            MainApplication.procedures = {};
+            MainApplication.proceduresInfo = {};
+            MainApplication.proceduresAtom = {};
+            speedctxRoot.getListToItems(
+                "Procedures",
+                basicQuery,
+                fieldProperties,
+                true,
+                function (item) {
+                    if (!MainApplication.proceduresInfo[item.Processes.value]) {
+                        MainApplication.proceduresInfo[item.Processes.value] = [];
+                    }
+                    MainApplication.proceduresInfo[item.Processes.value].push(item);
+                    return item;
+                },
+                function (items) {
+                    MainApplication.procedures = items;
+                }
+            );
 
           var employeeInfoColumns = [
             "ID",
@@ -271,8 +310,6 @@ function whenLayoutLoaded() {
 
       function checkAppDependency() {
         dependenciesCount++;
-        console.log("Number of dependecies: ", dependenciesCount);
-        console.log("Dependencies expected: ", expectedDepenciesCount);
         if (dependenciesCount === expectedDepenciesCount) {
           globalDefinitions.AuditLogManager_SaveLog({
             Action: `Logged into/Opened Audit Management application`,

@@ -43,6 +43,8 @@ function whenNewRequestDependeciesLoaded() {
     globalDefinitions.SetWorkflowRouting(customWorkflowEngine);
     customWorkflowEngine.routeEngine(customWorkflowEngine).setCurrentUserAsInitiator();
 
+    $spcontext.applyValidationEvents();
+
     $("#employeeName").val(MainApplication.staffDetails[CurrentUserProperties.email].Title);
     $("#employeeId").val(MainApplication.staffDetails[CurrentUserProperties.email].EmployeeId);
     $("#department").val(MainApplication.staffDetails[CurrentUserProperties.email].Department);
@@ -54,15 +56,36 @@ function whenNewRequestDependeciesLoaded() {
     MainApplication.NewRequestComponent.updatePlaceholder();
     MainApplication.NewRequestComponent.addQuestionSet();
 
+    // Disable the button
+    $('.submit-button').prop('disabled', true);
+
+
+    $('#checkbox').on('change', function () {
+    if ($(this).is(':checked')) {
+        $('.submit-button').prop('disabled', false);
+    } else {
+        $('.submit-button').prop('disabled', true);
+    }
+    });
+
     for (var i = 0; i < MainApplication.auditType.length; i++) {
 		$("#typeOfAudit").append(`<option>${MainApplication.auditType[i]}</option>`);
 	}
-    for (var i = 0; i < MainApplication.process.length; i++) {
-		$("#process").append(`<option>${MainApplication.process[i]}</option>`);
+
+    for (var i = 0; i < MainApplication.processes.length; i++) {
+		$("#process").append(`<option>${MainApplication.processes[i]}</option>`);
 	}
-    for (var i = 0; i < MainApplication.procedure.length; i++) {
-		$("#procedure").append(`<option>${MainApplication.procedure[i]}</option>`);
-	}
+    
+    $("#process").on("change", function() {
+        var selectedProcess = $(this).val();
+        var procedures = MainApplication.proceduresInfo[selectedProcess] || [];
+        $("#procedure").empty();
+        $("#procedure").append('<option selected disabled value="">Select a Procedure</option>');
+        procedures.forEach(function(item) {
+            $("#procedure").append(`<option value="${item.Title}">${item.Title}</option>`);
+        });
+    });
+
 
     MainApplication.NewRequestComponent.updateQuestionsPlaceholder();
 
@@ -202,7 +225,11 @@ MainApplication.NewRequestComponent.addQuestionSet = function () {
             </div>
             <div class="mt-2">
                 <label class="block text-sm font-medium text-blue-600 mb-2">Audit Finding</label>
-                <input type="text" placeholder="Enter text here..." class="audit-finding-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+                <select class="audit-finding-input w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
+                    <option disabled selected >Select an option</option>
+                    <option value="Compliance">Compliance</option>
+                    <option value="Non-Compliance">Non-Compliance</option>
+                </select>
             </div>
             <div class="mt-2">
                 <label class="block text-sm font-medium text-blue-600 mb-2">ISO Clause</label>

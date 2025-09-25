@@ -4,10 +4,8 @@ GlobalDefinitionsManager.prototype.extendStages = function () {
     // this.stageDefinitions.workflowcode = "AUDMGT-";
 
     this.stageDefinitions.author = "Author";
-    // this.stageDefinitions.hod = configProperties.HEADOFDEPARTMENT.setting;
-    // this.stageDefinitions.ceo = configProperties.CEO.setting;
-    this.stageDefinitions.hod = "HOD";
-    this.stageDefinitions.ceo = "CEO";
+    this.stageDefinitions.management = configProperties.MANAGEMENT.setting;
+    this.stageDefinitions.ceo = configProperties.CEO.setting;
 };
 
 
@@ -34,7 +32,7 @@ GlobalDefinitionsManager.prototype.SetWorkflowRouting = function (customWorkflow
             code: "AA1",
             initiationCode: "AA0",
             possibleRoutes: [{
-                name: globalDefinitions.stageDefinitions.hod,
+                name: globalDefinitions.stageDefinitions.management,
                 username: "",
                 condition: true,
                 authenticationType: customWorkflowEngine.stages.group,

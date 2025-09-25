@@ -1550,3 +1550,26 @@
     border: 1px solid #38679c !important;
     padding: .5rem 1rem !important;
 }
+
+/* ==============Submit button============== styles */
+/* Normal button styles */
+.submit-button {
+  background-color: #1d3d66; /* slate-700 */
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+  background-color: #3a4961; /* slate-800 */
+}
+
+/* Disabled state overrides */
+.submit-button:disabled {
+  background-color: #c8c7c7 !important;
+  color: white;
+  cursor: not-allowed;
+}
+
+.submit-button:disabled:hover {
+  background-color: #c8c7c7 !important;
+}

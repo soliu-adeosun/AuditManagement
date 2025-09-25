@@ -17,7 +17,7 @@ export default class NewRequest extends React.Component<{}, {}> {
                         {/* Text Input */}
                         <div className="mt-2">
                             <label className="block text-sm font-medium text-blue-600 mb-2">Employee ID</label>
-                            <input readOnly id="employeeId" type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+                            <input readOnly speed-bind="EmployeeID" id="employeeId" type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
                         </div>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
@@ -30,7 +30,7 @@ export default class NewRequest extends React.Component<{}, {}> {
                         {/* Text Input */}
                         <div className="mt-2">
                             <label className="block text-sm font-medium text-blue-600 mb-2">Department</label>
-                            <input readOnly id="department" type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+                            <input readOnly speed-bind="Department" id="department" type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
                         </div>
                         {/* Text Input */}
                         
@@ -44,16 +44,17 @@ export default class NewRequest extends React.Component<{}, {}> {
                         <div className="mt-2">
                             <label className="block text-sm font-medium text-blue-600 mb-2">Type of Audit</label>
                             <select id="typeOfAudit" speed-bind-validate="TypeOfAudit" className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
-                                <option>Select an option</option>
+                                <option disabled selected>Select an audit type</option>
                             </select>
                         </div>
 
+                        
+                    </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                         <div className="mt-2">
                             <label className="block text-sm font-medium text-blue-600 mb-2">Auditees</label>
                             <CustomPeoplePicker validate-control="true" multiple custom-people="Auditees" validation-msg="Please select an auditee" />
                         </div>
-                    </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                         {/* Dropdown */}
                         <div className="mt-2">
                             <label className="block text-sm font-medium text-blue-600 mb-2">Other Auditors </label>
@@ -101,13 +102,13 @@ export default class NewRequest extends React.Component<{}, {}> {
                         <div className="mt-2">
                             <label className="block text-sm font-medium text-blue-600 mb-2">Process</label>
                             <select id="process" speed-bind-validate="Process" className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
-                                <option>Select an option</option>
+                                <option disabled selected >Select a process</option>
                             </select>
                         </div>
                         <div className="mt-2">
                             <label className="block text-sm font-medium text-blue-600 mb-2">Procedure</label>
                             <select id="procedure" speed-bind-validate="Procedure" className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
-                                <option>Select an option</option>
+                                <option disabled selected >Select a procedure</option>
                             </select>
                         </div>
                     </div>
@@ -157,10 +158,11 @@ export default class NewRequest extends React.Component<{}, {}> {
                         </label>
                     </div>
                     <div className="action-btns flex justify-center items-center gap-3" style={{ marginTop: '2rem' }}>
-                        <ClientButton text={"Submit"} func={"MainApplication.NewRequestComponent.confirmSubmit"} clax={"px-4 py-2 bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 transition-colors"} prop="" attr="" />
+                        <ClientButton text={"Submit"} func={"MainApplication.NewRequestComponent.confirmSubmit"} clax={"px-4 py-2 text-sm font-medium submit-button"} prop="NewRequest" attr="" />
                         {/* <button id="saveButton" className="px-4 py-2 bg-slate-500 text-white text-sm font-medium hover:bg-slate-600 transition-colors">
                             Save
                         </button> */}
+                        <ClientButton text={"Save"} func={"MainApplication.NewRequestComponent.confirmSubmit"} clax={"px-4 py-2 text-sm font-medium"} prop="Draft" attr="id='draftbtn'" />
                         <a href="#/" className="px-4 py-2 bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">
                             Cancel
                         </a>
