@@ -12,7 +12,7 @@ export default class Dashboard extends React.Component<{}, {}> {
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                         <div className="border card audit border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow">
                             <div className="text-center">
-                                <h3 className="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">2</h3>
+                                <h3 id='totalAudit' className="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">0</h3>
                                 <h3 className="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">
                                     Total Audit
                                 </h3>
@@ -20,7 +20,7 @@ export default class Dashboard extends React.Component<{}, {}> {
                         </div>
                         <div className="border card pending border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow">
                             <div className="text-center">
-                                <h3 className="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">8</h3>
+                                <h3 id='pendingAudit' className="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">0</h3>
                                 <h3 className="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">
                                     Pending
                                 </h3>
@@ -28,7 +28,7 @@ export default class Dashboard extends React.Component<{}, {}> {
                         </div>
                         <div className="border card completed border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow">
                             <div className="text-center">
-                                <h3 className="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">3</h3>
+                                <h3 id='completedAudit' className="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">0</h3>
                                 <h3 className="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">
                                     Completed
                                 </h3>

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import CustomPeoplePicker from '../../../../Global/CustomPeoplePicker';
+import ClientButton from '../../../../Global/ClientButton';
 require("approverequest");
 
 export default class ApproveRequest extends React.Component<{}, {}> {
@@ -58,7 +59,7 @@ export default class ApproveRequest extends React.Component<{}, {}> {
 
                 <div>
                     <h2 className="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">Auditee Details</h2>
-                    <div id='auditeesDetailsContainer' />
+                    <div id='auditeesContainer' />
                     {/* <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
                         <div className="mt-2">
                             <label className="block text-sm font-medium text-blue-600 mb-2">Employee Name</label>
@@ -198,7 +199,7 @@ export default class ApproveRequest extends React.Component<{}, {}> {
                         </div>
                     </div>
                     <div className="action-btns flex justify-center items-center gap-3" style={{ marginTop: '2rem' }}>
-                        <button className="px-4 py-2 bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 transition-colors">
+                        {/* <button className="px-4 py-2 bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 transition-colors">
                             Submit
                         </button>
                         <button className="px-4 py-2 bg-slate-500 text-white text-sm font-medium hover:bg-slate-600 transition-colors">
@@ -206,7 +207,13 @@ export default class ApproveRequest extends React.Component<{}, {}> {
                         </button>
                         <button className="px-4 py-2 bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">
                             Cancel
-                        </button>
+                        </button> */}
+
+                        <ClientButton text={"Approve"} func={"MainApplication.ApproveRequestComponent.confirmSubmit"} clax={"px-4 py-2 text-sm font-medium submit-button"} prop="Approved" attr="" />
+                        <ClientButton text={"Decline"} func={"MainApplication.ApproveRequestComponent.confirmSubmit"} clax={"px-4 py-2 bg-slate-500 text-white text-sm font-medium hover:bg-slate-600 transition-colors"} prop="Declined" attr="id='draftbtn'" />
+                        <a href="#/" className="px-4 py-2 bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">
+                            Cancel
+                        </a>
                     </div>
                 </div>
             </div>

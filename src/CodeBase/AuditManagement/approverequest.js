@@ -39,7 +39,7 @@ whenApproveRequestDependeciesLoaded = function () {
     $spcontext.validationProperties.text.extend["Comments"] = function (field) {
         var passed = false;
         if ((field.trim() !== "" && (AppRequest.actionTaken === globalDefinitions.stageDefinitions.decline ||
-                AppRequest.actionTaken === globalDefinitions.stageDefinitions.correction)) ||
+            AppRequest.actionTaken === globalDefinitions.stageDefinitions.correction)) ||
             AppRequest.actionTaken === globalDefinitions.stageDefinitions.approve) passed = true;
         return passed;
     }
@@ -63,12 +63,12 @@ MainApplication.ApproveRequestComponent.recoverListData = function() {
                 type: 'Text',
                 val: AppRequest.itemId
             },
-            // {
-            //     operator: 'Eq',
-            //     field: 'Approval_Status',
-            //     type: 'Text',
-            //     val: globalDefinitions.stageDefinitions.pending
-            // }
+            {
+                operator: 'Eq',
+                field: 'Approval_Status',
+                type: 'Text',
+                val: globalDefinitions.stageDefinitions.pending
+            }
         ]);
         
         var extraProperties = [
@@ -289,7 +289,7 @@ MainApplication.ApproveRequestComponent.proceedToList = function(formData) {
 
 MainApplication.ApproveRequestComponent.displayAuditees = function(auditees) {
 
-    const $displayContainer = $("#auditeesDetailsContainer");
+    const $displayContainer = $("#auditeesContainer");
     $displayContainer.empty();
 
     if (!auditees || auditees.length === 0) {

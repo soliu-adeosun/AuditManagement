@@ -100,7 +100,7 @@ function whenLayoutLoaded() {
   $spcontext.loadSPDependencies(
     function () {
       var dependenciesCount = 0;
-      var expectedDepenciesCount = 3;
+      var expectedDepenciesCount = 4;
       // speedctxRoot = new Speed();
       globalDefinitions = new GlobalDefinitionsManager();
 
@@ -190,6 +190,7 @@ function whenLayoutLoaded() {
             //     MainApplication.cachedState.isReportAdmin = isAdmin;
             // });
 
+            checkAppDependency();
           });
 
 
