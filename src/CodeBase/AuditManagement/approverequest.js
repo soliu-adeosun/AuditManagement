@@ -2,7 +2,7 @@ loadApproveRequestComponent = function () {
     if (MainApplication.cachedState.mode) {
 		whenApproveRequestDependeciesLoaded();
 	}else{
-        MainApplication.cachedState.pageStateCall = whenApproveRequestDependeciesLoaded;
+        MainApplication.cachedState.pageStateCall = loadApproveRequestComponent;
     }
 };
 
@@ -146,12 +146,18 @@ MainApplication.ApproveRequestComponent.recoverListData = function() {
                             AppRequest.requestDetails = listProperties;
                             
                             const ArrayOfOtherAuditorsEmail = Array.isArray(listProperties.OtherAuditors)
-                            ? [...new Set(listProperties.OtherAuditors.map(owner => owner.email))]
+                            ? [...new Set(listProperties.OtherAuditors.map(auditors => auditors.email))]
+                            : [];
+
+                            const ArrayOfAuditeesEmail = Array.isArray(listProperties.Auditees)
+                            ? [...new Set(listProperties.Auditees.map(auditees => auditees.email))]
                             : [];
 
                             PeoplePicker.setDefault("OtherAuditors", ArrayOfOtherAuditorsEmail);
+                            PeoplePicker.setDefault("Auditees", ArrayOfAuditeesEmail);
                             PeoplePicker.initializePeoplePickers(MainApplication.staffList);
                             PeoplePicker.disablePicker("OtherAuditors");
+                            PeoplePicker.disablePicker("Auditees");
 
                             $spcontext.htmlBind(listProperties);
                             

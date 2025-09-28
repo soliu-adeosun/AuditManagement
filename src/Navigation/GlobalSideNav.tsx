@@ -77,11 +77,9 @@ const GlobalSideNav: React.FC = () => {
                                 <span className="font-medium">Create Audit</span>
                             </Link>
                         </div>
-                        <div className="relative">
+                        <div className="relative cursor-not-allowed">
                             {activeLink === '/approverequest' && <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500" />}
-                            <Link
-                                to="/approverequest"
-                                onClick={() => handleSetActiveLink('/approverequest')}
+                            <div
                                 className={`w-full flex items-center px-6 py-4 text-left transition-all duration-200 hover:bg-slate-600 ${
                                     activeLink === '/approverequest' ? 'bg-slate-600 text-white border-r-2 border-red-500' : 'text-slate-300 hover:text-white'
                                 }`}
@@ -95,13 +93,11 @@ const GlobalSideNav: React.FC = () => {
                                     />
                                 </svg>
                                 <span className="font-medium">Approval</span>
-                            </Link>
+                            </div>
                         </div>
-                        <div className="relative">
+                        <div className="relative cursor-not-allowed">
                             {activeLink === '/viewrequest' && <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500" />}
-                            <Link
-                                to="/viewrequest"
-                                onClick={() => handleSetActiveLink('/viewrequest')}
+                            <div
                                 className={`w-full flex items-center px-6 py-4 text-left transition-all duration-200 hover:bg-slate-600 ${
                                     activeLink === '/viewrequest' ? 'bg-slate-600 text-white border-r-2 border-red-500' : 'text-slate-300 hover:text-white'
                                 }`}
@@ -115,7 +111,7 @@ const GlobalSideNav: React.FC = () => {
                                     />
                                 </svg>
                                 <span className="font-medium">View</span>
-                            </Link>
+                            </div>
                         </div>
                     </nav>
                 </div>

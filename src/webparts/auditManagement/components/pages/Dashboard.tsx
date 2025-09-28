@@ -72,19 +72,24 @@ export default class Dashboard extends React.Component<{}, {}> {
                         </div>
                     </div>
                     <div className="overflow-x-auto">
-                        <table className="w-full table-mobile">
+                        <div className="norequest hidden text-center py-6 text-gray-500 text-sm sm:text-base">
+                            No Audit entries...
+                        </div>
+                        <table className="w-full hidden table-mobile" id="tasktable">
                             <thead className="bg-slate-50 border-b border-gray-200">
                                 <tr>
-                                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">AUDIT REF ID</th>
-                                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">TYPE</th>
-                                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">STATUS</th>
-                                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">DATE</th>
-                                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">INITIATOR</th>
-                                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">Actions</th>
+                                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">S/N</th>
+                                    <th speed-table-data="WorkflowRequestID" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">AUDIT REF ID</th>
+                                    <th speed-table-data="InitiatorName" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">INITIATOR</th>
+                                    <th speed-table-data="TypeOfAudit" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">TYPE</th>
+                                    <th speed-table-data="Current_Approver" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">CURRENT APPROVER</th>
+                                    <th speed-table-data="Approval_Status" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">STATUS</th>
+                                    <th speed-table-data="Created" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">DATE</th>
+                                    <th speed-table-data="Modified" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                <tr className="hover:bg-gray-50 transition-colors bg-white">
+                            <tbody className="divide-y divide-gray-200" id="speed-data-table">
+                                {/* <tr className="hover:bg-gray-50 transition-colors bg-white">
                                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-sm font-medium text-navy-900">REQ-001</td>
                                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-sm text-blue-500">Office Supply Request</td>
                                     <td className="px-3 sm:px-6 py-3 sm:py-4">
@@ -198,9 +203,13 @@ export default class Dashboard extends React.Component<{}, {}> {
                                             </button>
                                         </div>
                                     </td>
-                                </tr>
+                                </tr> */}
                             </tbody>
                         </table>
+                        <div>
+                            <ul id="myrequestpagination" className="pagination">
+                            </ul>
+                        </div>
                     </div>
                 </section>
             </div>

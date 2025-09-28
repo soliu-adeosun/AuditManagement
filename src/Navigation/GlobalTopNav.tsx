@@ -119,11 +119,9 @@ const GlobalTopNav: React.FC = () => {
                                 <span className="font-medium">Create Audit</span>
                             </Link>
                         </div>
-                        <div className="relative">
+                        <div className="relative cursor-not-allowed">
                             {activePath === "/approverequest" && <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500" />}
-                            <Link
-                                to="/approverequest"
-                                onClick={closeMobileMenu}
+                            <div
                                 className={`w-full flex items-center px-6 py-4 text-left transition-all duration-200 hover:bg-slate-600 ${
                                     activePath === "/approverequest" ? "bg-slate-600 text-white border-r-2 border-red-500" : "text-slate-300 hover:text-white"
                                 }`}
@@ -137,13 +135,11 @@ const GlobalTopNav: React.FC = () => {
                                     />
                                 </svg>
                                 <span className="font-medium">Approval</span>
-                            </Link>
+                            </div>
                         </div>
-                        <div className="relative">
+                        <div className="relative cursor-not-allowed">
                             {activePath === "/viewrequest" && <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500" />}
-                            <Link
-                                to="/viewrequest"
-                                onClick={closeMobileMenu}
+                            <div
                                 className={`w-full flex items-center px-6 py-4 text-left transition-all duration-200 hover:bg-slate-600 ${
                                     activePath === "/viewrequest" ? "bg-slate-600 text-white border-r-2 border-red-500" : "text-slate-300 hover:text-white"
                                 }`}
@@ -157,7 +153,7 @@ const GlobalTopNav: React.FC = () => {
                                     />
                                 </svg>
                                 <span className="font-medium">View</span>
-                            </Link>
+                            </div>
                         </div>
                     </nav>
                 </div>

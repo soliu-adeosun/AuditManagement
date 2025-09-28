@@ -9,58 +9,49 @@ export default class NewRequest extends React.Component<{}, {}> {
         return (
             <section className="bg-white p-4 sm:p-6 border border-gray-200 shadow-sm">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-                    {/* <div className="space-y-4 sm:space-y-6"> */}
-                        <div className="mt-2">
-                            <label className="block text-sm font-medium text-blue-600 mb-2">Name</label>
-                            <input readOnly id="employeeName" type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-40 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-                        </div>
-                        {/* Text Input */}
-                        <div className="mt-2">
-                            <label className="block text-sm font-medium text-blue-600 mb-2">Employee ID</label>
-                            <input readOnly speed-bind="EmployeeID" id="employeeId" type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-                        </div>
+                    <div className="mt-2">
+                        <label className="block text-sm font-medium text-blue-600 mb-2">Name</label>
+                        <input readOnly id="employeeName" type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-40 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+                    </div>
+                    {/* Text Input */}
+                    <div className="mt-2">
+                        <label className="block text-sm font-medium text-blue-600 mb-2">Employee ID</label>
+                        <input readOnly speed-bind="EmployeeID" id="employeeId" type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+                    </div>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
 
-                        {/* Text Input */}
-                        <div className="mt-2">
-                            <label className="block text-sm font-medium text-blue-600 mb-2">Email</label>
-                            <input readOnly id="employeeMail" type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-                        </div>
-                        {/* Text Input */}
-                        <div className="mt-2">
-                            <label className="block text-sm font-medium text-blue-600 mb-2">Department</label>
-                            <input readOnly speed-bind="Department" id="department" type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-                        </div>
-                        {/* Text Input */}
-                        
-                    {/* </div>
-                    <div className="space-y-4 sm:space-y-6"> */}
+                    {/* Text Input */}
+                    <div className="mt-2">
+                        <label className="block text-sm font-medium text-blue-600 mb-2">Email</label>
+                        <input readOnly id="employeeMail" type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
                     </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-                        {/* Text Input */}
-                        
-                        {/* Dropdown */}
-                        <div className="mt-2">
-                            <label className="block text-sm font-medium text-blue-600 mb-2">Type of Audit</label>
-                            <select id="typeOfAudit" speed-bind-validate="TypeOfAudit" className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
-                                <option disabled selected>Select an audit type</option>
-                            </select>
-                        </div>
-
-                        
+                    {/* Text Input */}
+                    <div className="mt-2">
+                        <label className="block text-sm font-medium text-blue-600 mb-2">Department</label>
+                        <input readOnly speed-bind="Department" id="department" type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
                     </div>
+                    {/* Text Input */}
+                </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-                        <div className="mt-2">
-                            <label className="block text-sm font-medium text-blue-600 mb-2">Auditees</label>
-                            <CustomPeoplePicker validate-control="true" multiple custom-people="Auditees" validation-msg="Please select an auditee" />
-                        </div>
-                        {/* Dropdown */}
-                        <div className="mt-2">
-                            <label className="block text-sm font-medium text-blue-600 mb-2">Other Auditors </label>
-                            <CustomPeoplePicker validate-control="true" multiple custom-people="OtherAuditors" validation-msg="Please select an auditor" />
-                        </div>
-                    {/* </div> */}
+                    {/* Dropdown */}
+                    <div className="mt-2">
+                        <label className="block text-sm font-medium text-blue-600 mb-2">Type of Audit</label>
+                        <select id="typeOfAudit" speed-bind-validate="TypeOfAudit" className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
+                            <option disabled selected value="">Select an audit type</option>
+                        </select>
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+                    <div className="mt-2">
+                        <label className="block text-sm font-medium text-blue-600 mb-2">Auditees</label>
+                        <CustomPeoplePicker validate-control="true" multiple custom-people="Auditees" validation-msg="Please select an auditee" />
+                    </div>
+                    {/* Dropdown */}
+                    <div className="mt-2">
+                        <label className="block text-sm font-medium text-blue-600 mb-2">Other Auditors </label>
+                        <CustomPeoplePicker validate-control="true" multiple custom-people="OtherAuditors" validation-msg="Please select an auditor" />
+                    </div>
                 </div>
                 <div style={{ marginTop: '2.2rem' }}>
                     <div>
@@ -68,33 +59,9 @@ export default class NewRequest extends React.Component<{}, {}> {
                         <textarea speed-bind-validate="InitiatorComment" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" defaultValue={""} />
                     </div>
                 </div>
-                {/* <section className="flex btn-action" style={{ marginTop: '2rem' }}>
-                    <button id='addAuditee' className="px-4 py-2 bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 transition-colors">
-                        Add New
-                    </button>
-                </section> */}
                 <div>
                     <h2 className="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">Auditee Details</h2>
                     <div id='auditeesContainer' />
-
-                    {/* <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
-                        <div className="mt-2">
-                            <label className="block text-sm font-medium text-blue-600 mb-2">Employee Name</label>
-                            <input type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-                        </div>
-                        <div className="mt-2">
-                            <label className="block text-sm font-medium text-blue-600 mb-2">Employee ID</label>
-                            <input id='auditeeId' type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-                        </div>
-                        <div className="mt-2">
-                            <label className="block text-sm font-medium text-blue-600 mb-2">Email</label>
-                            <input id='auditeeMail' type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-                        </div>
-                        <div className="mt-2">
-                            <label className="block text-sm font-medium text-blue-600 mb-2">Department</label>
-                            <input id='auditeeDepartment' type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-                        </div>
-                    </div> */}
                 </div>
                 <div className="mt-2">
                     <h2 className="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">Audit Questions</h2>
@@ -102,44 +69,18 @@ export default class NewRequest extends React.Component<{}, {}> {
                         <div className="mt-2">
                             <label className="block text-sm font-medium text-blue-600 mb-2">Process</label>
                             <select id="process" speed-bind-validate="Process" className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
-                                <option disabled selected >Select a process</option>
+                                <option disabled selected value="" >Select a process</option>
                             </select>
                         </div>
                         <div className="mt-2">
                             <label className="block text-sm font-medium text-blue-600 mb-2">Procedure</label>
                             <select id="procedure" speed-bind-validate="Procedure" className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
-                                <option disabled selected >Select a procedure</option>
+                                <option disabled selected value="" >Select a procedure</option>
                             </select>
                         </div>
                     </div>
-                    {/* <div className="mt-2">
-                        <label className="block text-sm font-medium text-blue-600 mb-2">Questions</label>
-                        <textarea placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" defaultValue={""} />
-                    </div> */}
                     <div id='questionsContainer' className="my-4" />
-                        {/* <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 mt-2">
-                            <div className="mt-2">
-                                <label className="block text-sm font-medium text-blue-600 mb-2">Questions</label>
-                                <input type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-                            </div>
-                            <div className="mt-2">
-                                <label className="block text-sm font-medium text-blue-600 mb-2">Audit Finding</label>
-                                <input type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-                            </div>
-                            <div className="mt-2">
-                                <label className="block text-sm font-medium text-blue-600 mb-2">ISO Clause</label>
-                                <input type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-                            </div>
-                            <div className="mt-2">
-                                <label className="block text-sm font-medium text-blue-600 mb-2">Objective Evidence</label>
-                                <input type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-                            </div>
-                            <div className="mt-2">
-                                <label className="block text-sm font-medium text-blue-600 mb-2">Non-conformance Statement</label>
-                                <input type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-                            </div>
-                        </div> */}
-                    
+
                     <section className="flex btn-action" style={{ marginTop: '2rem' }}>
                         <button id="addQuestionButton" className="px-4 py-2 bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 transition-colors">
                             Add New

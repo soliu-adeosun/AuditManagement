@@ -32,3 +32,24 @@
     width: 150px;
     /* border-radius: 10px; */
 }
+
+tr {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+    background-color: var(--white);
+}
+
+tr:hover {
+    background-color: var(--gray-100);
+}
+
+td {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--blue-500);
+}

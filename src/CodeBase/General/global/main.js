@@ -13,6 +13,7 @@ var configPropertiesRoot = {
 var speedctxRoot;
 var globalDefinitions;
 var popContext;
+var testContext;
 
 function MainStartPoint() {
   this.url = window.location.href;
@@ -100,7 +101,7 @@ function whenLayoutLoaded() {
   $spcontext.loadSPDependencies(
     function () {
       var dependenciesCount = 0;
-      var expectedDepenciesCount = 4;
+      var expectedDepenciesCount = 7;
       // speedctxRoot = new Speed();
       globalDefinitions = new GlobalDefinitionsManager();
 
@@ -156,6 +157,7 @@ function whenLayoutLoaded() {
 
         speedctxRoot = new Speed(configPropertiesRoot.AUDITMANAGEMENTURL.setting);
         speedctxRoot.errorHandler = globalDefinitions.errorHandler;
+        
         // $spcontext.errorHandler = globalDefinitions.errorHandler;
 
           speedctxRoot.getItem("Configuration", speedctxRoot.camlBuilder(), function (configObjects) {
@@ -189,7 +191,6 @@ function whenLayoutLoaded() {
             // speedctxRoot.isCurrentUserMemberOfGroup(configProperties.REPORTADMIN.setting, function (isAdmin) {
             //     MainApplication.cachedState.isReportAdmin = isAdmin;
             // });
-
             checkAppDependency();
           });
 
@@ -209,6 +210,7 @@ function whenLayoutLoaded() {
                   var title = listEnumerator.get_current().get_item("Title");
                   MainApplication.auditType.push(title);
               }
+              checkAppDependency();
           })
 
           speedctxRoot.getItem("Processes", speedctxRoot.camlBuilder(basicQuery), function (_spMeta) {
@@ -218,16 +220,9 @@ function whenLayoutLoaded() {
                   var title = listEnumerator.get_current().get_item("Title");
                   MainApplication.processes.push(title);
               }
+              checkAppDependency();
           })
 
-          // speedctxRoot.getItem("Procedure", $spcontext.camlBuilder(basicQuery), function (_spMeta) {
-          //     var listEnumerator = _spMeta.getEnumerator();
-          //     MainApplication.procedure = [];
-          //     while (listEnumerator.moveNext()) {
-          //         var title = listEnumerator.get_current().get_item("Title");
-          //         MainApplication.procedure.push(title);
-          //     }
-          // })
           var fieldProperties = {
                 ignoreThreshold: false,
                 merge: false,
@@ -251,6 +246,7 @@ function whenLayoutLoaded() {
                 },
                 function (items) {
                     MainApplication.procedures = items;
+                    checkAppDependency();
                 }
             );
 
@@ -301,7 +297,8 @@ function whenLayoutLoaded() {
                 return transformedItem;
             },
             function (items) {
-                MainApplication.staffList = items
+                MainApplication.staffList = items;
+                checkAppDependency();
             }
         );
 
@@ -312,6 +309,9 @@ function whenLayoutLoaded() {
       function checkAppDependency() {
         dependenciesCount++;
         if (dependenciesCount === expectedDepenciesCount) {
+          
+          console.log("Dependency count: ", dependenciesCount);
+          console.log("Expected Dependencies: ", expectedDepenciesCount);
           globalDefinitions.AuditLogManager_SaveLog({
             Action: `Logged into/Opened Audit Management application`,
             Message: `user logged in to application at ${$spcontext.stringnifyDate({ format: "dd/mm/yy", includeTime: true })}`
@@ -319,7 +319,6 @@ function whenLayoutLoaded() {
           $spcontext.errorHandler = globalDefinitions.errorHandler;
           MainApplication.cachedState.mode = true;
           MainApplication.cachedState.pageStateCall();
-          globalDefinitions.closeLoader();
         }
       }
     },

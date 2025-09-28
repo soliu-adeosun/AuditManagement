@@ -2,7 +2,10 @@ loadNewRequestComponent = function () {
     if (MainApplication.cachedState.mode) {
 		whenNewRequestDependeciesLoaded();
 	}else{
-        MainApplication.cachedState.pageStateCall = whenNewRequestDependeciesLoaded;
+        setTimeout(function () {
+            MainApplication.cachedState.pageStateCall = loadNewRequestComponent;
+        }, 1000);
+        
     }
 };
 
