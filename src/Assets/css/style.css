@@ -964,7 +964,7 @@
  }
 
  .bg-slate-50 {
-     background-color: var(--blue-50);
+     background-color: #f8fafc;
  }
 
  .uppercase {
@@ -1576,4 +1576,12 @@
 
 .norequest {
     padding: 20px 5px;
+}
+
+.w-1\/2 {
+    width: 50%;
+}
+
+.hover\:bg-gray-50:hover {
+    background-color: #f9fafb;
 }

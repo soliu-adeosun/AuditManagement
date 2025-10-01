@@ -479,9 +479,9 @@ MainApplication.NewRequestComponent.saveDataToList = function () {
         
         globalDefinitions.onActionCompleted();
 
-        if (!AppRequest.returned) {
-            formData.ParallelApprovals = JSON.stringify(customWorkflowEngine.getStagebyName(globalDefinitions.stageDefinitions.management).users);
-        }
+        // if (!AppRequest.returned) {
+        //     formData.ParallelApprovals = JSON.stringify(customWorkflowEngine.getStagebyName(globalDefinitions.stageDefinitions.management).users);
+        // }
         MainApplication.NewRequestComponent.proceedToList(formData, false);
     }
     else {

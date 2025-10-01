@@ -57,12 +57,6 @@ MainApplication.ViewRequestComponent.recoverListData = function() {
                 field: 'WorkflowRequestID',
                 type: 'Text',
                 val: AppRequest.itemId
-            },
-            {
-                operator: 'Eq',
-                field: 'Approval_Status',
-                type: 'Text',
-                val: globalDefinitions.stageDefinitions.pending
             }
         ]);
         
@@ -82,28 +76,12 @@ MainApplication.ViewRequestComponent.recoverListData = function() {
             }
             else {
                 // globalDefinitions.SetWorkflowRouting(customWorkflowEngine);
-                // listProperties.ParallelApprovals = $spcontext.JSONToObject(listProperties.ParallelApprovals);
-
-                // for(var x = 0; x < listProperties.ParallelApprovals.length; x++){
-                //     listProperties.ParallelApprovals[x].ismember = MainApplication.configuredTaskMembers[listProperties.ParallelApprovals[x].name].belongs;
-                // }
-
-                // if (listProperties.ParallelApprovals.length > 0) {
-                //     customWorkflowEngine.updateStageByName({
-                //         name: globalDefinitions.stageDefinitions.stakeholder,
-                //         users: listProperties.ParallelApprovals
-                //     });
-                // }
                 
                 // customWorkflowEngine.routeEngine(customWorkflowEngine).updateRoutesinFlow(listProperties, function (resolved) {
                 //     customWorkflowEngine.routeEngine(customWorkflowEngine).
                 //     PageSecurity(customWorkflowEngine.stages.securityModeTask, listProperties.Current_Approver, listProperties.Approval_Status, function (error) {
 
                         if (typeof error === "undefined") {
-
-                            // if(listProperties.UpdateMode !== "Yes"){
-                            //     $("#processbyall").remove();
-                            // }
                             
                             listProperties.Created = $spcontext.stringnifyDate({
                                 value: listProperties.Created
@@ -118,13 +96,6 @@ MainApplication.ViewRequestComponent.recoverListData = function() {
                             listProperties.AttachmentURL = $spcontext.JSONToObject(listProperties.AttachmentURL, 'object');
                             listProperties.AuditeesDetails = $spcontext.JSONToObject(listProperties.AuditeesDetails);
                             listProperties.QuestionsDetails = $spcontext.JSONToObject(listProperties.QuestionsDetails);
-                            // listProperties.BankDetails = $spcontext.JSONToObject(listProperties.BankDetails);
-                            // listProperties.ProductType = $spcontext.JSONToObject(listProperties.ProductType);
-
-
-                            //$("#orgtype").text(str);
-                            // listProperties.OrganizationType = listProperties.OrganizationType.toString();
-                            // listProperties.ProductType = listProperties.ProductType.toString();
 
                             MainApplication.ViewRequestComponent.displayAuditees(listProperties.AuditeesDetails);
                             MainApplication.ViewRequestComponent.displayQuestionSets(listProperties.QuestionsDetails);

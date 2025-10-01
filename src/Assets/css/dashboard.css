@@ -53,3 +53,11 @@ td {
     line-height: 1.25rem;
     color: var(--blue-500);
 }
+
+li {
+    list-style: none;
+}
+
+ul {
+    padding-left: 0 !important;
+}

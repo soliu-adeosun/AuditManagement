@@ -27,13 +27,18 @@ MainApplication.ApproveRequestComponent.ApplicationDetails = function () {
     this.documentsToUpdate = {};
 }
 
+
 whenApproveRequestDependeciesLoaded = function () {
     globalDefinitions.callLoader();
-    $spcontext.assignAttributes();
-    AppRequest = new MainApplication.ApproveRequestComponent.ApplicationDetails();
     globalDefinitions.extendStages();
-    globalDefinitions.callLoader();
+    $spcontext.assignAttributes();
+    
+    AppRequest = new MainApplication.ApproveRequestComponent.ApplicationDetails();
+    // globalDefinitions.extendStages();
     customWorkflowEngine = new WorkflowManagerEngine(CurrentUserProperties);
+    // globalDefinitions.SetWorkflowRouting(customWorkflowEngine);
+    AppRequest.itemId = $spcontext.getParameterByName("itemid", window.location.href);
+
     $spcontext.filesDictionary = {};
 
     $spcontext.validationProperties.text.extend["Comments"] = function (field) {
@@ -50,7 +55,7 @@ whenApproveRequestDependeciesLoaded = function () {
 
 
 MainApplication.ApproveRequestComponent.recoverListData = function() {
-    AppRequest.itemId = $spcontext.getParameterByName("itemid", window.location.href);
+    
     if (AppRequest.itemId !== null && AppRequest.itemId !== "") {
 
         var query = speedctxRoot.camlBuilder([{
@@ -80,31 +85,17 @@ MainApplication.ApproveRequestComponent.recoverListData = function() {
 
         speedctxRoot.getListToControl(globalDefinitions.stageDefinitions.listname, query, extraProperties, function (listProperties) {
             if ($.isEmptyObject(listProperties)) {
-                MainApplication.notyf.error("Request doesnt exist...");
+                MainApplication.notyf.error("You already took action on this request...");
                 $spcontext.redirect("#/", false);
                 globalDefinitions.closeLoader();
                 
             }
             else {
-                // globalDefinitions.SetWorkflowRouting(customWorkflowEngine);
-                // listProperties.ParallelApprovals = $spcontext.JSONToObject(listProperties.ParallelApprovals);
-
-                // for(var x = 0; x < listProperties.ParallelApprovals.length; x++){
-                //     listProperties.ParallelApprovals[x].ismember = MainApplication.configuredTaskMembers[listProperties.ParallelApprovals[x].name].belongs;
-                // }
-
-                // if (listProperties.ParallelApprovals.length > 0) {
-                //     customWorkflowEngine.updateStageByName({
-                //         name: globalDefinitions.stageDefinitions.stakeholder,
-                //         users: listProperties.ParallelApprovals
-                //     });
-                // }
-                
                 // customWorkflowEngine.routeEngine(customWorkflowEngine).updateRoutesinFlow(listProperties, function (resolved) {
                 //     customWorkflowEngine.routeEngine(customWorkflowEngine).
                 //     PageSecurity(customWorkflowEngine.stages.securityModeTask, listProperties.Current_Approver, listProperties.Approval_Status, function (error) {
 
-                        if (typeof error === "undefined") {
+                        if (MainApplication.configuredTaskMembers[listProperties.Current_Approver].belongs) {
 
                             // if(listProperties.UpdateMode !== "Yes"){
                             //     $("#processbyall").remove();
@@ -123,13 +114,6 @@ MainApplication.ApproveRequestComponent.recoverListData = function() {
                             listProperties.AttachmentURL = $spcontext.JSONToObject(listProperties.AttachmentURL, 'object');
                             listProperties.AuditeesDetails = $spcontext.JSONToObject(listProperties.AuditeesDetails);
                             listProperties.QuestionsDetails = $spcontext.JSONToObject(listProperties.QuestionsDetails);
-                            // listProperties.BankDetails = $spcontext.JSONToObject(listProperties.BankDetails);
-                            // listProperties.ProductType = $spcontext.JSONToObject(listProperties.ProductType);
-
-
-                            //$("#orgtype").text(str);
-                            // listProperties.OrganizationType = listProperties.OrganizationType.toString();
-                            // listProperties.ProductType = listProperties.ProductType.toString();
 
                             MainApplication.ApproveRequestComponent.displayAuditees(listProperties.AuditeesDetails);
                             MainApplication.ApproveRequestComponent.displayQuestionSets(listProperties.QuestionsDetails);
@@ -165,19 +149,19 @@ MainApplication.ApproveRequestComponent.recoverListData = function() {
                             globalDefinitions.closeLoader();
                             
                         } else {
-                            globalDefinitions.HandlerError(error);
+                            globalDefinitions.HandlerError("You are not allowed to access this request");
                             globalDefinitions.AuditLogManager_SaveLog({
                                 Action: `Unauthorized action to view Audit Management ${listProperties.WorkflowRequestID}`,
-                                Message: error
+                                Message: "You are not allowed to access this request"
                             });
                             setTimeout(function () {
                                 globalDefinitions.closeLoader();
                             }, 1000);
                             $spcontext.redirect("#/", false);
                         }
-                    // });
+                    // }); //commented here
                     
-                // });
+                // }); //commented here
             }
         });
     } else {
@@ -190,6 +174,7 @@ MainApplication.ApproveRequestComponent.recoverListData = function() {
 MainApplication.ApproveRequestComponent.confirmSubmit = function (actionTaken) {
     $("#confirmModal").modal("show");
     AppRequest.actionTaken = actionTaken;
+    MainApplication.confirmAction = MainApplication.ApproveRequestComponent.actionConfirmed;
 }
 
 MainApplication.ApproveRequestComponent.actionConfirmed = function () {
@@ -206,63 +191,17 @@ MainApplication.ApproveRequestComponent.saveDataToList = function (actionTaken) 
         var formData = {};
         AppRequest.comment = $("#approvercomment").val();
 
-        var returnStr = "";
-        var returnStage = "";
-        if(actionTaken === "DeclinedVDR"){
-            returnStr = "Returned to vendor";
-            returnStage = "AAA";
-        }
-
-        if(actionTaken === "ApprovedForAll"){
-            returnStr = "Proceessed by all (SCM)";
-            returnStage = "AA5";
-        }
 
         var historyProp = {
             stage: AppRequest.requestDetails.Current_Approver,
             comment: AppRequest.comment,
-            action: (actionTaken === globalDefinitions.stageDefinitions.approve) ? actionTaken : returnStr
+            action: actionTaken
         };
 
-        if(AppRequest.requestDetails.Current_Approver === globalDefinitions.stageDefinitions.stakeholder){
-            for(var x = 0; x < AppRequest.requestDetails.ParallelApprovals.length; x++){
-                if(AppRequest.requestDetails.ParallelApprovals[x].ismember && 
-                    (AppRequest.requestDetails.ParallelApprovals[x].status === globalDefinitions.stageDefinitions.pending.toLowerCase() || 
-                        AppRequest.requestDetails.ParallelApprovals[x].status === globalDefinitions.stageDefinitions.correction)){
-                    AppRequest.requestDetails.ParallelApprovals[x].status = actionTaken;
-                    AppRequest.requestDetails.ParallelApprovals[x].workliststatus = AppRequest.requestDetails.ParallelApprovals[x].name + `|${actionTaken}`
-                    delete AppRequest.requestDetails.ParallelApprovals[x].ismember;
-                    historyProp.stage = AppRequest.requestDetails.ParallelApprovals[x].name;
-                    break;
-                }
-            }
-
-            formData.ParallelApprovals = JSON.stringify(AppRequest.requestDetails.ParallelApprovals);
-        }
-
-        /*if(AppRequest.requestDetails.Current_Approver === globalDefinitions.stageDefinitions.customerservice){
-            formData.AccountNumber = tempData.AccountNumber;
-            formData.ExpiryDate = $spcontext.stringnifyDate({ value : tempData.ExpiryDate, format: "dd/mm/yy", includeTime : false, reconstruct: "mm/dd/yy" });
-        }*/
 
         formData = customWorkflowEngine.routeEngine(customWorkflowEngine).requestHistoryHandler(formData, AppRequest.requestDetails.Transaction_History, historyProp);
+        formData = customWorkflowEngine.routeEngine(customWorkflowEngine).runRouting(formData, AppRequest.requestDetails.Current_Approver_Code, actionTaken);
         
-        if(actionTaken === "DeclinedVDR" && AppRequest.requestDetails.Current_Approver === globalDefinitions.stageDefinitions.scm){
-            actionTaken = globalDefinitions.stageDefinitions.correction;
-            AppRequest.actionTaken = actionTaken;
-            formData = customWorkflowEngine.routeEngine(customWorkflowEngine).runRouting(formData, AppRequest.requestDetails.Current_Approver_Code, actionTaken);
-        }
-        else if(actionTaken === "DeclinedVDR"){
-            AppRequest.actionTaken = globalDefinitions.stageDefinitions.approve;
-            formData = customWorkflowEngine.routeEngine(customWorkflowEngine).runRouting(formData, returnStage, globalDefinitions.stageDefinitions.approve);
-        }
-        else if(actionTaken === "ApprovedForAll"){
-            AppRequest.actionTaken = globalDefinitions.stageDefinitions.approve;
-            formData = customWorkflowEngine.routeEngine(customWorkflowEngine).runRouting(formData, returnStage, globalDefinitions.stageDefinitions.approve);
-        }
-        else{
-            formData = customWorkflowEngine.routeEngine(customWorkflowEngine).runRouting(formData, AppRequest.requestDetails.Current_Approver_Code, globalDefinitions.stageDefinitions.approve);
-        }
         
         globalDefinitions.onActionCompleted();
         MainApplication.ApproveRequestComponent.proceedToList(formData);
@@ -278,19 +217,22 @@ MainApplication.ApproveRequestComponent.proceedToList = function(formData) {
     var Attachments = $spcontext.grabAllAttachments();
     //used to grab all string links so that it can be updated.
     //AppRequest.FileUrls = $spcontext.grabAllAttachmentsLinks();
-    globalDefinitions.uploadAttachment(Attachments, globalDefinitions.stageDefinitions.foldername,
-        globalDefinitions.stageDefinitions.documentlib,
-        function () {
+    // globalDefinitions.uploadAttachment(Attachments, globalDefinitions.stageDefinitions.foldername,
+        // globalDefinitions.stageDefinitions.documentlib,
+        // function () {
             formData.ID = AppRequest.requestDetails.ID;
-            $spcontext.updateItems([formData], globalDefinitions.stageDefinitions.listname, function () {
+            speedctxRoot.updateItems([formData], globalDefinitions.stageDefinitions.listname, function () {
                 AppRequest.requestDetails.Current_Approver = formData.Current_Approver;
-                globalDefinitions.EmailSetup(customWorkflowEngine, AppRequest, function (mailStatus) {
+                // globalDefinitions.EmailSetup(customWorkflowEngine, AppRequest, function (mailStatus) {
                     globalDefinitions.closeLoader();
-                    globalDefinitions.showSuccessModal();
-                    $spcontext.redirect("#/mytask", false);
-                });
+                    globalDefinitions.HandlerSuccess(`You have successfully taken action on this request`);
+                    globalDefinitions.AuditLogManager_SaveLog({
+                        Action : `took action on time sheet request ${AppRequest.requestDetails.WorkflowRequestID}`
+                    });
+                    $spcontext.redirect("#/", false);
+                // });
             });
-        })
+        // })
 }
 
 MainApplication.ApproveRequestComponent.displayAuditees = function(auditees) {

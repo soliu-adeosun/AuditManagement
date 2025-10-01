@@ -1,6 +1,7 @@
 import * as React from 'react';
 import CustomPeoplePicker from '../../../../Global/CustomPeoplePicker';
 import ClientButton from '../../../../Global/ClientButton';
+import { Link } from 'react-router-dom';
 require("approverequest");
 
 export default class ApproveRequest extends React.Component<{}, {}> {
@@ -49,11 +50,11 @@ export default class ApproveRequest extends React.Component<{}, {}> {
                     {/* Dropdown */}
                     <div className="mt-2">
                         <label className="block text-sm font-medium text-blue-600 mb-2">Auditees </label>
-                        <CustomPeoplePicker multiple custom-people="Auditees" />
+                        <CustomPeoplePicker multiple custom-people="Auditees" validate-control='false' />
                     </div>
                     <div className="mt-2">
                         <label className="block text-sm font-medium text-blue-600 mb-2">Other Auditors </label>
-                        <CustomPeoplePicker multiple custom-people="OtherAuditors" />
+                        <CustomPeoplePicker multiple custom-people="OtherAuditors" validate-control='false' />
                     </div>
                 </div>
                 <div style={{ marginTop: '2.2rem' }}>
@@ -156,12 +157,25 @@ export default class ApproveRequest extends React.Component<{}, {}> {
                             </div>
                         </div>
                     </div>
+                    <div style={{ marginTop: '2.2rem' }}>
+                        <div>
+                            <label className="block text-sm font-medium text-blue-600 mb-2">Comment</label>
+                            <textarea id="approvercomment"
+                            speed-bind-validate="ApproverComment"
+                            speed-include-control="false"
+                            speed-as-static="true"
+                            speed-validate-type="Comments"
+                            speed-event-switch="false"
+                            speed-validate-msg="Please tell us why you want to decline the audit!"
+                            placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" defaultValue={""} />
+                        </div>
+                    </div>
                     <div className="action-btns flex justify-center items-center gap-3" style={{ marginTop: '2rem' }}>
                         <ClientButton text={"Approve"} func={"MainApplication.ApproveRequestComponent.confirmSubmit"} clax={"px-4 py-2 text-sm font-medium submit-button"} prop="Approved" attr="" />
                         <ClientButton text={"Decline"} func={"MainApplication.ApproveRequestComponent.confirmSubmit"} clax={"px-4 py-2 bg-slate-500 text-white text-sm font-medium hover:bg-slate-600 transition-colors"} prop="Declined" attr="id='draftbtn'" />
-                        <a href="#/" className="px-4 py-2 bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">
+                        <Link to="/" className="px-4 py-2 bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">
                             Cancel
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>

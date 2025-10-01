@@ -12,8 +12,7 @@ var configPropertiesRoot = {
 
 var speedctxRoot;
 var globalDefinitions;
-var popContext;
-var testContext;
+var rsBAContext;
 
 function MainStartPoint() {
   this.url = window.location.href;
@@ -101,7 +100,7 @@ function whenLayoutLoaded() {
   $spcontext.loadSPDependencies(
     function () {
       var dependenciesCount = 0;
-      var expectedDepenciesCount = 7;
+      var expectedDepenciesCount = 9;
       // speedctxRoot = new Speed();
       globalDefinitions = new GlobalDefinitionsManager();
 
@@ -153,9 +152,10 @@ function whenLayoutLoaded() {
           }
         }
 
-        popContext = new Speed(configPropertiesRoot.POPCONTEXT.setting);
+        rsBAContext = new Speed(configPropertiesRoot.POPCONTEXT.setting);
 
         speedctxRoot = new Speed(configPropertiesRoot.AUDITMANAGEMENTURL.setting);
+        // testContext = new Speed("/sites");
         speedctxRoot.errorHandler = globalDefinitions.errorHandler;
         
         // $spcontext.errorHandler = globalDefinitions.errorHandler;
@@ -193,6 +193,18 @@ function whenLayoutLoaded() {
             // });
             checkAppDependency();
           });
+
+          rsBAContext.isUserMemberOfGroup([configPropertiesRoot.MANAGEMENT.setting, configPropertiesRoot.CEO.setting],
+              { email : CurrentUserProperties.email, groupEmails: true },function(isUserMember, groupUserProperties){
+                  MainApplication.isUserAnActor = isUserMember;
+                  MainApplication.configuredTaskMembers = groupUserProperties;
+                  checkAppDependency();
+              })
+
+            rsBAContext.isCurrentUserMemberOfGroup(configPropertiesRoot.REPORTADMIN.setting, function (isAdmin) {
+                MainApplication.cachedState.isReportAdmin = isAdmin;
+                checkAppDependency();
+            });
 
 
 
@@ -263,7 +275,7 @@ function whenLayoutLoaded() {
             "Job_x0020_Role"
         ];
 
-        popContext.getListToItems(
+        rsBAContext.getListToItems(
             "Staff List",
             [{}],
             {
