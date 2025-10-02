@@ -34,9 +34,9 @@ whenApproveRequestDependeciesLoaded = function () {
     $spcontext.assignAttributes();
     
     AppRequest = new MainApplication.ApproveRequestComponent.ApplicationDetails();
-    // globalDefinitions.extendStages();
+    globalDefinitions.extendStages();
     customWorkflowEngine = new WorkflowManagerEngine(CurrentUserProperties);
-    // globalDefinitions.SetWorkflowRouting(customWorkflowEngine);
+    globalDefinitions.SetWorkflowRouting(customWorkflowEngine);
     AppRequest.itemId = $spcontext.getParameterByName("itemid", window.location.href);
 
     $spcontext.filesDictionary = {};
@@ -93,9 +93,10 @@ MainApplication.ApproveRequestComponent.recoverListData = function() {
             else {
                 // customWorkflowEngine.routeEngine(customWorkflowEngine).updateRoutesinFlow(listProperties, function (resolved) {
                 //     customWorkflowEngine.routeEngine(customWorkflowEngine).
-                //     PageSecurity(customWorkflowEngine.stages.securityModeTask, listProperties.Current_Approver, listProperties.Approval_Status, function (error) {
+                //     PageSecurity(customWorkflowEngine.stages.securityModeTask, MainApplication.configuredTaskMembers[listProperties.Current_Approver].belongs, listProperties.Approval_Status, function (error) {
 
                         if (MainApplication.configuredTaskMembers[listProperties.Current_Approver].belongs) {
+                        // if (typeof error === "undefined") {
 
                             // if(listProperties.UpdateMode !== "Yes"){
                             //     $("#processbyall").remove();

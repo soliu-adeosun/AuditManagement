@@ -74,21 +74,7 @@ export default class Dashboard extends React.Component<{}, {}> {
 
 
                     <div>
-                        <ul className="flex text-sm font-medium text-center rounded-lg shadow-sm">
-                            <li className="w-1/2">
-                                <button data-tab="pending" id="pendingTab"
-                                    className="tab-btn block w-full p-4 text-white bg-slate-700 hover:bg-slate-800">
-                                    Pending Audits
-                                </button>
-                            </li>
-                            <li className="w-1/2">
-                                <button data-tab="myAudits" id="myAuditsTab"
-                                    className="tab-btn block w-full p-4 bg-white border-r border-gray-200 hover:bg-gray-50">
-                                    My Audits
-                                </button>
-                            </li>
-                        </ul>
-
+                        <div id='dashboard-tabs'/>
                         {/* Panels */}
             
                         <div className="overflow-x-auto">
@@ -102,9 +88,9 @@ export default class Dashboard extends React.Component<{}, {}> {
                                         <th speed-table-data="WorkflowRequestID" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">AUDIT REF ID</th>
                                         <th speed-table-data="InitiatorName" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">INITIATOR</th>
                                         <th speed-table-data="TypeOfAudit" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">TYPE</th>
-                                        <th speed-table-data="Current_Approver" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">CURRENT APPROVER</th>
                                         <th speed-table-data="Approval_Status" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">STATUS</th>
-                                        <th speed-table-data="Created" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">DATE</th>
+                                        <th speed-table-data="Current_Approver" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">NEXT APPROVER</th>
+                                        {/* <th speed-table-data="Created" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">DATE</th> */}
                                         <th speed-table-data="Modified" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>

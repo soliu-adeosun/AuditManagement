@@ -86,6 +86,24 @@ whenDashboardDependeciesLoaded = function () {
             }
         }
     };
+
+    $("#dashboard-tabs").empty();
+    $("#dashboard-tabs").append(
+        `<ul class="flex text-sm font-medium text-center rounded-lg shadow-sm">
+            <li class="w-1/2">
+                <button data-tab="pending" id="pendingTab"
+                    class="tab-btn block w-full p-4 text-white bg-slate-700 hover:bg-slate-800">
+                    Pending Audits
+                </button>
+            </li>
+            <li class="w-1/2">
+                <button data-tab="myAudits" id="myAuditsTab"
+                    class="tab-btn block w-full p-4 bg-white border-r border-gray-200 hover:bg-gray-50">
+                    My Audits
+                </button>
+            </li>
+        </ul>`
+    );
     // MainApplication.DashboardComponent.currentTab = "Pending";
     // Set up tab click handlers
     $("#pendingTab").click(() => {
