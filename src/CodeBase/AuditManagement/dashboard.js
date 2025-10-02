@@ -121,23 +121,23 @@ MainApplication.DashboardComponent.pendingRequests = function () {
         },
     ];
 
-    if (MainApplication.configuredTaskMembers["Management"].belongs){
+    if (MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.management].belongs){
         queryCaml.push({
             evaluator: "Or",
             operator: 'Eq',
             field: 'PendingUserLogin',
             type: 'Text',
-            val: "Management"
+            val: globalDefinitions.stageDefinitions.management
         });
     }
 
-    if (MainApplication.configuredTaskMembers["CEO"].belongs){
+    if (MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.ceo].belongs){
         queryCaml.push({
             evaluator: "Or",
             operator: 'Eq',
             field: 'PendingUserLogin',
             type: 'Text',
-            val: "CEO"
+            val: globalDefinitions.stageDefinitions.ceo
         });
     }
     queryCaml = customWorkflowEngine.setupTaskForGroups(queryCaml);

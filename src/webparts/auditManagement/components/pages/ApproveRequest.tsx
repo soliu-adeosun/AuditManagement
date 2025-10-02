@@ -87,7 +87,7 @@ export default class ApproveRequest extends React.Component<{}, {}> {
                             <textarea readOnly speed-bind="AreasOfImprovement" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" defaultValue={""} />
                         </div>
                     </div>
-                    <div className="lg:flex justify-between gap-3" style={{ marginTop: '2rem' }}>
+                    {/* <div className="lg:flex justify-between gap-3" style={{ marginTop: '2rem' }}>
                         <div className="w-full mt-2">
                             <label className="block text-sm font-medium text-blue-600 mb-2">Status</label>
                             <select className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
@@ -101,9 +101,10 @@ export default class ApproveRequest extends React.Component<{}, {}> {
                             <label className="block text-sm font-medium text-blue-600 mb-2">Areas of Improvement</label>
                             <textarea placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" defaultValue={""} />
                         </div>
-                    </div>
-                    <div>
-                        <h2 className="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">NONCONFORMANCE RISK
+                    </div> */}
+                    {/* NC RISK ASSESSMENT SECTION STARTS HERE */}
+                    <div id="riskAssessmentContainer" />
+                        {/* <h2 className="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">NONCONFORMANCE RISK
                             ASSESSMENT SECTION</h2>
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 mt-2">
                             <div className="mt-2">
@@ -155,8 +156,9 @@ export default class ApproveRequest extends React.Component<{}, {}> {
                                     Exposure</label>
                                 <input type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
                             </div>
-                        </div>
-                    </div>
+                        </div> */}
+                    {/* </div> */}
+                    {/* NC RISK ASSESSMENT SECTION ENDS HERE */}
                     <div style={{ marginTop: '2.2rem' }}>
                         <div>
                             <label className="block text-sm font-medium text-blue-600 mb-2">Comment</label>

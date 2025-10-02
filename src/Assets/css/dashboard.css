@@ -33,11 +33,14 @@
     /* border-radius: 10px; */
 }
 
+thead {
+    background-color: var(--gray-100);
+}
+
 tr {
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;
-    background-color: var(--white);
 }
 
 tr:hover {

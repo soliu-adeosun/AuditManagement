@@ -96,7 +96,7 @@ export default class Dashboard extends React.Component<{}, {}> {
                                 No Audit entries...
                             </div>
                             <table className="w-full hidden table-mobile" id="tasktable">
-                                <thead className="bg-slate-50 border-b border-gray-200">
+                                <thead className="border-b border-gray-200">
                                     <tr>
                                         <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">S/N</th>
                                         <th speed-table-data="WorkflowRequestID" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">AUDIT REF ID</th>

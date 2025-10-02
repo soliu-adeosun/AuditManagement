@@ -1,11 +1,11 @@
 loadNewRequestComponent = function () {
     if (MainApplication.cachedState.mode) {
-		whenNewRequestDependeciesLoaded();
-	}else{
+        whenNewRequestDependeciesLoaded();
+    } else {
         setTimeout(function () {
             MainApplication.cachedState.pageStateCall = loadNewRequestComponent;
         }, 1000);
-        
+
     }
 };
 
@@ -32,6 +32,7 @@ MainApplication.NewRequestComponent.ApplicationDetails = function () {
     this.finalrating = [];
     this.questionSetCounter = 0;
     this.groupProperties = {};
+    this.nonConformanceCounter = 1;
 }
 
 
@@ -53,11 +54,11 @@ function whenNewRequestDependeciesLoaded() {
     // ];
 
     // for(var x = 0; x < allgroups.length; x++){
-	// 	$spcontext.SPGroupDetails(allgroups[x],function(group){
-	// 		groupName = group.get_loginName();
-	// 		AppRequest.groupProperties[groupName] = group;
-	// 	});
-	// }
+    // 	$spcontext.SPGroupDetails(allgroups[x],function(group){
+    // 		groupName = group.get_loginName();
+    // 		AppRequest.groupProperties[groupName] = group;
+    // 	});
+    // }
 
     $spcontext.applyValidationEvents();
 
@@ -77,27 +78,27 @@ function whenNewRequestDependeciesLoaded() {
 
 
     $('#checkbox').on('change', function () {
-    if ($(this).is(':checked')) {
-        $('.submit-button').prop('disabled', false);
-    } else {
-        $('.submit-button').prop('disabled', true);
-    }
+        if ($(this).is(':checked')) {
+            $('.submit-button').prop('disabled', false);
+        } else {
+            $('.submit-button').prop('disabled', true);
+        }
     });
 
     for (var i = 0; i < MainApplication.auditType.length; i++) {
-		$("#typeOfAudit").append(`<option>${MainApplication.auditType[i]}</option>`);
-	}
+        $("#typeOfAudit").append(`<option>${MainApplication.auditType[i]}</option>`);
+    }
 
     for (var i = 0; i < MainApplication.processes.length; i++) {
-		$("#process").append(`<option>${MainApplication.processes[i]}</option>`);
-	}
-    
-    $("#process").on("change", function() {
+        $("#process").append(`<option>${MainApplication.processes[i]}</option>`);
+    }
+
+    $("#process").on("change", function () {
         var selectedProcess = $(this).val();
         var procedures = MainApplication.proceduresInfo[selectedProcess] || [];
         $("#procedure").empty();
         $("#procedure").append('<option selected disabled value="">Select a Procedure</option>');
-        procedures.forEach(function(item) {
+        procedures.forEach(function (item) {
             $("#procedure").append(`<option value="${item.Title}">${item.Title}</option>`);
         });
     });
@@ -105,11 +106,11 @@ function whenNewRequestDependeciesLoaded() {
 
     MainApplication.NewRequestComponent.updateQuestionsPlaceholder();
 
-    $('#addQuestionButton').on('click', function() {
+    $('#addQuestionButton').on('click', function () {
         MainApplication.NewRequestComponent.addQuestionSet();
     });
 
-    $('#questionsContainer').on('click', '.remove-question-set', function() {
+    $('#questionsContainer').on('click', '.remove-question-set', function () {
         const questionSetId = $(this).data('id');
         MainApplication.NewRequestComponent.removeQuestionSet(questionSetId);
     });
@@ -160,7 +161,7 @@ MainApplication.NewRequestComponent.findPersonData = function (email) {
     };
 }
 
-MainApplication.NewRequestComponent.addPersonBlock = function(person) {
+MainApplication.NewRequestComponent.addPersonBlock = function (person) {
     const block = `
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 mt-4 person-block" data-id="${person.Email}">
             <div class="mt-2">
@@ -184,7 +185,7 @@ MainApplication.NewRequestComponent.addPersonBlock = function(person) {
     $("#auditeesContainer").append(block);
 }
 
-MainApplication.NewRequestComponent.removePersonBlock = function(person) {
+MainApplication.NewRequestComponent.removePersonBlock = function (person) {
     $(`#auditeesContainer .person-block[data-id="${person.Email}"]`).remove();
 }
 
@@ -231,45 +232,69 @@ MainApplication.NewRequestComponent.updatePlaceholder = function () {
     }
 }
 
+
 // Function to add a new question set to questionsContainer
 MainApplication.NewRequestComponent.addQuestionSet = function () {
     const questionSetId = `question-set-${AppRequest.questionSetCounter++}`;
+    const nonConformanceId = `RSAUDNC${AppRequest.nonConformanceCounter.toString().padStart(3, '0')}`;
     const questionSetHtml = `
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
-            <div class="mt-2">
-                <label class="block text-sm font-medium text-blue-600 mb-2">Questions</label>
-                <input type="text" placeholder="Enter text here..." class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
+                <div class="mt-2">
+                    <label class="block text-sm font-medium text-blue-600 mb-2">Questions</label>
+                    <input type="text" placeholder="Enter text here..." class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+                </div>
+                <div class="mt-2">
+                    <label class="block text-sm font-medium text-blue-600 mb-2">Audit Finding</label>
+                    <select class="audit-finding-input w-full px-3 sm:px-4 py-2 sm:py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
+                        <option disabled selected>Select an option</option>
+                        <option value="Conformance">Conformance</option>
+                        <option value="Non-Conformance">Non-Conformance</option>
+                    </select>
+                </div>
+                <div class="mt-2">
+                    <label class="block text-sm font-medium text-blue-600 mb-2">ISO Clause</label>
+                    <input type="text" placeholder="Enter text here..." class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+                </div>
+                <div class="mt-2">
+                    <label class="block text-sm font-medium text-blue-600 mb-2">Objective Evidence</label>
+                    <input type="text" placeholder="Enter text here..." class="objective-evidence-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+                </div>
+                <div class="mt-2">
+                    <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance Statement</label>
+                    <input type="text" placeholder="Enter text here..." class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" disabled />
+                </div>
+                <div class="mt-2 hidden non-conformance-id">
+                    <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance ID</label>
+                    <input type="text" value="${nonConformanceId}" class="non-conformance-id-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                </div>
+                <div class="absolute right-0">
+                    <button class="remove-question-set p-1 sm:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors" data-id="${questionSetId}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                </div>
             </div>
-            <div class="mt-2">
-                <label class="block text-sm font-medium text-blue-600 mb-2">Audit Finding</label>
-                <select class="audit-finding-input w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
-                    <option disabled selected >Select an option</option>
-                    <option value="Conformance">Conformance</option>
-                    <option value="Non-Conformance">Non-Conformance</option>
-                </select>
-            </div>
-            <div class="mt-2">
-                <label class="block text-sm font-medium text-blue-600 mb-2">ISO Clause</label>
-                <input type="text" placeholder="Enter text here..." class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-            </div>
-            <div class="mt-2">
-                <label class="block text-sm font-medium text-blue-600 mb-2">Objective Evidence</label>
-                <input type="text" placeholder="Enter text here..." class="objective-evidence-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-            </div>
-            <div class="mt-2">
-                <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance Statement</label>
-                <input type="text" placeholder="Enter text here..." class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-            </div>
-            <div class="absolute right-0">
-                <button class="remove-question-set p-1 sm:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors" data-id="${questionSetId}">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                </button>
-            </div>
-        </div>
-    `;
+        `;
     $('#questionsContainer').append(questionSetHtml);
+
+    // Add event listener for audit finding selection
+    $(`#questionsContainer .question-set[data-id="${questionSetId}"] .audit-finding-input`).on('change', function () {
+        const $questionSet = $(this).closest('.question-set');
+        const $nonConformanceInput = $questionSet.find('.non-conformance-input');
+        const $nonConformanceIdDiv = $questionSet.find('.non-conformance-id');
+
+        if ($(this).val() === 'Non-Conformance') {
+            $nonConformanceInput.prop('disabled', false);
+            // $nonConformanceIdDiv.removeClass('hidden');
+            AppRequest.nonConformanceCounter++; // Increment counter only when Non-Conformance is selected
+        } else {
+            $nonConformanceInput.prop('disabled', true);
+            $nonConformanceIdDiv.addClass('hidden');
+        }
+    });
+
     MainApplication.NewRequestComponent.updateQuestionsPlaceholder();
 }
+
 
 // Function to remove a question set with animation
 MainApplication.NewRequestComponent.removeQuestionSet = function (questionSetId) {
@@ -301,22 +326,25 @@ MainApplication.NewRequestComponent.updateQuestionsPlaceholder = function () {
     }
 }
 
-MainApplication.NewRequestComponent.getAllQuestionsData = function() {
+MainApplication.NewRequestComponent.getAllQuestionsData = function () {
     const $questionSets = $('#questionsContainer .question-set');
     const questionsData = [];
 
-    $questionSets.each(function() {
+    $questionSets.each(function () {
         const $set = $(this);
         const questionData = {
             Questions: $set.find('.question-input').val() || '',
             AuditFinding: $set.find('.audit-finding-input').val() || '',
             ISOClause: $set.find('.iso-clause-input').val() || '',
             ObjectiveEvidence: $set.find('.objective-evidence-input').val() || '',
-            NonConformanceStatement: $set.find('.non-conformance-input').val() || ''
+            NonConformanceStatement: $set.find('.non-conformance-input').val() || '',
+            NonConformanceID: $set.find('.non-conformance-id-input').val() || ''
         };
 
         // Log if any field is missing
-        if (!questionData.Questions && !questionData.AuditFinding && !questionData.ISOClause && !questionData.ObjectiveEvidence && !questionData.NonConformanceStatement) {
+        if (!questionData.Questions && !questionData.AuditFinding && !questionData.ISOClause &&
+            !questionData.ObjectiveEvidence && !questionData.NonConformanceStatement &&
+            !questionData.NonConformanceID) {
             console.warn(`No data found for question set with data-id="${$set.data('id')}"`);
         }
 
@@ -331,30 +359,30 @@ MainApplication.NewRequestComponent.getAllQuestionsData = function() {
 };
 
 
-MainApplication.NewRequestComponent.recoverListData = function() {
+MainApplication.NewRequestComponent.recoverListData = function () {
 
     var query = speedctxRoot.camlBuilder([{
         rowlimit: 1
     },
 
-        {
-            operator: 'Eq',
-            field: 'WorkflowRequestID',
-            type: 'Text',
-            val: AppRequest.itemId
-        },
-        {
-            operator: 'Eq',
-            field: 'Approval_Status',
-            type: 'Text',
-            val: globalDefinitions.stageDefinitions.pending
-        }
+    {
+        operator: 'Eq',
+        field: 'WorkflowRequestID',
+        type: 'Text',
+        val: AppRequest.itemId
+    },
+    {
+        operator: 'Eq',
+        field: 'Approval_Status',
+        type: 'Text',
+        val: globalDefinitions.stageDefinitions.pending
+    }
     ]);
-    
+
     var extraProperties = [
         "ID", "WorkflowRequestID", "Current_Approver", "Current_Approver_Code", "Approval_Status",
         "Created", "InitiatorEmailAddress", "InitiatorLogin", "Transaction_History", "ReturnForCorrection",
-        "Modified", "PendingUserEmail", "PendingUserLogin", "Attachment_Folder", "AttachmentURL","Author",
+        "Modified", "PendingUserEmail", "PendingUserLogin", "Attachment_Folder", "AttachmentURL", "Author",
         "AuditeesDetails", "QuestionsDetails"
     ];
 
@@ -368,7 +396,7 @@ MainApplication.NewRequestComponent.recoverListData = function() {
             listProperties.Created = $spcontext.stringnifyDate({
                 value: listProperties.Created
             });
-            
+
             listProperties.Transaction_History = $spcontext.JSONToObject(listProperties.Transaction_History);
             listProperties.AttachmentURL = $spcontext.JSONToObject(listProperties.AttachmentURL, 'object');
             listProperties.AuditeesDetails = $spcontext.JSONToObject(listProperties.AuditeesDetails);
@@ -387,15 +415,15 @@ MainApplication.NewRequestComponent.recoverListData = function() {
             }
 
             AppRequest.requestDetails = listProperties;
-            
-            
+
+
 
             $spcontext.htmlBind(listProperties);
-            
+
             const ArrayOfOtherAuditorsEmail = Array.isArray(listProperties.OtherAuditors) ? [...new Set(listProperties.OtherAuditors.map(auditor => auditor.email))] : [];
             const ArrayOfAuditeesEmail = Array.isArray(listProperties.Auditees) ? [...new Set(listProperties.Auditees.map(auditee => auditee.email))] : [];
 
-            
+
 
             PeoplePicker.setDefault("OtherAuditors", ArrayOfOtherAuditorsEmail);
             PeoplePicker.setDefault("Auditees", ArrayOfAuditeesEmail);
@@ -408,7 +436,7 @@ MainApplication.NewRequestComponent.recoverListData = function() {
             $("#procedure").empty();
             $("#procedure").append('<option value="" disabled selected>Select a procedure</option>');
 
-            procedures.forEach(function(item) {
+            procedures.forEach(function (item) {
                 var isSelected = item.Title === selectedProcedure ? "selected" : "";
                 $("#procedure").append(`<option value="${item.Title}" ${isSelected}>${item.Title}</option>`);
             });
@@ -427,12 +455,10 @@ MainApplication.NewRequestComponent.confirmSubmit = function (action) {
     if (action === "Draft") {
         MainApplication.confirmAction = MainApplication.NewRequestComponent.saveConfirmed;
         $("#confirmModal").modal("show");
-    }else{
+    } else {
         MainApplication.confirmAction = MainApplication.NewRequestComponent.actionConfirmed;
         $("#confirmModal").modal("show");
     }
-
-    
 }
 
 MainApplication.NewRequestComponent.actionConfirmed = function () {
@@ -451,9 +477,9 @@ MainApplication.NewRequestComponent.saveDataToList = function () {
     formData.InitiatorName = CurrentUserProperties.title;
 
     formData.AuditeesDetails = MainApplication.NewRequestComponent.getAllAuditeeData();
-    
+
     formData.QuestionsDetails = MainApplication.NewRequestComponent.getAllQuestionsData();
-    
+
     // formData = Peoplepicker.getValue();
     const pickerValues = PeoplePicker.getValue();
 
@@ -464,10 +490,7 @@ MainApplication.NewRequestComponent.saveDataToList = function () {
 
         formData.AuditeesDetails = JSON.stringify(formData.AuditeesDetails);
         formData.QuestionsDetails = JSON.stringify(formData.QuestionsDetails);
-        // formData.KPIDetails = JSON.stringify(AppRequest.sections);
-        // formData.StartDate = $spcontext.stringnifyDate({ value : formData.StartDate, format : "dd/mm/yy", reconstruct : "mm/dd/yy"});
-        // formData.EndDate = $spcontext.stringnifyDate({ value : formData.EndDate, format : "dd/mm/yy", reconstruct : "mm/dd/yy"});
-        
+
         globalDefinitions.callLoader();
         formData = customWorkflowEngine.routeEngine(customWorkflowEngine).requestHistoryHandler(formData, AppRequest.transactionHistory, { stage: "Auditor", action: "Audit Created" });
         if (AppRequest.returned) {
@@ -476,12 +499,8 @@ MainApplication.NewRequestComponent.saveDataToList = function () {
         else {
             formData = customWorkflowEngine.routeEngine(customWorkflowEngine).runRouting(formData);
         }
-        
-        globalDefinitions.onActionCompleted();
 
-        // if (!AppRequest.returned) {
-        //     formData.ParallelApprovals = JSON.stringify(customWorkflowEngine.getStagebyName(globalDefinitions.stageDefinitions.management).users);
-        // }
+        globalDefinitions.onActionCompleted();
         MainApplication.NewRequestComponent.proceedToList(formData, false);
     }
     else {
@@ -498,9 +517,9 @@ MainApplication.NewRequestComponent.saveDataToListAsDraft = function () {
     formData.InitiatorName = CurrentUserProperties.title;
 
     formData.AuditeesDetails = MainApplication.NewRequestComponent.getAllAuditeeData() || {};
-    
+
     formData.QuestionsDetails = MainApplication.NewRequestComponent.getAllQuestionsData() || {};
-    
+
     // formData = Peoplepicker.getValue();
     const pickerValues = PeoplePicker.getValue();
 
@@ -511,10 +530,10 @@ MainApplication.NewRequestComponent.saveDataToListAsDraft = function () {
     formData.AuditeesDetails = JSON.stringify(formData.AuditeesDetails);
     formData.QuestionsDetails = JSON.stringify(formData.QuestionsDetails);
 
-    
+
     globalDefinitions.callLoader();
     formData = customWorkflowEngine.routeEngine(customWorkflowEngine).runRouting(formData, AppRequest.defaultStage, globalDefinitions.stageDefinitions.save);
-    
+
     globalDefinitions.onActionCompleted();
 
     MainApplication.NewRequestComponent.proceedToList(formData, true);
@@ -523,36 +542,36 @@ MainApplication.NewRequestComponent.saveDataToListAsDraft = function () {
 MainApplication.NewRequestComponent.proceedToList = function (formData, saveMode) {
     if (AppRequest.itemId == null) {
         speedctxRoot.createItems([formData], configProperties.AUDMGTLIST.setting,
-        function (createdItemsProperties) {
-            var itemID = createdItemsProperties[0].get_id();
-            var updateObj = {};
-            updateObj.ID = itemID;
-            var dateCreatedCode = $spcontext.stringnifyDate({
-                includeTime: true,
-                timeSpace: false,
-                format: "dd-mm-yy"
-            });
-            dateCreatedCode = dateCreatedCode.replace(/-/g, "");
-            updateObj.WorkflowRequestID = globalDefinitions.stageDefinitions.workflowcode + dateCreatedCode;
-
-            AppRequest.requestDetails = formData;
-            AppRequest.requestDetails.WorkflowRequestID = updateObj.WorkflowRequestID;
-            updateObj.Year = $spcontext.serverDate().getFullYear();
-
-            speedctxRoot.updateItems([updateObj], configProperties.AUDMGTLIST.setting, function () {
-                setTimeout(() => {
-                    globalDefinitions.closeLoader();
-                }, 2000);
-                globalDefinitions.HandlerSuccess(saveMode ? "Audit Saved as Draft Successfully" : "Audit Submitted Successfully");
-                
-                globalDefinitions.AuditLogManager_SaveLog({
-                    Action: saveMode ? `saved Audit ${AppRequest.requestDetails.WorkflowRequestID}` : `submitted Audit ${AppRequest.requestDetails.WorkflowRequestID}`
+            function (createdItemsProperties) {
+                var itemID = createdItemsProperties[0].get_id();
+                var updateObj = {};
+                updateObj.ID = itemID;
+                var dateCreatedCode = $spcontext.stringnifyDate({
+                    includeTime: true,
+                    timeSpace: false,
+                    format: "dd-mm-yy"
                 });
-                globalDefinitions.onActionCompleted();
-                $spcontext.redirect("#/", false);
+                dateCreatedCode = dateCreatedCode.replace(/-/g, "");
+                updateObj.WorkflowRequestID = globalDefinitions.stageDefinitions.workflowcode + dateCreatedCode;
+
+                AppRequest.requestDetails = formData;
+                AppRequest.requestDetails.WorkflowRequestID = updateObj.WorkflowRequestID;
+                updateObj.Year = $spcontext.serverDate().getFullYear();
+
+                speedctxRoot.updateItems([updateObj], configProperties.AUDMGTLIST.setting, function () {
+                    setTimeout(() => {
+                        globalDefinitions.closeLoader();
+                    }, 2000);
+                    globalDefinitions.HandlerSuccess(saveMode ? "Audit Saved as Draft Successfully" : "Audit Submitted Successfully");
+
+                    globalDefinitions.AuditLogManager_SaveLog({
+                        Action: saveMode ? `saved Audit ${AppRequest.requestDetails.WorkflowRequestID}` : `submitted Audit ${AppRequest.requestDetails.WorkflowRequestID}`
+                    });
+                    globalDefinitions.onActionCompleted();
+                    $spcontext.redirect("#/", false);
+                });
             });
-        });
-    }else{
+    } else {
         formData.ID = AppRequest.requestDetails.ID;
 
         if (!saveMode && AppRequest.requestDetails.Year === "") {
@@ -569,7 +588,7 @@ MainApplication.NewRequestComponent.proceedToList = function (formData, saveMode
                 globalDefinitions.closeLoader();
             }, 2000);
             globalDefinitions.HandlerSuccess(saveMode ? "Audit Saved as Draft Successfully" : "Audit Submitted Successfully");
-            
+
             globalDefinitions.AuditLogManager_SaveLog({
                 Action: saveMode ? `saved Audit ${AppRequest.requestDetails.WorkflowRequestID}` : `submitted Audit ${AppRequest.requestDetails.WorkflowRequestID}`
             });
@@ -580,7 +599,7 @@ MainApplication.NewRequestComponent.proceedToList = function (formData, saveMode
 }
 
 
-MainApplication.NewRequestComponent.displayAuditees = function(auditees) {
+MainApplication.NewRequestComponent.displayAuditees = function (auditees) {
 
     const $displayContainer = $("#auditeesContainer");
     $displayContainer.empty();
@@ -620,7 +639,7 @@ MainApplication.NewRequestComponent.displayAuditees = function(auditees) {
 };
 
 
-MainApplication.NewRequestComponent.displayQuestionSets = function(questionSets) {
+MainApplication.NewRequestComponent.displayQuestionSets = function (questionSets) {
     const $displayContainer = $("#questionsContainer");
     $displayContainer.empty();
 

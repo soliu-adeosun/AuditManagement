@@ -1,5 +1,6 @@
 import * as React from 'react';
 import CustomPeoplePicker from '../../../../Global/CustomPeoplePicker';
+import { Link } from 'react-router-dom';
 require("viewrequest");
 
 
@@ -85,7 +86,7 @@ export default class ViewRequest extends React.Component<{}, {}> {
                             <textarea readOnly speed-bind="AreasOfImprovement" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" defaultValue={""} />
                         </div>
                     </div>
-                    <div className="lg:flex justify-between gap-3" style={{ marginTop: '2rem' }}>
+                    {/* <div className="lg:flex justify-between gap-3" style={{ marginTop: '2rem' }}>
                         <div className="w-full mt-2">
                             <label className="block text-sm font-medium text-blue-600 mb-2">Status</label>
                             <select className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
@@ -99,6 +100,11 @@ export default class ViewRequest extends React.Component<{}, {}> {
                             <label className="block text-sm font-medium text-blue-600 mb-2">Areas of Improvement</label>
                             <textarea placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" defaultValue={""} />
                         </div>
+                    </div> */}
+                    <div className="action-btns flex justify-center items-center gap-3" style={{ marginTop: '2rem' }}>
+                        <Link to="/" className="px-4 py-2 bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">
+                            Cancel
+                        </Link>
                     </div>
                 </div>
             </div>

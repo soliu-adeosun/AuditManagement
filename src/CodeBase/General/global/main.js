@@ -100,7 +100,7 @@ function whenLayoutLoaded() {
   $spcontext.loadSPDependencies(
     function () {
       var dependenciesCount = 0;
-      var expectedDepenciesCount = 9;
+      var expectedDepenciesCount = 10;
       // speedctxRoot = new Speed();
       globalDefinitions = new GlobalDefinitionsManager();
 
@@ -262,6 +262,16 @@ function whenLayoutLoaded() {
                 }
             );
 
+          rsBAContext.getItem("ISO CLAUSE", $spcontext.camlBuilder(basicQuery), function (_spMeta) {
+              var listEnumerator = _spMeta.getEnumerator();
+              MainApplication.isoClause = [];
+              while (listEnumerator.moveNext()) {
+                  var title = listEnumerator.get_current().get_item("Title");
+                  MainApplication.isoClause.push(title);
+              }
+              checkAppDependency();
+          })
+
           var employeeInfoColumns = [
             "ID",
             "Title",
@@ -272,12 +282,23 @@ function whenLayoutLoaded() {
             "DEPARTMENT",
             "EID",
             "D_x002e_O_x002e_E_x0020__x002f__",
-            "Job_x0020_Role"
+            "Job_x0020_Role",
+            "Active"
         ];
 
         rsBAContext.getListToItems(
             "Staff List",
-            [{}],
+            [{
+                orderby: "ID",
+                ascending: "FALSE"
+              },
+              {
+              operator: 'Eq',
+              field: 'Active',
+              type: 'Text',
+              val: "Yes"
+            }
+            ],
             {
                 ignoreThreshold: false,
                 data: employeeInfoColumns,
@@ -296,7 +317,8 @@ function whenLayoutLoaded() {
                     Department: item.DEPARTMENT || '',
                     EmployeeId: item.EID || '',
                     DateOfEmployment: item.D_x002e_O_x002e_E_x0020__x002f__ || '',
-                    JobRole: item.Job_x0020_Role || ''
+                    JobRole: item.Job_x0020_Role || '',
+                    Active: item.Active || ''
                 };
 
                 if (transformedItem.Emailmail !== "") {
