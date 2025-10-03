@@ -25,6 +25,7 @@ MainApplication.ApproveRequestComponent.ApplicationDetails = function () {
     this.returned = false;
     this.messageType = "standard";
     this.documentsToUpdate = {};
+    this.isNonConformance = null;
 }
 
 
@@ -49,17 +50,31 @@ whenApproveRequestDependeciesLoaded = function () {
         return passed;
     }
 
+    if (MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.ceo].belongs){
+        $("#satisfactoryDiv").hide();
+    }
+
+
     $("#satisfactory").on('change', function () {
-        console.log(this.value);
         if (this.value === "Satisfactory") {
-            $("#riskAssessmentContainer").show();
+            if(AppRequest.isNonConformance === 0){
+                $("#riskAssessmentContainer").hide();
+                $("#managementRepContainer").show();
+            }else{
+                $("#riskAssessmentContainer").show();
+                $("#managementRepContainer").hide();
+            }
+            
         } else {
             $("#riskAssessmentContainer").hide();
+            $("#managementRepContainer").hide();
         }
     });
+    $("#managementRepContainer").hide();
     $("#riskAssessmentContainer").hide();
 
     $spcontext.applyValidationEvents();
+    MainApplication.ApproveRequestComponent.displayManagementDetails();
     MainApplication.ApproveRequestComponent.recoverListData();
 };
 
@@ -216,11 +231,11 @@ MainApplication.ApproveRequestComponent.saveDataToList = function (actionTaken) 
             var riskAssessment = MainApplication.ApproveRequestComponent.getNCRiskAssessmentData();
             var managementRep = MainApplication.ApproveRequestComponent.getManagementDetailsData();
         
-            if (riskAssessment && riskAssessment.length > 0) {
+            // if (riskAssessment && riskAssessment.length > 0) {
                 formData.RiskAssessment = JSON.stringify(riskAssessment);
-            } else if (managementRep && managementRep.length > 0) {
+            // } else if (managementRep && managementRep.length > 0) {
                 formData.ManagementRep = JSON.stringify(managementRep);
-            }
+        //     }
         }
 
         formData = customWorkflowEngine.routeEngine(customWorkflowEngine).requestHistoryHandler(formData, AppRequest.requestDetails.Transaction_History, historyProp);
@@ -353,7 +368,8 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
 
     // If no non-conformance data, trigger management details and return
     if (nonConformanceData.length === 0) {
-        MainApplication.ApproveRequestComponent.displayManagementDetails();
+        // $("#managementRepContainer").show();
+        AppRequest.isNonConformance = 0;
         return;
     }
 
@@ -553,7 +569,7 @@ MainApplication.ApproveRequestComponent.createManagementDetails = function () {
 
 // Function to display the Management Details section
 MainApplication.ApproveRequestComponent.displayManagementDetails = function () {
-    const $container = $('#riskAssessmentContainer');
+    const $container = $('#managementRepContainer');
     $container.empty(); // Clear existing content
     const managementDetailsElement = MainApplication.ApproveRequestComponent.createManagementDetails();
     $container.append(managementDetailsElement);
@@ -561,7 +577,7 @@ MainApplication.ApproveRequestComponent.displayManagementDetails = function () {
 
 // Function to collect all data from the Management Details section
 MainApplication.ApproveRequestComponent.getManagementDetailsData = function () {
-    const $grids = $('#riskAssessmentContainer .grid.grid-cols-1.lg\\:grid-cols-2');
+    const $grids = $('#managementRepContainer .grid.grid-cols-1.lg\\:grid-cols-2');
     const managementData = [];
 
     $grids.each(function () {

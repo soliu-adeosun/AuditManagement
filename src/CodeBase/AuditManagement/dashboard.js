@@ -89,10 +89,7 @@ whenDashboardDependeciesLoaded = function () {
 
     $("#dashboard-tabs").empty();
     
-    if (MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.management].belongs || 
-        MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.ceo].belongs ||
-        MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.admin].belongs
-    ) {
+    if (MainApplication.isUserAnActor) {
         $("#dashboard-tabs").append(
             `<ul class="flex text-sm font-medium text-center rounded-lg shadow-sm">
                 <li class="w-1/2">
@@ -104,7 +101,7 @@ whenDashboardDependeciesLoaded = function () {
                 <li class="w-1/2">
                     <button data-tab="pending" id="pendingTab"
                         class="tab-btn block w-full p-4 bg-white border-r border-gray-200 hover:bg-gray-50">
-                        Pending Audits
+                        Action Required (<span id="auditsAwaitingMyAction"></span>)
                     </button>
                 </li>
             </ul>`
@@ -191,7 +188,7 @@ MainApplication.DashboardComponent.pendingRequests = function () {
 
     speedctxRoot.getListToItems(configProperties.AUDMGTLIST.setting, query, extraProperties, true, null, function (tableData) {
         AppRequest.pendingItems = tableData;
-        $("#pendingAudit").text(tableData.length);
+        $("#auditsAwaitingMyAction").text(tableData.length);
         if (MainApplication.DashboardComponent.currentTab === "Pending") {
             MainApplication.DashboardComponent.showTableData(tableData);
         }
@@ -226,9 +223,14 @@ MainApplication.DashboardComponent.myRequests = function () {
             return item.Approval_Status === "Completed";
         });
 
+        var pendingItems = tableData.filter(function (item) {
+            return item.Approval_Status === "Pending";
+        });
+
         AppRequest.myItems = tableData;
         $("#totalAudit").text(tableData.length);
         $("#completedAudit").text(completedItems.length);
+        $("#pendingAudit").text(pendingItems.length);
         if (MainApplication.DashboardComponent.currentTab === "MyAudits") {
             MainApplication.DashboardComponent.showTableData(tableData);
         }

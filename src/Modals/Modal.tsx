@@ -103,7 +103,7 @@ export default class Modal extends React.Component<{}, {}> {
                         <div className="modal-content">
                             <div className="modal-header">
                                 <div className="icon">
-                                    <img src={require("../Assets/img/confirm-icon.png")} />
+                                    {/* <img src={require("../Assets/img/confirm-icon.png")} /> */}
                                 </div>
                             </div>
                             <div className="modal-body">
@@ -113,12 +113,12 @@ export default class Modal extends React.Component<{}, {}> {
                             <div className="modal-footer">
                                 <button
                                     type="button"
-                                    className="btn btn-secondary"
+                                    className="px-4 py-2 bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
                                     data-bs-dismiss="modal"
                                 >
                                     No
                                 </button>
-                                <ClientButton text={"Yes"} func={"MainApplication.confirmAction"} clax={"btn btn-primary"} prop="" attr="" />
+                                <ClientButton text={"Yes"} func={"MainApplication.confirmAction"} clax={"px-4 py-2 bg-slate-500 text-white text-sm font-medium hover:bg-slate-600 transition-colors"} prop="" attr="" />
                             </div>
                         </div>
                     </div>

@@ -112,6 +112,7 @@ export default class ApproveRequest extends React.Component<{}, {}> {
                         </div>
                     </div> */}
                     {/* NC RISK ASSESSMENT SECTION STARTS HERE */}
+                    <div id="managementRepContainer" />
                     <div id="riskAssessmentContainer" />
                         {/* <h2 className="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">NONCONFORMANCE RISK
                             ASSESSMENT SECTION</h2>
