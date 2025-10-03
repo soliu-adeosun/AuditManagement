@@ -81,10 +81,19 @@ export default class ApproveRequest extends React.Component<{}, {}> {
                         </div>
                     </div>
                     <div id='questionsContainer' className="mt-2" />
-                    <div style={{ marginTop: '2.2rem' }}>
+                    <div style={{ marginTop: '2.2rem' }} className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                         <div>
                             <label className="block text-sm font-medium text-blue-600 mb-2">Areas of Improvement</label>
                             <textarea readOnly speed-bind="AreasOfImprovement" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" defaultValue={""} />
+                        </div>
+
+                        <div id='satisfactoryDiv' className="w-full mt-2">
+                            <label className="block text-sm font-medium text-blue-600 mb-2">Status</label>
+                            <select id='satisfactory' className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
+                                <option value={""}>Select an option</option>
+                                <option value={"Satisfactory"}>Satisfactory</option>
+                                <option value={"Not Satisfactory"}>Not Satisfactory</option>
+                            </select>
                         </div>
                     </div>
                     {/* <div className="lg:flex justify-between gap-3" style={{ marginTop: '2rem' }}>

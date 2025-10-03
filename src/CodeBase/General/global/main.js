@@ -100,7 +100,7 @@ function whenLayoutLoaded() {
   $spcontext.loadSPDependencies(
     function () {
       var dependenciesCount = 0;
-      var expectedDepenciesCount = 10;
+      var expectedDepenciesCount = 12;
       // speedctxRoot = new Speed();
       globalDefinitions = new GlobalDefinitionsManager();
 
@@ -194,7 +194,7 @@ function whenLayoutLoaded() {
             checkAppDependency();
           });
 
-          rsBAContext.isUserMemberOfGroup([configPropertiesRoot.MANAGEMENT.setting, configPropertiesRoot.CEO.setting],
+          rsBAContext.isUserMemberOfGroup([configPropertiesRoot.MANAGEMENT.setting, configPropertiesRoot.CEO.setting, configPropertiesRoot.REPORTADMIN.setting],
               { email : CurrentUserProperties.email, groupEmails: true },function(isUserMember, groupUserProperties){
                   MainApplication.isUserAnActor = isUserMember;
                   MainApplication.configuredTaskMembers = groupUserProperties;
@@ -265,9 +265,50 @@ function whenLayoutLoaded() {
           rsBAContext.getItem("ISO CLAUSE", $spcontext.camlBuilder(basicQuery), function (_spMeta) {
               var listEnumerator = _spMeta.getEnumerator();
               MainApplication.isoClause = [];
+              MainApplication.occurrence = [];
+
               while (listEnumerator.moveNext()) {
                   var title = listEnumerator.get_current().get_item("Title");
+                  var occurrenceData = $spcontext.checkNull(listEnumerator.get_current().get_item("d65x"));
+
                   MainApplication.isoClause.push(title);
+
+                  // Only push non-empty strings
+                  if (occurrenceData !== "") {
+                      MainApplication.occurrence.push(occurrenceData);
+                  }
+              }
+
+              checkAppDependency();
+          });
+
+          var riskQuery = [
+                {
+                    ascending: "TRUE",  //ascending or descending
+                    orderby: "Value", //Column Name to order by
+                }
+            ];
+
+          speedctxRoot.getItem("RiskImpact", speedctxRoot.camlBuilder(riskQuery), function (_spMeta) {
+              var listEnumerator = _spMeta.getEnumerator();
+              MainApplication.riskImpact = [];
+              while (listEnumerator.moveNext()) {
+                  var riskImpactObj = {};
+                  riskImpactObj.title = listEnumerator.get_current().get_item("Title");
+                  riskImpactObj.value = listEnumerator.get_current().get_item("Value");
+                  MainApplication.riskImpact.push(riskImpactObj);
+              }
+              checkAppDependency();
+          })
+
+          speedctxRoot.getItem("NonConformanceRating", speedctxRoot.camlBuilder(riskQuery), function (_spMeta) {
+              var listEnumerator = _spMeta.getEnumerator();
+              MainApplication.NCRating = [];
+              while (listEnumerator.moveNext()) {
+                  var ncRatingObj = {};
+                  ncRatingObj.title = listEnumerator.get_current().get_item("Title");
+                  ncRatingObj.value = listEnumerator.get_current().get_item("Value");
+                  MainApplication.NCRating.push(ncRatingObj);
               }
               checkAppDependency();
           })
@@ -364,31 +405,3 @@ function whenLayoutLoaded() {
 
 
 whenLayoutLoaded();
-
-function deleteRowAttachment(elementBindProperty, index, elementId) {
-  var customId = "#" + elementBindProperty + "display" + index;
-  var property = document.getElementById(elementId).getAttribute("speed-file-validate");
-  property = (typeof property === "undefined" || property === null) ? document.getElementById(elementId).getAttribute("speed-file-bind") : property;
-  $spcontext.clearFileInput(elementId);
-  $(customId).remove();
-  //delete $spcontext.filesDictionary[property];
-  $spcontext.filesDictionary[property].files.splice(index, 1);
-  //redraw attachments
-  $("div[speed-file-bind='" + elementBindProperty + "']").empty();
-
-  if ($spcontext.filesDictionary[property].files.length !== 0) {
-    for (var y = 0; y < $spcontext.filesDictionary[property].files.length; y++) {
-      if (typeof $spcontext.filesDictionary[property].files[y] === "string") {
-        var splitedLinks = $spcontext.filesDictionary[property].files[y].split("/");
-        var pos = splitedLinks.length - 1;
-        displayName = splitedLinks[pos];
-        var attachmentBlock = "<p id='" + elementBindProperty + "display" + y + "' style='color : #002c4d'><a href='" + $spcontext.filesDictionary[property].files[y] + "'>" + displayName + "<span><a style='color: red; cursor: pointer; padding-left: 5px' class='attachment-inline-delete' onclick='deleteRowAttachment(\"" + elementBindProperty + "\", " + y + ",\"" + elementId + "\")'>x</a></span></a></p>";
-        $("div[speed-file-bind='" + elementBindProperty + "']").append(attachmentBlock);
-      } else {
-        var attachmentBlock = "<p id='" + elementBindProperty + "display" + y + "' style='color : #002c4d'>" + $spcontext.filesDictionary[property].files[y].dataName +
-          "<span><a class='attachment-inline-delete' style='color: red; cursor: pointer; padding-left: 5px' onclick='deleteRowAttachment(\"" + elementBindProperty + "\", " + y + ",\"" + elementId + "\")'>x</a></span></p>";
-        $("div[speed-file-bind='" + elementBindProperty + "']").append(attachmentBlock);
-      }
-    }
-  }
-}

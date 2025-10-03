@@ -49,6 +49,16 @@ whenApproveRequestDependeciesLoaded = function () {
         return passed;
     }
 
+    $("#satisfactory").on('change', function () {
+        console.log(this.value);
+        if (this.value === "Satisfactory") {
+            $("#riskAssessmentContainer").show();
+        } else {
+            $("#riskAssessmentContainer").hide();
+        }
+    });
+    $("#riskAssessmentContainer").hide();
+
     $spcontext.applyValidationEvents();
     MainApplication.ApproveRequestComponent.recoverListData();
 };
@@ -190,6 +200,7 @@ MainApplication.ApproveRequestComponent.saveDataToList = function (actionTaken) 
     globalDefinitions.onActionClicked();
 
     var tempData = $spcontext.bind({});
+    
     if ($spcontext.checkPassedValidation()) {
         var formData = {};
         AppRequest.comment = $("#approvercomment").val();
@@ -201,6 +212,16 @@ MainApplication.ApproveRequestComponent.saveDataToList = function (actionTaken) 
             action: actionTaken
         };
 
+        if (MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.management].belongs) {
+            var riskAssessment = MainApplication.ApproveRequestComponent.getNCRiskAssessmentData();
+            var managementRep = MainApplication.ApproveRequestComponent.getManagementDetailsData();
+        
+            if (riskAssessment && riskAssessment.length > 0) {
+                formData.RiskAssessment = JSON.stringify(riskAssessment);
+            } else if (managementRep && managementRep.length > 0) {
+                formData.ManagementRep = JSON.stringify(managementRep);
+            }
+        }
 
         formData = customWorkflowEngine.routeEngine(customWorkflowEngine).requestHistoryHandler(formData, AppRequest.requestDetails.Transaction_History, historyProp);
         formData = customWorkflowEngine.routeEngine(customWorkflowEngine).runRouting(formData, AppRequest.requestDetails.Current_Approver_Code, actionTaken);
@@ -293,7 +314,7 @@ MainApplication.ApproveRequestComponent.displayQuestionSets = function(questionS
     questionSets.forEach((questionSet, index) => {
         const questionSetId = questionSet.id || `question-set-${index}`;
         const block = `
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 small-gap mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Questions</label>
                     <input type="text" value="${questionSet.Questions || ''}" class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
@@ -322,34 +343,31 @@ MainApplication.ApproveRequestComponent.displayQuestionSets = function(questionS
 
 MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (questionsDetails) {
     // Predefined options for select fields
-    const isoClauseOptions = MainApplication.isoClause;
-    const occurrenceOptions = ['Rare', 'Unlikely', 'Possible', 'Likely', 'Almost Certain'];
-    const ncRatingOptions = ['Low', 'Medium', 'High', 'Critical'];
-    const riskImpactOptions = ['Minor', 'Major', 'Critical'];
+    const isoClauseOptions = MainApplication.isoClause || [];
+    const occurrenceOptions = MainApplication.occurrence || [];
+    const ncRatingOptions = MainApplication.NCRating || [];
+    const riskImpactOptions = MainApplication.riskImpact || [];
 
     // Filter questionsDetails for Non-Conformance entries
     const nonConformanceData = questionsDetails.filter(data => data.AuditFinding === 'Non-Conformance');
 
-    // Base HTML structure
-    let html = '';
-
-    // If no non-conformance data, show a different section
+    // If no non-conformance data, trigger management details and return
     if (nonConformanceData.length === 0) {
         MainApplication.ApproveRequestComponent.displayManagementDetails();
         return;
     }
 
     // Build Non-Conformance Risk Assessment table
-    html = `
+    let html = `
         <div>
             <h2 class="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">NONCONFORMANCE RISK ASSESSMENT SECTION</h2>
             <div class="overflow-x-auto">
                 <table class="w-full table-auto border-collapse">
                     <thead>
                         <tr class="bg-gray-100">
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC REFERENCE NO.</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC REF ID</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">ISO CLAUSE</th>
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NON-CONFORMANCE</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">OCCURRENCE</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC RATING</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC CLASSIFICATION</th>
@@ -369,41 +387,45 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
 
         html += `
             <tr class="border-b" data-nc-id="${ncId}">
-                <td class="py-2">
+                <td class="px-2 py-2">
                     <input type="text" value="${ncId}" readonly class="nc-reference-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
                 </td>
-                <td class="py-2">
+                <td class="px-2 py-2">
                     <select class="iso-clause-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
-                        <option value="">Select an option</option>
+                        <option value="">Select</option>
                         ${isoClauseOptions.map(option => `<option value="${option}" ${option === isoClause ? 'selected' : ''}>${option}</option>`).join('')}
                     </select>
                 </td>
-                <td class="py-2">
-                    <input type="text" value="${ncStatement}" class="non-conformance-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
+                <td class="px-2 py-2">
+                    <input type="text" readonly value="${ncStatement}" class="non-conformance-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
                 </td>
-                <td class="py-2">
+                <td class="px-2 py-2">
                     <select class="occurrence-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
-                        <option value="">Select an option</option>
+                        <option value="">Select</option>
                         ${occurrenceOptions.map(option => `<option value="${option}">${option}</option>`).join('')}
                     </select>
                 </td>
-                <td class="py-2">
+                <td class="px-2 py-2">
                     <select class="nc-rating-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
-                        <option value="">Select an option</option>
-                        ${ncRatingOptions.map(option => `<option value="${option}">${option}</option>`).join('')}
+                        <option value="">Select</option>
+                        ${ncRatingOptions.map(option => `<option value="${option.value}">${option.title}</option>`).join('')}
                     </select>
                 </td>
-                <td class="py-2">
-                    <input type="text" placeholder="Enter classification..." class="nc-classification-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
+                <td class="px-2 py-2">
+                    <select class="nc-classification-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
+                        <option value="">Select</option>
+                        <option value="Minor">Minor</option>
+                        <option value="Major">Major</option>
+                    </select>
                 </td>
-                <td class="py-2">
+                <td class="px-2 py-2">
                     <select class="risk-impact-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
-                        <option value="">Select an option</option>
-                        ${riskImpactOptions.map(option => `<option value="${option}">${option}</option>`).join('')}
+                        <option value="">Select</option>
+                        ${riskImpactOptions.map(option => `<option value="${option.value}">${option.title}</option>`).join('')}
                     </select>
                 </td>
-                <td class="py-2">
-                    <input type="text" placeholder="Enter risk exposure..." class="overall-risk-exposure-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
+                <td class="px-2 py-2">
+                    <input type="text" readonly class="overall-risk-exposure-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
                 </td>
             </tr>
         `;
@@ -416,16 +438,41 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
         </div>
     `;
 
-    // Return as DOM element using jQuery
-    return $('<div>').html(html)[0];
+    // Create DOM element and attach event listeners
+    const $container = $('<div>').html(html);
+    
+    // Add event listeners for NC Rating and Risk Impact selects
+    $container.find('tr').each(function () {
+        const $row = $(this);
+        const $ncRatingSelect = $row.find('.nc-rating-input');
+        const $riskImpactSelect = $row.find('.risk-impact-input');
+        const $overallRiskExposureInput = $row.find('.overall-risk-exposure-input');
+
+        function updateOverallRiskExposure() {
+            const ncRatingValue = parseFloat($ncRatingSelect.val()) || 0;
+            const riskImpactValue = parseFloat($riskImpactSelect.val()) || 0;
+            const product = ncRatingValue * riskImpactValue;
+            $overallRiskExposureInput.val(product || '');
+        }
+
+        $ncRatingSelect.on('change', updateOverallRiskExposure);
+        $riskImpactSelect.on('change', updateOverallRiskExposure);
+        
+        // Initialize with current values
+        updateOverallRiskExposure();
+    });
+
+    return $container[0]; // Return as DOM element
 };
 
 // Function to display the NC Risk Assessment section
 MainApplication.ApproveRequestComponent.displayNCRiskAssessment = function (questionsDetails) {
     const $container = $('#riskAssessmentContainer');
-    $container.empty();
+    $container.empty(); // Clear existing content
     const ncRiskAssessmentElement = MainApplication.ApproveRequestComponent.createNCRiskAssessment(questionsDetails);
-    $container.append(ncRiskAssessmentElement);
+    if (ncRiskAssessmentElement) {
+        $container.append(ncRiskAssessmentElement);
+    }
 };
 
 // Function to collect all data from the NC Risk Assessment table
@@ -488,11 +535,11 @@ MainApplication.ApproveRequestComponent.createManagementDetails = function () {
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Name</label>
-                    <input readonly type="text" value="${name}" placeholder="Enter text here..." class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+                    <input readonly type="text" value="${name}" placeholder="Enter text here..." class="management-name-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
                 </div>
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Email</label>
-                    <input readonly type="text" value="${emailValue}" placeholder="Enter text here..." class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+                    <input readonly type="text" value="${emailValue}" placeholder="Enter text here..." class="management-email-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
                 </div>
             </div>
         `;
@@ -510,4 +557,25 @@ MainApplication.ApproveRequestComponent.displayManagementDetails = function () {
     $container.empty(); // Clear existing content
     const managementDetailsElement = MainApplication.ApproveRequestComponent.createManagementDetails();
     $container.append(managementDetailsElement);
+};
+
+// Function to collect all data from the Management Details section
+MainApplication.ApproveRequestComponent.getManagementDetailsData = function () {
+    const $grids = $('#riskAssessmentContainer .grid.grid-cols-1.lg\\:grid-cols-2');
+    const managementData = [];
+
+    $grids.each(function () {
+        const $grid = $(this);
+        const managementEntry = {
+            Name: $grid.find('.management-name-input').val() || '',
+            Email: $grid.find('.management-email-input').val() || ''
+        };
+
+        // Only add to array if at least one field has a value
+        if (Object.values(managementEntry).some(value => value !== '')) {
+            managementData.push(managementEntry);
+        }
+    });
+
+    return managementData;
 };

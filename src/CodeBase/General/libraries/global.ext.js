@@ -6,6 +6,7 @@ GlobalDefinitionsManager.prototype.extendStages = function () {
     this.stageDefinitions.author = "Author";
     this.stageDefinitions.management = configProperties.MANAGEMENT.setting;
     this.stageDefinitions.ceo = configProperties.CEO.setting;
+    this.stageDefinitions.admin = configProperties.REPORTADMIN.setting;
 };
 
 

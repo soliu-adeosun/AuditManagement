@@ -209,7 +209,7 @@ MainApplication.ViewRequestComponent.displayQuestionSets = function(questionSets
     questionSets.forEach((questionSet, index) => {
         const questionSetId = questionSet.id || `question-set-${index}`;
         const block = `
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 small-gap mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Questions</label>
                     <input type="text" value="${questionSet.Questions || ''}" class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />

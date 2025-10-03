@@ -88,22 +88,40 @@ whenDashboardDependeciesLoaded = function () {
     };
 
     $("#dashboard-tabs").empty();
-    $("#dashboard-tabs").append(
-        `<ul class="flex text-sm font-medium text-center rounded-lg shadow-sm">
-            <li class="w-1/2">
-                <button data-tab="pending" id="pendingTab"
-                    class="tab-btn block w-full p-4 text-white bg-slate-700 hover:bg-slate-800">
-                    Pending Audits
-                </button>
-            </li>
-            <li class="w-1/2">
-                <button data-tab="myAudits" id="myAuditsTab"
-                    class="tab-btn block w-full p-4 bg-white border-r border-gray-200 hover:bg-gray-50">
-                    My Audits
-                </button>
-            </li>
-        </ul>`
-    );
+    
+    if (MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.management].belongs || 
+        MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.ceo].belongs ||
+        MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.admin].belongs
+    ) {
+        $("#dashboard-tabs").append(
+            `<ul class="flex text-sm font-medium text-center rounded-lg shadow-sm">
+                <li class="w-1/2">
+                    <button data-tab="myAudits" id="myAuditsTab"
+                        class="tab-btn block w-full p-4 text-white bg-slate-700 hover:bg-slate-800">
+                        My Audits
+                    </button>
+                </li>
+                <li class="w-1/2">
+                    <button data-tab="pending" id="pendingTab"
+                        class="tab-btn block w-full p-4 bg-white border-r border-gray-200 hover:bg-gray-50">
+                        Pending Audits
+                    </button>
+                </li>
+            </ul>`
+        );
+    } else {
+        $("#dashboard-tabs").append(
+            `<ul class="flex text-sm font-medium text-center rounded-lg shadow-sm">
+                <li class="w-full">
+                    <button data-tab="myAudits" id="myAuditsTab"
+                        class="tab-btn block w-full p-4 text-white bg-slate-700 hover:bg-slate-800">
+                        My Audits
+                    </button>
+                </li>
+            </ul>`
+        );
+    }
+    
     // MainApplication.DashboardComponent.currentTab = "Pending";
     // Set up tab click handlers
     $("#pendingTab").click(() => {
@@ -123,7 +141,7 @@ whenDashboardDependeciesLoaded = function () {
     // Fetch data for both tabs
     MainApplication.DashboardComponent.pendingRequests();
     MainApplication.DashboardComponent.myRequests();
-    MainApplication.DashboardComponent.currentTab = "Pending";
+    MainApplication.DashboardComponent.currentTab = "MyAudits";
 };
 
 MainApplication.DashboardComponent.pendingRequests = function () {
