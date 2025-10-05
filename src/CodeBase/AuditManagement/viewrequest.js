@@ -193,7 +193,7 @@ MainApplication.ViewRequestComponent.displayAuditees = function(auditees) {
 };
 
 
-MainApplication.ViewRequestComponent.displayQuestionSets = function(questionSets) {
+MainApplication.ViewRequestComponent.displayQuestionSets = function (questionSets) {
     const $displayContainer = $("#questionsContainer");
     $displayContainer.empty();
 
@@ -212,7 +212,7 @@ MainApplication.ViewRequestComponent.displayQuestionSets = function(questionSets
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 small-gap mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Questions</label>
-                    <input type="text" value="${questionSet.Questions || ''}" class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                    <textarea readonly class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.Questions || ''}</textarea>
                 </div>
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Audit Finding</label>
@@ -220,15 +220,15 @@ MainApplication.ViewRequestComponent.displayQuestionSets = function(questionSets
                 </div>
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">ISO Clause</label>
-                    <input type="text" value="${questionSet.ISOClause || ''}" class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                    <textarea readonly class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.ISOClause || ''}</textarea>
                 </div>
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Objective Evidence</label>
-                    <input type="text" value="${questionSet.ObjectiveEvidence || ''}" class="objective-evidence-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                    <textarea readonly class="objective-evidence-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.ObjectiveEvidence || ''}</textarea>
                 </div>
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance Statement</label>
-                    <input type="text" value="${questionSet.NonConformanceStatement || ''}" class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                    <textarea readonly class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.NonConformanceStatement || ''}</textarea>
                 </div>
             </div>
         `;

@@ -149,6 +149,15 @@
         "speedpoint_core",
         "main"
       ]
+    },
+    "report": {
+      "path": "src/codebase/auditmanagement/report.js",
+      "globalName": "report",
+      "globalDependencies": [
+        "global",
+        "speedpoint_core",
+        "main"
+      ]
     }
   },
   "localizedResources": {

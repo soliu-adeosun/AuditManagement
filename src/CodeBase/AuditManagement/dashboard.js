@@ -34,11 +34,11 @@ whenDashboardDependeciesLoaded = function () {
         },
         "Approval_Status": function (valueToEva) {
             if (valueToEva.Approval_Status === "Pending" && valueToEva.Current_Approver === "Saved For Later") {
-                return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800">Not Submitted</span>`;
+                return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800">Saved For Later</span>`;
             } else if (valueToEva.Approval_Status === "Completed") {
                 return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-green-100 text-green-800">Completed</span>`;
             } else if (valueToEva.Approval_Status === "Declined") {
-                return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-red-100 text-red-800">Rejected</span>`;
+                return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-red-100 text-red-800">Declined</span>`;
             } else if (valueToEva.Approval_Status === "Pending") {
                 return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>`;
             }
@@ -133,6 +133,18 @@ whenDashboardDependeciesLoaded = function () {
         MainApplication.DashboardComponent.showTableData(AppRequest.myItems);
         $(".tab-btn").removeClass("text-white bg-slate-700 hover:bg-slate-800").addClass("bg-white border-r border-gray-200 hover:bg-gray-50");
         $("#myAuditsTab").addClass("text-white bg-slate-700 hover:bg-slate-800").removeClass("bg-white border-r border-gray-200 hover:bg-gray-50");
+    });
+
+    $("#reportsearchfield").on("keyup", function () {
+        var searchQuery = $(this).val();
+        if(MainApplication.DashboardComponent.currentTab === "MyAudits"){
+            var data = AppRequest.myItems || [];
+        }else{
+            var data = AppRequest.pendingItems || [];
+        }
+        
+        var filteredItems = MainApplication.reportSyncSearch(searchQuery, data);
+        MainApplication.ReportComponent.showTableData(filteredItems);
     });
 
     // Fetch data for both tabs

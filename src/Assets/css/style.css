@@ -1603,3 +1603,124 @@ textarea[readonly] {
   border: 1px solid #ccc;    /* softer border */
   color: #666;               /* dimmed text */
 }
+
+
+
+
+/* Filter Modal */
+
+.search-filter-container {
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.search-filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.search-filter-title {
+    color: #1e3a8a;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.close-filter-icon {
+    font-size: 18px;
+    color: #64748b;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.close-filter-icon:hover {
+    color: #1e3a8a;
+}
+
+.search-filter-grid {
+    margin-bottom: 15px;
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.filter-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-item.full-width {
+    grid-column: span 2;
+}
+
+.filter-label {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.filter-input, .date-input, .filter-select {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #1e40af;
+    transition: all 0.3s;
+}
+
+.date-input {
+    background-color: #fff;
+}
+
+.filter-select {
+    appearance: none;
+    background-color: #fff;
+    cursor: pointer;
+    padding-right: 30px; /* Space for custom arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%231e3a8a' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.search-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #1e3a8a;
+    color: white;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s;
+}
+
+.search-button:hover {
+    background-color: #1e40af;
+}
+
+/* Focus states for inputs */
+.filter-input:focus, .date-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+textarea {
+    resize: none !important;
+}

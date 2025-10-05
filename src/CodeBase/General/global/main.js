@@ -54,17 +54,6 @@ function MainStartPoint() {
       auth: false,
       department: ""
     },
-    docsclassfication: [],
-    businesstype: [],
-    orgtype: [],
-    countries: [],
-    states: [],
-    cities: [],
-    vendors: [],
-    products: [],
-    currency: [],
-    documentupload: {},
-    corporatedocumentupload: {}
   };
   this.staffDetails = {};
   this.staffList = [];
@@ -78,6 +67,7 @@ function MainStartPoint() {
   this.DashboardComponent = {};
   this.ApproveRequestComponent = {};
   this.ViewRequestComponent = {};
+  this.ReportComponent = {};
 
   this.CurrentPageSubmitFunction = null;
   this.auditType = [];
@@ -380,6 +370,7 @@ function whenLayoutLoaded() {
         checkAppDependency();
       });
 
+      
 
       function checkAppDependency() {
         dependenciesCount++;
@@ -391,6 +382,10 @@ function whenLayoutLoaded() {
             Action: `Logged into/Opened Audit Management application`,
             Message: `user logged in to application at ${$spcontext.stringnifyDate({ format: "dd/mm/yy", includeTime: true })}`
           });
+          // if (MainApplication.isUserAnActor){
+          //   $(".reportNav").show();
+          //   $(".reportNavMobile").show();
+          // }
           $spcontext.errorHandler = globalDefinitions.errorHandler;
           MainApplication.cachedState.mode = true;
           MainApplication.cachedState.pageStateCall();
@@ -402,6 +397,22 @@ function whenLayoutLoaded() {
     }
   );
 }
+
+MainApplication.reportSyncSearch = function (keyquery, data) {
+  if (!keyquery || keyquery.trim().length < 3) {
+    return data;
+  }
+
+  keyquery = keyquery.trim().toLowerCase();
+
+  return data.filter(item =>
+    item.WorkflowRequestID?.toLowerCase().includes(keyquery) ||
+    item.InitiatorName?.toLowerCase().includes(keyquery) ||
+    item.TypeOfAudit?.toLowerCase().includes(keyquery) ||
+    item.Approval_Status?.toLowerCase().includes(keyquery) ||
+    item.Current_Approver?.toLowerCase().includes(keyquery)
+  );
+};
 
 
 whenLayoutLoaded();

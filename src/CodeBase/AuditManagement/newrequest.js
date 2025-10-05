@@ -233,51 +233,58 @@ MainApplication.NewRequestComponent.updatePlaceholder = function () {
 }
 
 
-// Function to add a new question set to questionsContainer
 MainApplication.NewRequestComponent.addQuestionSet = function () {
     const questionSetId = `question-set-${AppRequest.questionSetCounter++}`;
-    const nonConformanceId = `RSAUDNC${AppRequest.nonConformanceCounter.toString().padStart(3, '0')}`;
+    // Generate nonConformanceId using date and time
+    const dateCreatedCode = $spcontext.stringnifyDate({
+        includeTime: true,
+        timeSpace: false,
+        format: "dd-mm-yy HH:mm"
+    }).replace(/[-: ]/g, ""); // e.g., 0510250936 for 05-10-25 09:36
+    const nonConformanceId = `RSAUDNC${dateCreatedCode}`;
+
     const questionSetHtml = `
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 small-gap mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Questions</label>
-                    <input type="text" placeholder="Enter text here..." class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Audit Finding</label>
-                    <select class="audit-finding-input w-full px-3 sm:px-4 py-2 sm:py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
-                        <option disabled selected>Select an option</option>
-                        <option value="Conformance">Conformance</option>
-                        <option value="Non-Conformance">Non-Conformance</option>
-                    </select>
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">ISO Clause</label>
-                    <input type="text" placeholder="Enter text here..." class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Objective Evidence</label>
-                    <input type="text" placeholder="Enter text here..." class="objective-evidence-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance Statement</label>
-                    <input type="text" placeholder="Enter text here..." class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" disabled />
-                </div>
-                <div class="mt-2 hidden non-conformance-id">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance ID</label>
-                    <input type="text" value="${nonConformanceId}" class="non-conformance-id-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
-                </div>
-                <div class="absolute right-0">
-                    <button class="remove-question-set p-1 sm:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors" data-id="${questionSetId}">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    </button>
-                </div>
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 small-gap mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
+            <div class="mt-2">
+                <label class="block text-sm font-medium text-blue-600 mb-2">Questions</label>
+                <textarea placeholder="Enter text here..." class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base"></textarea>
             </div>
-        `;
+            <div class="mt-2">
+                <label class="block text-sm font-medium text-blue-600 mb-2">Audit Finding</label>
+                <select class="audit-finding-input w-full px-3 sm:px-4 py-2 sm:py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
+                    <option disabled selected>Select an option</option>
+                    <option value="Conformance">Conformance</option>
+                    <option value="Non-Conformance">Non-Conformance</option>
+                </select>
+            </div>
+            <div class="mt-2">
+                <label class="block text-sm font-medium text-blue-600 mb-2">ISO Clause</label>
+                <textarea placeholder="Enter text here..." class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base"></textarea>
+            </div>
+            <div class="mt-2">
+                <label class="block text-sm font-medium text-blue-600 mb-2">Objective Evidence</label>
+                <textarea placeholder="Enter text here..." class="objective-evidence-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base"></textarea>
+            </div>
+            <div class="mt-2">
+                <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance Statement</label>
+                <textarea placeholder="Enter text here..." class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" disabled></textarea>
+            </div>
+            <div class="mt-2 non-conformance-id hidden">
+                <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance ID</label>
+                <textarea class="non-conformance-id-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly>${nonConformanceId}</textarea>
+            </div>
+            <div class="absolute right-0">
+                <button class="remove-question-set p-1 sm:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors" data-id="${questionSetId}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+            </div>
+        </div>
+    `;
     $('#questionsContainer').append(questionSetHtml);
 
-    // Add event listener for audit finding selection
-    $(`#questionsContainer .question-set[data-id="${questionSetId}"] .audit-finding-input`).on('change', function () {
+    // Add event listener with prevention of duplicates
+    const $auditFindingInput = $(`#questionsContainer .question-set[data-id="${questionSetId}"] .audit-finding-input`);
+    $auditFindingInput.off('change').on('change', function () {
         const $questionSet = $(this).closest('.question-set');
         const $nonConformanceInput = $questionSet.find('.non-conformance-input');
         const $nonConformanceIdDiv = $questionSet.find('.non-conformance-id');
@@ -285,7 +292,14 @@ MainApplication.NewRequestComponent.addQuestionSet = function () {
         if ($(this).val() === 'Non-Conformance') {
             $nonConformanceInput.prop('disabled', false);
             // $nonConformanceIdDiv.removeClass('hidden');
-            AppRequest.nonConformanceCounter++; // Increment counter only when Non-Conformance is selected
+            // Regenerate ID based on current time if needed
+            const newDateCreatedCode = $spcontext.stringnifyDate({
+                includeTime: true,
+                timeSpace: false,
+                format: "dd-mm-yy HH:mm"
+            }).replace(/[-: ]/g, "");
+            const newNonConformanceId = `RSAUDNC${newDateCreatedCode}`;
+            $questionSet.find('.non-conformance-id-input').val(newNonConformanceId);
         } else {
             $nonConformanceInput.prop('disabled', true);
             $nonConformanceIdDiv.addClass('hidden');
@@ -293,8 +307,7 @@ MainApplication.NewRequestComponent.addQuestionSet = function () {
     });
 
     MainApplication.NewRequestComponent.updateQuestionsPlaceholder();
-}
-
+};
 
 // Function to remove a question set with animation
 MainApplication.NewRequestComponent.removeQuestionSet = function (questionSetId) {
@@ -658,7 +671,7 @@ MainApplication.NewRequestComponent.displayQuestionSets = function (questionSets
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 small-gap mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Questions</label>
-                    <input type="text" value="${questionSet.Questions || ''}" class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+                    <textarea class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.Questions || ''}</textarea>
                 </div>
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Audit Finding</label>
@@ -670,21 +683,21 @@ MainApplication.NewRequestComponent.displayQuestionSets = function (questionSets
                 </div>
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">ISO Clause</label>
-                    <input type="text" value="${questionSet.ISOClause || ''}" class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+                    <textarea class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.ISOClause || ''}</textarea>
                 </div>
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Objective Evidence</label>
-                    <input type="text" value="${questionSet.ObjectiveEvidence || ''}" class="objective-evidence-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+                    <textarea class="objective-evidence-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.ObjectiveEvidence || ''}</textarea>
                 </div>
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance Statement</label>
-                    <input type="text" value="${questionSet.NonConformanceStatement || ''}" class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+                    <textarea class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.NonConformanceStatement || ''}</textarea>
                 </div>
                 <div class="absolute right-0">
-                <button class="remove-question-set p-1 sm:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors" data-id="${questionSetId}">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                </button>
-            </div>
+                    <button class="remove-question-set p-1 sm:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors" data-id="${questionSetId}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                </div>
             </div>
         `;
         $displayContainer.append(block);

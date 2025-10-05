@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import NewRequest from './pages/NewRequest';
 import ApproveRequest from './pages/ApproveRequest';
 import ViewRequest from './pages/ViewRequest';
+import Report from './pages/Report';
 import { Layout } from '../../../Global/Layout';
 
 require('main');
@@ -19,6 +20,7 @@ declare global {
     loadNewRequestComponent : () => void;
     loadApproveRequestComponent : () => void;
     loadViewRequestComponent : () => void;
+    loadReportComponent : () => void;
   }
 }
 
@@ -33,6 +35,7 @@ export default class AuditManagement extends React.Component<IAuditManagementPro
             <Route path="newrequest" element={<NewRequest />} />
             <Route path="approverequest" element={<ApproveRequest />} />
             <Route path="viewrequest" element={<ViewRequest />} />
+            <Route path="report" element={<Report />} />
           </Route>
         </Routes>
       </HashRouter>

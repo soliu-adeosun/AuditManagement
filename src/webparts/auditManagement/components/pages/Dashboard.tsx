@@ -46,17 +46,26 @@ export default class Dashboard extends React.Component<{}, {}> {
                     <div className="p-4 sm:p-6 border-b border-gray-200">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div>
-                                <h2 className="text-xl sm:text-2xl font-bold text-navy-900">Request Management</h2>
-                                <p className="text-sm text-blue-500 mt-1">Manage and track all system requests</p>
+                                <h2 className="text-xl sm:text-2xl font-bold text-navy-900">Audit Management</h2>
+                                <p className="text-sm text-blue-500 mt-1">Manage and track all your audits</p>
                             </div>
                             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                                <div className="relative search-bar">
+                                    <svg className="absolute left-3 transform -translate-y-1/2 w-4 h-4 text-slate-400"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                    <input id='reportsearchfield' type="text" placeholder="Search..."
+                                        className="pl-10 pr-4 py-2 w-full bg-gray-50 border border-gray-200 text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all" />
+                                </div>
                                 <a href='#/newrequest' className="flex items-center justify-center px-3 sm:px-4 py-2 bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 transition-colors">
                                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                     </svg>
                                     Add New
                                 </a>
-                                <button className="flex items-center justify-center px-3 sm:px-4 py-2 border border-gray-300 text-blue-500 text-sm font-medium hover:bg-gray-50 transition-colors">
+                                {/* <button className="flex items-center justify-center px-3 sm:px-4 py-2 border border-gray-300 text-blue-500 text-sm font-medium hover:bg-gray-50 transition-colors">
                                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                     </svg>
@@ -67,7 +76,7 @@ export default class Dashboard extends React.Component<{}, {}> {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                     Export
-                                </button>
+                                </button> */}
                             </div>
                         </div>
                     </div>

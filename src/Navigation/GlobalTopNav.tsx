@@ -155,6 +155,27 @@ const GlobalTopNav: React.FC = () => {
                                 <span className="font-medium">View</span>
                             </div>
                         </div>
+
+                        <div className="relative reportNavMobile hidden">
+                            {activePath === "/report" && <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500" />}
+                            <Link
+                                to="/report"
+                                onClick={closeMobileMenu}
+                                className={`w-full flex items-center px-6 py-4 text-left transition-all duration-200 hover:bg-slate-600 ${
+                                    activePath === "/report" ? "bg-slate-600 text-white border-r-2 border-red-500" : "text-slate-300 hover:text-white"
+                                }`}
+                            >
+                                <svg className="w-5 h-5 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                                    />
+                                </svg>
+                                <span className="font-medium">Report</span>
+                            </Link>
+                        </div>
                     </nav>
                 </div>
             </div>

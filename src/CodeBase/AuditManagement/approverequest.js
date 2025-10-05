@@ -313,7 +313,7 @@ MainApplication.ApproveRequestComponent.displayAuditees = function(auditees) {
     });
 };
 
-MainApplication.ApproveRequestComponent.displayQuestionSets = function(questionSets) {
+MainApplication.ApproveRequestComponent.displayQuestionSets = function (questionSets) {
     const $displayContainer = $("#questionsContainer");
     $displayContainer.empty();
 
@@ -332,7 +332,7 @@ MainApplication.ApproveRequestComponent.displayQuestionSets = function(questionS
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 small-gap mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Questions</label>
-                    <input type="text" value="${questionSet.Questions || ''}" class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                    <textarea readonly class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.Questions || ''}</textarea>
                 </div>
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Audit Finding</label>
@@ -340,15 +340,15 @@ MainApplication.ApproveRequestComponent.displayQuestionSets = function(questionS
                 </div>
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">ISO Clause</label>
-                    <input type="text" value="${questionSet.ISOClause || ''}" class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                    <textarea readonly class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.ISOClause || ''}</textarea>
                 </div>
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Objective Evidence</label>
-                    <input type="text" value="${questionSet.ObjectiveEvidence || ''}" class="objective-evidence-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                    <textarea readonly class="objective-evidence-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.ObjectiveEvidence || ''}</textarea>
                 </div>
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance Statement</label>
-                    <input type="text" value="${questionSet.NonConformanceStatement || ''}" class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                    <textarea readonly class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.NonConformanceStatement || ''}</textarea>
                 </div>
             </div>
         `;
@@ -368,7 +368,6 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
 
     // If no non-conformance data, trigger management details and return
     if (nonConformanceData.length === 0) {
-        // $("#managementRepContainer").show();
         AppRequest.isNonConformance = 0;
         return;
     }
@@ -413,7 +412,7 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
                     </select>
                 </td>
                 <td class="px-2 py-2">
-                    <input type="text" readonly value="${ncStatement}" class="non-conformance-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
+                    <textarea readonly class="non-conformance-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm">${ncStatement || ''}</textarea>
                 </td>
                 <td class="px-2 py-2">
                     <select class="occurrence-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
@@ -428,11 +427,7 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
                     </select>
                 </td>
                 <td class="px-2 py-2">
-                    <select class="nc-classification-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
-                        <option value="">Select</option>
-                        <option value="Minor">Minor</option>
-                        <option value="Major">Major</option>
-                    </select>
+                    <input type="text" readonly class="nc-classification-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
                 </td>
                 <td class="px-2 py-2">
                     <select class="risk-impact-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
@@ -456,26 +451,37 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
 
     // Create DOM element and attach event listeners
     const $container = $('<div>').html(html);
-    
+
     // Add event listeners for NC Rating and Risk Impact selects
     $container.find('tr').each(function () {
         const $row = $(this);
         const $ncRatingSelect = $row.find('.nc-rating-input');
+        const $ncClassificationInput = $row.find('.nc-classification-input');
         const $riskImpactSelect = $row.find('.risk-impact-input');
         const $overallRiskExposureInput = $row.find('.overall-risk-exposure-input');
 
-        function updateOverallRiskExposure() {
+        function updateNCClassificationAndRiskExposure() {
             const ncRatingValue = parseFloat($ncRatingSelect.val()) || 0;
+            // Set NC Classification based on NC Rating
+            if (ncRatingValue >= 1 && ncRatingValue <= 4) {
+                $ncClassificationInput.val('Minor');
+            } else if (ncRatingValue >= 5 && ncRatingValue <= 6) {
+                $ncClassificationInput.val('Major');
+            } else {
+                $ncClassificationInput.val('');
+            }
+
+            // Update Overall Risk Exposure
             const riskImpactValue = parseFloat($riskImpactSelect.val()) || 0;
             const product = ncRatingValue * riskImpactValue;
             $overallRiskExposureInput.val(product || '');
         }
 
-        $ncRatingSelect.on('change', updateOverallRiskExposure);
-        $riskImpactSelect.on('change', updateOverallRiskExposure);
-        
+        $ncRatingSelect.on('change', updateNCClassificationAndRiskExposure);
+        $riskImpactSelect.on('change', updateNCClassificationAndRiskExposure);
+
         // Initialize with current values
-        updateOverallRiskExposure();
+        updateNCClassificationAndRiskExposure();
     });
 
     return $container[0]; // Return as DOM element
