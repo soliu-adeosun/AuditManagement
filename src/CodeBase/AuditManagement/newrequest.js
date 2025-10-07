@@ -125,13 +125,18 @@ function whenNewRequestDependeciesLoaded() {
         MainApplication.NewRequestComponent.updatePlaceholder();
     });
 
+    $('#reviewerCommentDiv textarea').removeAttr('speed-bind-validate');
+    $("#reviewerCommentDiv").hide();
+
     setTimeout(function () {
         if (AppRequest.itemId !== null && AppRequest.itemId !== "") {
             if(AppRequest.mode !== "editdraft"){
                 $("#reviewerCommentDiv").show();
+                $("#draftbtn").hide();
             }else{
                 $('#reviewerCommentDiv textarea').removeAttr('speed-bind-validate');
                 $("#reviewerCommentDiv").hide();
+                
             }
             MainApplication.NewRequestComponent.recoverListData();
         }

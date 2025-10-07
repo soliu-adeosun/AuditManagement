@@ -97,6 +97,7 @@ whenReportDependeciesLoaded = function () {
 };
 
 MainApplication.ReportComponent.retrieveRequest = function () {
+    globalDefinitions.callLoader();
     var reportQuery = [{
             ascending: "FALSE",
             orderby: "Modified"

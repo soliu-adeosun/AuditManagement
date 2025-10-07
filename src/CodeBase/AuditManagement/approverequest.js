@@ -54,6 +54,11 @@ whenApproveRequestDependeciesLoaded = function () {
         $("#satisfactoryDiv").hide();
     }
 
+    if (MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.management].belongs){
+        $("#satisfactoryDiv").show();
+        $("#satisfactory").attr("speed-bind-validate", "Satisfactory");
+    }
+
 
     $("#satisfactory").on('change', function () {
         if (this.value === "Satisfactory") {
