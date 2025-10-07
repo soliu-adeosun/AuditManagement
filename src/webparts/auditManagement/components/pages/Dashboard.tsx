@@ -1,4 +1,5 @@
 import * as React from 'react';
+import AuditCardSkeleton from '../../../../Global/AuditCardSkeleton';
 require("dashboard");
 
 
@@ -8,7 +9,7 @@ export default class Dashboard extends React.Component<{}, {}> {
         return (
             <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 md:space-y-8">
                 {/* Cards Section */}
-                <section className="space-y-4">
+                {/* <section className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                         <div className="border card audit border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow">
                             <div className="text-center">
@@ -35,7 +36,11 @@ export default class Dashboard extends React.Component<{}, {}> {
                             </div>
                         </div>
                     </div>
-                </section>
+                </section> */}
+                <div id='dashboardCards'>
+                    <AuditCardSkeleton />
+                </div>
+                
                 {/* <section className="flex btn-action">
                     <button className="px-4 py-2 bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 transition-colors">
                         Create

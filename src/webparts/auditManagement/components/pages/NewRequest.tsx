@@ -93,6 +93,14 @@ export default class NewRequest extends React.Component<{}, {}> {
                             <textarea speed-bind="AreasOfImprovement" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" defaultValue={""} />
                         </div>
                     </div>
+
+                    {/* Reviewer's comment */}
+                    <div style={{ marginTop: '2.2rem' }} id='reviewerCommentDiv' className='hidden'>
+                        <div>
+                            <label className="block text-sm font-medium text-blue-600 mb-2">Comments</label>
+                            <textarea speed-bind-validate="Comment" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readOnly />
+                        </div>
+                    </div>
                     <div style={{ marginTop: '2rem' }}>
                         <label className="flex items-center space-x-3">
                             <input id="checkbox" type="checkbox" className="w-4 h-4 text-red-500 border-gray-300 focus:ring-red-500" />

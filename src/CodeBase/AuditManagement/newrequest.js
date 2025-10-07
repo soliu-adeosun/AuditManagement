@@ -26,7 +26,7 @@ MainApplication.NewRequestComponent.ApplicationDetails = function () {
     this.approverComments = "";
     this.transactionHistory = [];
     this.defaultStage = "AA0";
-    this.returned = false;
+    this.returned = null;
     this.sectionArr = [];
     this.sections = {};
     this.finalrating = [];
@@ -48,17 +48,6 @@ function whenNewRequestDependeciesLoaded() {
     customWorkflowEngine = new WorkflowManagerEngine(CurrentUserProperties);
     globalDefinitions.SetWorkflowRouting(customWorkflowEngine);
     customWorkflowEngine.routeEngine(customWorkflowEngine).setCurrentUserAsInitiator();
-
-    // var allgroups = [globalDefinitions.stageDefinitions.ceo,
-    //     globalDefinitions.stageDefinitions.management
-    // ];
-
-    // for(var x = 0; x < allgroups.length; x++){
-    // 	$spcontext.SPGroupDetails(allgroups[x],function(group){
-    // 		groupName = group.get_loginName();
-    // 		AppRequest.groupProperties[groupName] = group;
-    // 	});
-    // }
 
     $spcontext.applyValidationEvents();
 
@@ -138,6 +127,12 @@ function whenNewRequestDependeciesLoaded() {
 
     setTimeout(function () {
         if (AppRequest.itemId !== null && AppRequest.itemId !== "") {
+            if(AppRequest.mode !== "editdraft"){
+                $("#reviewerCommentDiv").show();
+            }else{
+                $('#reviewerCommentDiv textarea').removeAttr('speed-bind-validate');
+                $("#reviewerCommentDiv").hide();
+            }
             MainApplication.NewRequestComponent.recoverListData();
         }
         globalDefinitions.closeLoader();
@@ -231,7 +226,6 @@ MainApplication.NewRequestComponent.updatePlaceholder = function () {
         $placeholder.remove();
     }
 }
-
 
 MainApplication.NewRequestComponent.addQuestionSet = function () {
     const questionSetId = `question-set-${AppRequest.questionSetCounter++}`;
@@ -371,7 +365,6 @@ MainApplication.NewRequestComponent.getAllQuestionsData = function () {
     return questionsData;
 };
 
-
 MainApplication.NewRequestComponent.recoverListData = function () {
 
     var query = speedctxRoot.camlBuilder([{
@@ -385,10 +378,18 @@ MainApplication.NewRequestComponent.recoverListData = function () {
         val: AppRequest.itemId
     },
     {
+        evaluator: "Or",
         operator: 'Eq',
         field: 'Approval_Status',
         type: 'Text',
         val: globalDefinitions.stageDefinitions.pending
+    },
+    {
+        evaluator: "Or",
+        operator: 'Eq',
+        field: 'Approval_Status',
+        type: 'Text',
+        val: "Revise"
     }
     ]);
 
@@ -505,11 +506,15 @@ MainApplication.NewRequestComponent.saveDataToList = function () {
         formData.QuestionsDetails = JSON.stringify(formData.QuestionsDetails);
 
         globalDefinitions.callLoader();
-        formData = customWorkflowEngine.routeEngine(customWorkflowEngine).requestHistoryHandler(formData, AppRequest.transactionHistory, { stage: "Auditor", action: "Audit Created" });
-        if (AppRequest.returned) {
-            formData = customWorkflowEngine.routeEngine(customWorkflowEngine).runRouting(formData, AppRequest.requestDetails.Current_Approver_Code, globalDefinitions.stageDefinitions.modified);
+        AppRequest.returned = AppRequest.requestDetails.ReturnForCorrection;
+        // formData = customWorkflowEngine.routeEngine(customWorkflowEngine).requestHistoryHandler(formData, AppRequest.transactionHistory, { stage: "Auditor", action: "Audit Created" });
+        if (AppRequest.returned === "Yes") {
+            console.log(AppRequest.returned);
+            formData = customWorkflowEngine.routeEngine(customWorkflowEngine).requestHistoryHandler(formData, AppRequest.requestDetails.Transaction_History, { stage: "Auditor", action: "Audit Modified" });
+            formData = customWorkflowEngine.routeEngine(customWorkflowEngine).runRouting(formData);
         }
         else {
+            formData = customWorkflowEngine.routeEngine(customWorkflowEngine).requestHistoryHandler(formData, AppRequest.transactionHistory, { stage: "Auditor", action: "Audit Created" });
             formData = customWorkflowEngine.routeEngine(customWorkflowEngine).runRouting(formData);
         }
 
@@ -548,6 +553,8 @@ MainApplication.NewRequestComponent.saveDataToListAsDraft = function () {
     formData = customWorkflowEngine.routeEngine(customWorkflowEngine).runRouting(formData, AppRequest.defaultStage, globalDefinitions.stageDefinitions.save);
 
     globalDefinitions.onActionCompleted();
+
+    console.log(formData);
 
     MainApplication.NewRequestComponent.proceedToList(formData, true);
 }
@@ -692,6 +699,10 @@ MainApplication.NewRequestComponent.displayQuestionSets = function (questionSets
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance Statement</label>
                     <textarea class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.NonConformanceStatement || ''}</textarea>
+                </div>
+                <div class="mt-2 hidden">
+                    <label class="block text-sm font-medium text-blue-600 mb-2">Reference ID</label>
+                    <input type="text" value="${questionSet.NonConformanceID || ''}" class="non-conformance-id-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
                 </div>
                 <div class="absolute right-0">
                     <button class="remove-question-set p-1 sm:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors" data-id="${questionSetId}">

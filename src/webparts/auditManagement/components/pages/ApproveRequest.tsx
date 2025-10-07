@@ -185,6 +185,7 @@ export default class ApproveRequest extends React.Component<{}, {}> {
                     <div className="action-btns flex justify-center items-center gap-3" style={{ marginTop: '2rem' }}>
                         <ClientButton text={"Approve"} func={"MainApplication.ApproveRequestComponent.confirmSubmit"} clax={"px-4 py-2 text-sm font-medium submit-button"} prop="Approved" attr="" />
                         <ClientButton text={"Decline"} func={"MainApplication.ApproveRequestComponent.confirmSubmit"} clax={"px-4 py-2 bg-slate-500 text-white text-sm font-medium hover:bg-slate-600 transition-colors"} prop="Declined" attr="id='draftbtn'" />
+                        <ClientButton text={"Return For Correction"} func={"MainApplication.ApproveRequestComponent.confirmSubmit"} clax={"px-4 py-2 bg-slate-500 text-white text-sm font-medium hover:bg-slate-600 transition-colors"} prop="Revise" attr="id='rtnBtn'" />
                         <Link to="/" className="px-4 py-2 bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">
                             Cancel
                         </Link>

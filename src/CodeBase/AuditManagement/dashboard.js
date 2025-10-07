@@ -33,14 +33,16 @@ whenDashboardDependeciesLoaded = function () {
             });
         },
         "Approval_Status": function (valueToEva) {
-            if (valueToEva.Approval_Status === "Pending" && valueToEva.Current_Approver === "Saved For Later") {
-                return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800">Saved For Later</span>`;
+            if (valueToEva.Approval_Status === "Pending" && valueToEva.Current_Approver === globalDefinitions.stageDefinitions.save) {
+                return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800">Draft</span>`;
             } else if (valueToEva.Approval_Status === "Completed") {
                 return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-green-100 text-green-800">Completed</span>`;
             } else if (valueToEva.Approval_Status === "Declined") {
                 return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-red-100 text-red-800">Declined</span>`;
             } else if (valueToEva.Approval_Status === "Pending") {
                 return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>`;
+            } else if (valueToEva.Approval_Status === "Revise") {
+                return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800">Revise</span>`;
             }
         },
         "Modified": function (valueToEva) {
@@ -67,6 +69,14 @@ whenDashboardDependeciesLoaded = function () {
                         </svg>
                     </a>
                 </div>`;
+            var editDraftStr = `
+                <div class="flex space-x-1 sm:space-x-2">
+                    <a href="#/newrequest?itemId=${valueToEva.WorkflowRequestID}&mode=editdraft" class="p-1 sm:p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                    </a>
+                </div>`;
             var viewStr = `
                 <div class="flex space-x-1 sm:space-x-2">
                     <a href="#/viewrequest?itemId=${valueToEva.WorkflowRequestID}" class="p-1 sm:p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 transition-colors">
@@ -76,8 +86,10 @@ whenDashboardDependeciesLoaded = function () {
                         </svg>
                     </a>
                 </div>`;
-            
-            if (valueToEva.Approval_Status === "Pending" && valueToEva.Current_Approver === "Save For Later") {
+
+            if ((valueToEva.Approval_Status === "Pending" && valueToEva.Current_Approver === globalDefinitions.stageDefinitions.save)){
+                return editDraftStr;
+            } else if (valueToEva.Approval_Status === "Revise") {
                 return editStr;
             } else if (valueToEva.Approval_Status === "Completed") {
                 return viewStr;
@@ -240,9 +252,44 @@ MainApplication.DashboardComponent.myRequests = function () {
         });
 
         AppRequest.myItems = tableData;
-        $("#totalAudit").text(tableData.length);
-        $("#completedAudit").text(completedItems.length);
-        $("#pendingAudit").text(pendingItems.length);
+        // $("#totalAudit").text(tableData.length);
+        // $("#completedAudit").text(completedItems.length);
+        // $("#pendingAudit").text(pendingItems.length);
+
+        $("#dashboardCards").empty();
+        $("#dashboardCards").append(
+            `
+            <section class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+                        <div class="border card audit border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="text-center">
+                                <h3 id='totalAudit' class="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">${tableData.length}</h3>
+                                <h3 class="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">
+                                    Total Audit
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="border card pending border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="text-center">
+                                <h3 id='pendingAudit' class="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">${pendingItems.length}</h3>
+                                <h3 class="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">
+                                    Pending
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="border card completed border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="text-center">
+                                <h3 id='completedAudit' class="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">${completedItems.length}</h3>
+                                <h3 class="text-base sm:text-lg font-semibold text-navy-900 flex-1 mr-2">
+                                    Completed
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+            `
+        );
         if (MainApplication.DashboardComponent.currentTab === "MyAudits") {
             MainApplication.DashboardComponent.showTableData(tableData);
         }

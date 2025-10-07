@@ -28,10 +28,10 @@
     width: 150px;
     /* border-radius: 10px; */
 }
-.action-btns button {
+/* .action-btns button {
     width: 150px;
-    /* border-radius: 10px; */
-}
+    /* border-radius: 10px;
+} */
 
 thead {
     background-color: var(--gray-100);

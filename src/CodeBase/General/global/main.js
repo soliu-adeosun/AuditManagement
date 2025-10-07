@@ -382,10 +382,10 @@ function whenLayoutLoaded() {
             Action: `Logged into/Opened Audit Management application`,
             Message: `user logged in to application at ${$spcontext.stringnifyDate({ format: "dd/mm/yy", includeTime: true })}`
           });
-          // if (MainApplication.isUserAnActor){
-          //   $(".reportNav").show();
-          //   $(".reportNavMobile").show();
-          // }
+          if (MainApplication.isUserAnActor){
+            $(".reportNav").show();
+            $(".reportNavMobile").show();
+          }
           $spcontext.errorHandler = globalDefinitions.errorHandler;
           MainApplication.cachedState.mode = true;
           MainApplication.cachedState.pageStateCall();

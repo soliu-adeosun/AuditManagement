@@ -40,14 +40,16 @@ whenReportDependeciesLoaded = function () {
             });
         },
         "Approval_Status": function (valueToEva) {
-            if (valueToEva.Approval_Status === "Pending" && valueToEva.Current_Approver === "Saved For Later") {
-                return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800">Saved For Later</span>`;
+            if (valueToEva.Approval_Status === "Pending" && valueToEva.Current_Approver === globalDefinitions.stageDefinitions.save) {
+                return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800">Draft</span>`;
             } else if (valueToEva.Approval_Status === "Completed") {
                 return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-green-100 text-green-800">Completed</span>`;
             } else if (valueToEva.Approval_Status === "Declined") {
                 return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-red-100 text-red-800">Declined</span>`;
             } else if (valueToEva.Approval_Status === "Pending") {
                 return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>`;
+            } else if (valueToEva.Approval_Status === "Revise") {
+                return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800">Revise</span>`;
             }
         },
         "Modified": function (valueToEva) {

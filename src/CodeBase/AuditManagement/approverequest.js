@@ -45,7 +45,7 @@ whenApproveRequestDependeciesLoaded = function () {
     $spcontext.validationProperties.text.extend["Comments"] = function (field) {
         var passed = false;
         if ((field.trim() !== "" && (AppRequest.actionTaken === globalDefinitions.stageDefinitions.decline ||
-            AppRequest.actionTaken === globalDefinitions.stageDefinitions.correction)) ||
+            AppRequest.actionTaken === globalDefinitions.stageDefinitions.correction || AppRequest.actionTaken === "Revise")) ||
             AppRequest.actionTaken === globalDefinitions.stageDefinitions.approve) passed = true;
         return passed;
     }
@@ -220,6 +220,7 @@ MainApplication.ApproveRequestComponent.saveDataToList = function (actionTaken) 
         var formData = {};
         AppRequest.comment = $("#approvercomment").val();
 
+        formData.Comment = AppRequest.comment;
 
         var historyProp = {
             stage: AppRequest.requestDetails.Current_Approver,
@@ -239,8 +240,17 @@ MainApplication.ApproveRequestComponent.saveDataToList = function (actionTaken) 
         }
 
         formData = customWorkflowEngine.routeEngine(customWorkflowEngine).requestHistoryHandler(formData, AppRequest.requestDetails.Transaction_History, historyProp);
-        formData = customWorkflowEngine.routeEngine(customWorkflowEngine).runRouting(formData, AppRequest.requestDetails.Current_Approver_Code, actionTaken);
         
+        if (actionTaken === "Approved" || actionTaken === "Declined") {
+            formData = customWorkflowEngine.routeEngine(customWorkflowEngine).runRouting(formData, AppRequest.requestDetails.Current_Approver_Code, actionTaken);
+        } else if (actionTaken === "Revise") {
+            formData.Current_Approver = AppRequest.requestDetails.InitiatorName;
+            formData.Current_Approver_Code = AppRequest.defaultStage;
+            formData.PendingUserLogin = AppRequest.requestDetails.InitiatorEmailAddress;
+            formData.PendingUserEmail = AppRequest.requestDetails.InitiatorEmailAddress;
+            formData.Approval_Status = "Revise";
+            formData.ReturnForCorrection = "Yes";
+        }
         
         globalDefinitions.onActionCompleted();
         MainApplication.ApproveRequestComponent.proceedToList(formData);
@@ -266,7 +276,7 @@ MainApplication.ApproveRequestComponent.proceedToList = function(formData) {
                     globalDefinitions.closeLoader();
                     globalDefinitions.HandlerSuccess(`You have successfully taken action on this request`);
                     globalDefinitions.AuditLogManager_SaveLog({
-                        Action : `took action on time sheet request ${AppRequest.requestDetails.WorkflowRequestID}`
+                        Action : `took action on audit request ${AppRequest.requestDetails.WorkflowRequestID}`
                     });
                     $spcontext.redirect("#/", false);
                 // });
