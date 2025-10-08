@@ -24,7 +24,7 @@ export default class ViewRequest extends React.Component<{}, {}> {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                     {/* Text Input */}
                     <div className="mt-2">
-                        <label className="block text-sm font-medium text-blue-600 mb-2">Department</label>
+                        <label className="block text-sm font-medium text-blue-600 mb-2">Division/Unit</label>
                         <input readOnly type="text" speed-bind="Department" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
                     </div>
                     {/* Text Input */}
@@ -66,6 +66,10 @@ export default class ViewRequest extends React.Component<{}, {}> {
                 <div>
                     <h2 className="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">Auditee Details</h2>
                     <div id='auditeesContainer' />
+                </div>
+                <div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">Other Auditors Details</h2>
+                    <div id='auditorsContainer' />
                 </div>
                 <div className="mt-2">
                     <h2 className="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">Audit Questions</h2>

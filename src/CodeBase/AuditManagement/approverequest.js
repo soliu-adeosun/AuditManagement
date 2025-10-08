@@ -52,11 +52,15 @@ whenApproveRequestDependeciesLoaded = function () {
 
     if (MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.ceo].belongs){
         $("#satisfactoryDiv").hide();
+        $("#managementRepContainer").show();
+        $("#riskAssessmentContainer").show();
     }
 
     if (MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.management].belongs){
         $("#satisfactoryDiv").show();
         $("#satisfactory").attr("speed-bind-validate", "Satisfactory");
+        $("#managementRepContainer").hide();
+        $("#riskAssessmentContainer").hide();
     }
 
 
@@ -75,8 +79,8 @@ whenApproveRequestDependeciesLoaded = function () {
             $("#managementRepContainer").hide();
         }
     });
-    $("#managementRepContainer").hide();
-    $("#riskAssessmentContainer").hide();
+    // $("#managementRepContainer").hide();
+    // $("#riskAssessmentContainer").hide();
 
     $spcontext.applyValidationEvents();
     MainApplication.ApproveRequestComponent.displayManagementDetails();
@@ -110,7 +114,7 @@ MainApplication.ApproveRequestComponent.recoverListData = function() {
             "ID", "WorkflowRequestID", "Current_Approver", "Current_Approver_Code", "Approval_Status",
             "Created", "InitiatorEmailAddress", "InitiatorLogin", "Transaction_History", "ReturnForCorrection",
             "Modified", "PendingUserEmail", "PendingUserLogin", "Attachment_Folder", "AttachmentURL","Author",
-            "AuditeesDetails", "QuestionsDetails"
+            "AuditeesDetails", "QuestionsDetails", "RiskAssessment", "Satisfactory"
         ];
 
         speedctxRoot.getListToControl(globalDefinitions.stageDefinitions.listname, query, extraProperties, function (listProperties) {
@@ -145,6 +149,7 @@ MainApplication.ApproveRequestComponent.recoverListData = function() {
                             listProperties.AttachmentURL = $spcontext.JSONToObject(listProperties.AttachmentURL, 'object');
                             listProperties.AuditeesDetails = $spcontext.JSONToObject(listProperties.AuditeesDetails);
                             listProperties.QuestionsDetails = $spcontext.JSONToObject(listProperties.QuestionsDetails);
+                            listProperties.RiskAssessment = $spcontext.JSONToObject(listProperties.RiskAssessment);
 
                             MainApplication.ApproveRequestComponent.displayAuditees(listProperties.AuditeesDetails);
                             MainApplication.ApproveRequestComponent.displayQuestionSets(listProperties.QuestionsDetails);
@@ -174,10 +179,15 @@ MainApplication.ApproveRequestComponent.recoverListData = function() {
                             PeoplePicker.disablePicker("OtherAuditors");
                             PeoplePicker.disablePicker("Auditees");
 
-                            if (MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.management].belongs){
+                            // if (MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.management].belongs){
                                 MainApplication.ApproveRequestComponent.displayNCRiskAssessment(listProperties.QuestionsDetails);
+                            // }
+
+                            if (MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.ceo].belongs){
+                                MainApplication.ApproveRequestComponent.displayNCRiskAssessmentReadOnly(listProperties.RiskAssessment);
                             }
 
+                            
                             $spcontext.htmlBind(listProperties);
                             globalDefinitions.closeLoader();
                             
@@ -447,7 +457,7 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
                 <td class="px-2 py-2">
                     <select class="risk-impact-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
                         <option value="">Select</option>
-                        ${riskImpactOptions.map(option => `<option value="${option.value}">${option.title}</option>`).join('')}
+                        ${riskImpactOptions.map(option => `<option value="${option.value}" style="background-color: ${option.color}; color: white;">${option.title}</option>`).join('')}
                     </select>
                 </td>
                 <td class="px-2 py-2">
@@ -615,4 +625,104 @@ MainApplication.ApproveRequestComponent.getManagementDetailsData = function () {
     });
 
     return managementData;
+};
+
+MainApplication.ApproveRequestComponent.displayNCRiskAssessmentReadOnly = function (ncRiskData) {
+    // Log MainApplication.riskImpact for debugging
+    console.log('MainApplication.riskImpact:', MainApplication.riskImpact);
+
+    // Log ncRiskData for debugging
+    console.log('ncRiskData:', ncRiskData);
+
+    // If no data, return empty container
+    if (ncRiskData.length === 0) {
+        console.log('No ncRiskData available');
+        return $('#riskAssessmentContainer').html('<p class="text-gray-500 italic my-4 sm:my-6 text-center">No Non-Conformance Risk Assessment data available.</p>')[0];
+    }
+
+    // Build read-only table
+    let html = `
+        <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">NONCONFORMANCE RISK ASSESSMENT SUMMARY</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full table-auto border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC REF ID</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">ISO CLAUSE</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">OCCURRENCE</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC RATING</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC CLASSIFICATION</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">RISK IMPACT</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">OVERALL RISK EXPOSURE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    `;
+
+    // Add rows for each data entry
+    ncRiskData.forEach((data, index) => {
+        // Sanitize data to prevent XSS
+        const ncId = $('<div>').text(data.NCReferenceNo || '').html();
+        const isoClause = $('<div>').text(data.ISOClause || '').html();
+        const ncStatement = $('<div>').text(data.NonConformance || '').html();
+        const occurrence = $('<div>').text(data.Occurrence || '').html();
+        const ncRating = $('<div>').text(data.NCRating || '').html();
+        const ncClassification = $('<div>').text(data.NCClassification || '').html();
+        const riskImpact = $('<div>').text(data.RiskImpact || '').html();
+
+        // Find the ColorCode for the RiskImpact value
+        const riskImpactValue = parseFloat(data.RiskImpact) || 0; // Convert to number for comparison
+        const riskImpactOption = MainApplication.riskImpact.find(option => parseFloat(option.value) === riskImpactValue) || {};
+        const riskImpactColor = riskImpactOption.color || '#f3f4f6'; // Use 'color' property
+        const riskImpactTitle = riskImpactOption.title || data.RiskImpact;
+        console.log(`Row ${index} RiskImpact:`, {
+            dataRiskImpact: data.RiskImpact,
+            riskImpactValue,
+            matchedOption: riskImpactOption,
+            colorCode: riskImpactColor
+        });
+
+        const overallRiskExposure = $('<div>').text(data.OverallRiskExposure || '').html();
+
+        html += `
+            <tr class="border-b">
+                <td class="px-2 py-2">
+                    <input type="text" value="${ncId}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
+                </td>
+                <td class="px-2 py-2">
+                    <input type="text" value="${isoClause}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
+                </td>
+                <td class="px-2 py-2">
+                    <textarea readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none">${ncStatement}</textarea>
+                </td>
+                <td class="px-2 py-2">
+                    <input type="text" value="${occurrence}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
+                </td>
+                <td class="px-2 py-2">
+                    <input type="text" value="${ncRating}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
+                </td>
+                <td class="px-2 py-2">
+                    <input type="text" value="${ncClassification}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
+                </td>
+                <td class="px-2 py-2">
+                    <input type="text" value="${riskImpactTitle}" readonly class="w-full px-3 py-2 text-sm border-none focus:outline-none" style="background-color: ${riskImpactColor}; color: white;" />
+                </td>
+                <td class="px-2 py-2">
+                    <input type="text" value="${overallRiskExposure}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+
+    // Create and return DOM element
+    return $('#riskAssessmentContainer').html(html)[0];
 };

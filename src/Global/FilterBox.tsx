@@ -13,10 +13,10 @@ export const FilterBox = () => {
                 <div className="search-filter-grid">
                     <div className="filter-row">
                         <div className="filter-item">
-                            <input type="text" placeholder="Reference ID" className="filter-input reference-id-input" speed-bind-query="WorkflowRequestID" speed-operator="Eq" />
+                            <input type="text" placeholder="Initiator Name" className="filter-input employee-name-input" speed-bind-query="InitiatorName" speed-operator="Contains" />
                         </div>
                         <div className="filter-item">
-                            <input type="text" placeholder="Employee Name" className="filter-input employee-name-input" speed-bind-query="InitiatorName" speed-operator="Contains" />
+                            <input type="text" placeholder="Next Approver" className="filter-input reference-id-input" speed-bind-query="Current_Approver" speed-operator="Eq" />
                         </div>
                     </div>
                     <div className="filter-row">

@@ -286,6 +286,7 @@ function whenLayoutLoaded() {
                   var riskImpactObj = {};
                   riskImpactObj.title = listEnumerator.get_current().get_item("Title");
                   riskImpactObj.value = listEnumerator.get_current().get_item("Value");
+                  riskImpactObj.color = listEnumerator.get_current().get_item("ColorCode");
                   MainApplication.riskImpact.push(riskImpactObj);
               }
               checkAppDependency();
