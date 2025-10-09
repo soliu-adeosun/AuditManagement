@@ -262,7 +262,7 @@ GlobalDefinitionsManager.prototype.displayHistory = function (Arr, tableid) {
   var str = "";
   for (d in Arr) {
     str +=
-      `<tr><td><a onclick="MainApplication.viewEmployeeProfile('${Arr[d].email}')">${Arr[d].name}</a></td><td>${Arr[d].stage}</td><td>${Arr[d].action}</td>
+      `<tr><td>${Arr[d].name}</td><td>${Arr[d].stage}</td><td>${Arr[d].action}</td>
         <td>${$spcontext.replaceSpecialkeysinString(Arr[d].comment)}</td><td>${Arr[d].actiontime}</td></tr>`;
   }
   $("#" + tableid).append(str);
