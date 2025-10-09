@@ -205,6 +205,13 @@ function whenLayoutLoaded() {
                 }
             ];
 
+            var isoQuery = [
+                {
+                    ascending: "TRUE",  //ascending or descending
+                    orderby: "SortClause", //Column Name to order by
+                }
+            ];
+
           speedctxRoot.getItem("AuditType", speedctxRoot.camlBuilder(basicQuery), function (_spMeta) {
               var listEnumerator = _spMeta.getEnumerator();
               MainApplication.auditType = [];
@@ -252,7 +259,7 @@ function whenLayoutLoaded() {
                 }
             );
 
-          rsBAContext.getItem("ISO CLAUSE", $spcontext.camlBuilder(basicQuery), function (_spMeta) {
+          rsBAContext.getItem("ISO CLAUSE", $spcontext.camlBuilder(isoQuery), function (_spMeta) {
               var listEnumerator = _spMeta.getEnumerator();
               MainApplication.isoClause = [];
               MainApplication.occurrence = [];
@@ -368,7 +375,7 @@ function whenLayoutLoaded() {
             }
         );
 
-        checkAppDependency();
+        // checkAppDependency();
       });
 
       
@@ -417,3 +424,42 @@ MainApplication.reportSyncSearch = function (keyquery, data) {
 
 
 whenLayoutLoaded();
+
+
+MainApplication.displayPeople = function (people, containerId, prefix, placeholderText) {
+    const $displayContainer = $(`#${containerId}`);
+    $displayContainer.empty();
+
+    if (!people || people.length === 0) {
+        $displayContainer.append(`
+            <div class="text-center text-gray-500 mt-4">
+                ${placeholderText}
+            </div>
+        `);
+        return;
+    }
+
+    people.forEach(person => {
+        const block = `
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 mt-4 person-block" data-id="${person.Email || ''}">
+                <div class="mt-2">
+                    <label class="block text-sm font-medium text-blue-600 mb-2">Employee Name</label>
+                    <input id="${prefix}Name_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Title || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                </div>
+                <div class="mt-2">
+                    <label class="block text-sm font-medium text-blue-600 mb-2">Employee ID</label>
+                    <input id="${prefix}Id_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.EmployeeId || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                </div>
+                <div class="mt-2">
+                    <label class="block text-sm font-medium text-blue-600 mb-2">Email</label>
+                    <input id="${prefix}Mail_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Email || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                </div>
+                <div class="mt-2">
+                    <label class="block text-sm font-medium text-blue-600 mb-2">Department</label>
+                    <input id="${prefix}Department_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Department || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                </div>
+            </div>
+        `;
+        $displayContainer.append(block);
+    });
+};

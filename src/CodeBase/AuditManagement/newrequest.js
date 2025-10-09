@@ -59,7 +59,8 @@ function whenNewRequestDependeciesLoaded() {
     PeoplePicker.defaultValues = {};
     PeoplePicker.initializePeoplePickers(MainApplication.staffList);
 
-    MainApplication.NewRequestComponent.updatePlaceholder();
+    MainApplication.NewRequestComponent.updatePlaceholder("auditeesContainer", "auditees", "No Auditees selected...Please select an auditee from the people picker above");
+    MainApplication.NewRequestComponent.updatePlaceholder("auditorsContainer", "auditors", "No Auditors selected...Please select an auditor from the people picker above");
     MainApplication.NewRequestComponent.addQuestionSet();
 
     // Disable the button
@@ -104,26 +105,9 @@ function whenNewRequestDependeciesLoaded() {
         MainApplication.NewRequestComponent.removeQuestionSet(questionSetId);
     });
 
-    const initialSelections = $("#auditees").val() || [];
-    initialSelections.forEach(email => {
-        const personData = MainApplication.NewRequestComponent.findPersonData(email);
-        MainApplication.NewRequestComponent.addPersonBlock(personData);
-    });
-
-    $("#auditees").on("select2:select", function (e) {
-        const person = e.params.data;
-        const $option = $(person.element);
-        const personData = MainApplication.NewRequestComponent.findPersonData($option.val());
-        MainApplication.NewRequestComponent.addPersonBlock(personData);
-        MainApplication.NewRequestComponent.updatePlaceholder();
-    });
-
-    $("#auditees").on("select2:unselect", function (e) {
-        const person = e.params.data;
-        const $option = $(person.element);
-        MainApplication.NewRequestComponent.removePersonBlock({ Email: $option.val() });
-        MainApplication.NewRequestComponent.updatePlaceholder();
-    });
+    // Initialize pickers
+    MainApplication.NewRequestComponent.initializePeoplePicker('auditees', 'auditeesContainer', 'auditees');
+    MainApplication.NewRequestComponent.initializePeoplePicker('otherauditors', 'auditorsContainer', 'auditors');
 
     $('#reviewerCommentDiv textarea').removeAttr('speed-bind-validate');
     $("#reviewerCommentDiv").hide();
@@ -159,70 +143,49 @@ MainApplication.NewRequestComponent.findPersonData = function (email) {
         DateOfEmployment: person.DateOfEmployment || '',
         JobRole: person.JobRole || ''
     };
-}
+};
 
-MainApplication.NewRequestComponent.addPersonBlock = function (person) {
+// Generic function to add a person block to a specified container
+MainApplication.NewRequestComponent.addPersonBlock = function (person, containerId, prefix) {
     const block = `
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 mt-4 person-block" data-id="${person.Email}">
             <div class="mt-2">
                 <label class="block text-sm font-medium text-blue-600 mb-2">Employee Name</label>
-                <input id="auditeeName_${person.Email.replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Title}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                <input id="${prefix}Name_${person.Email.replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Title}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
             </div>
             <div class="mt-2">
                 <label class="block text-sm font-medium text-blue-600 mb-2">Employee ID</label>
-                <input id="auditeeId_${person.Email.replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.EmployeeId}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                <input id="${prefix}Id_${person.Email.replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.EmployeeId}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
             </div>
             <div class="mt-2">
                 <label class="block text-sm font-medium text-blue-600 mb-2">Email</label>
-                <input id="auditeeMail_${person.Email.replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Email}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                <input id="${prefix}Mail_${person.Email.replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Email}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
             </div>
             <div class="mt-2">
                 <label class="block text-sm font-medium text-blue-600 mb-2">Department</label>
-                <input id="auditeeDepartment_${person.Email.replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Department}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                <input id="${prefix}Department_${person.Email.replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Department}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
             </div>
         </div>
     `;
-    $("#auditeesContainer").append(block);
-}
-
-MainApplication.NewRequestComponent.removePersonBlock = function (person) {
-    $(`#auditeesContainer .person-block[data-id="${person.Email}"]`).remove();
-}
-
-MainApplication.NewRequestComponent.getAllAuditeeData = function () {
-    const $container = $('#auditeesContainer');
-    const $blocks = $container.find('.person-block');
-    const auditeeData = [];
-
-    $blocks.each(function () {
-        const $block = $(this);
-        const email = $block.data('id');
-        if (!email) return;
-
-        const personData = {
-            Title: $block.find(`input[id*="auditeeName_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || '',
-            Email: email,
-            EmployeeId: $block.find(`input[id*="auditeeId_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || '',
-            Department: $block.find(`input[id*="auditeeDepartment_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || ''
-        };
-
-        auditeeData.push(personData);
-    });
-
-    return auditeeData;
+    $(`#${containerId}`).append(block);
 };
 
-// Helper function to update placeholder visibility
-MainApplication.NewRequestComponent.updatePlaceholder = function () {
-    const $container = $("#auditeesContainer");
+// Generic function to remove a person block from a specified container
+MainApplication.NewRequestComponent.removePersonBlock = function (person, containerId) {
+    $(`#${containerId} .person-block[data-id="${person.Email}"]`).remove();
+};
+
+// Generic function to update placeholder visibility
+MainApplication.NewRequestComponent.updatePlaceholder = function (containerId, placeholderId, placeholderText) {
+    const $container = $(`#${containerId}`);
     const $personBlocks = $container.find('.person-block');
-    const $placeholder = $container.find('#auditees-placeholder');
+    const $placeholder = $container.find(`#${placeholderId}`);
 
     if ($personBlocks.length === 0) {
         if ($placeholder.length === 0) {
             const placeholderHtml = `
-                <div id="auditees-placeholder" class="text-center py-6 text-gray-500 text-sm sm:text-base">
-                    No auditees selected. Please select an auditee from the picker above.
+                <div id="${placeholderId}" class="text-center py-6 text-gray-500 text-sm sm:text-base">
+                    ${placeholderText}
                 </div>
             `;
             $container.append(placeholderHtml);
@@ -230,7 +193,104 @@ MainApplication.NewRequestComponent.updatePlaceholder = function () {
     } else {
         $placeholder.remove();
     }
-}
+};
+
+// Generic function to initialize a people picker
+MainApplication.NewRequestComponent.initializePeoplePicker = function (pickerId, containerId, prefix) {
+    // Initialize existing selections
+    const initialSelections = $(`#${pickerId}`).val() || [];
+    initialSelections.forEach(email => {
+        const personData = MainApplication.NewRequestComponent.findPersonData(email);
+        MainApplication.NewRequestComponent.addPersonBlock(personData, containerId, prefix);
+    });
+
+    // Handle select event
+    $(`#${pickerId}`).on("select2:select", function (e) {
+        const person = e.params.data;
+        const $option = $(person.element);
+        const personData = MainApplication.NewRequestComponent.findPersonData($option.val());
+        MainApplication.NewRequestComponent.addPersonBlock(personData, containerId, prefix);
+        MainApplication.NewRequestComponent.updatePlaceholder(containerId, `${prefix}-placeholder`, `No ${prefix}s selected. Please select an ${prefix} from the picker above.`);
+    });
+
+    // Handle unselect event
+    $(`#${pickerId}`).on("select2:unselect", function (e) {
+        const person = e.params.data;
+        const $option = $(person.element);
+        MainApplication.NewRequestComponent.removePersonBlock({ Email: $option.val() }, containerId);
+        MainApplication.NewRequestComponent.updatePlaceholder(containerId, `${prefix}-placeholder`, `No ${prefix}s selected. Please select an ${prefix} from the picker above.`);
+    });
+};
+
+
+MainApplication.NewRequestComponent.getAllPersonData = function (containerId, prefix) {
+    const $container = $(`#${containerId}`);
+    const $blocks = $container.find('.person-block');
+    const personData = [];
+
+    $blocks.each(function () {
+        const $block = $(this);
+        const email = $block.data('id');
+        if (!email) return;
+
+        const data = {
+            Title: $block.find(`input[id*="${prefix}Name_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || '',
+            Email: email,
+            EmployeeId: $block.find(`input[id*="${prefix}Id_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || '',
+            Department: $block.find(`input[id*="${prefix}Department_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || ''
+        };
+
+        personData.push(data);
+    });
+
+    return personData;
+};
+
+// MainApplication.NewRequestComponent.getAllAuditeeData = function () {
+//     const $container = $('#auditeesContainer');
+//     const $blocks = $container.find('.person-block');
+//     const auditeeData = [];
+
+//     $blocks.each(function () {
+//         const $block = $(this);
+//         const email = $block.data('id');
+//         if (!email) return;
+
+//         const personData = {
+//             Title: $block.find(`input[id*="auditeeName_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || '',
+//             Email: email,
+//             EmployeeId: $block.find(`input[id*="auditeeId_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || '',
+//             Department: $block.find(`input[id*="auditeeDepartment_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || ''
+//         };
+
+//         auditeeData.push(personData);
+//     });
+
+//     return auditeeData;
+// };
+
+// MainApplication.NewRequestComponent.getAllAuditorsData = function () {
+//     const $container = $('#auditorsContainer');
+//     const $blocks = $container.find('.person-block');
+//     const auditorData = [];
+
+//     $blocks.each(function () {
+//         const $block = $(this);
+//         const email = $block.data('id');
+//         if (!email) return;
+
+//         const personData = {
+//             Title: $block.find(`input[id*="auditorName_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || '',
+//             Email: email,
+//             EmployeeId: $block.find(`input[id*="auditorId_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || '',
+//             Department: $block.find(`input[id*="auditorDepartment_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || ''
+//         };
+
+//         auditorData.push(personData);
+//     });
+
+//     return auditorData;
+// };
 
 MainApplication.NewRequestComponent.addQuestionSet = function () {
     const questionSetId = `question-set-${AppRequest.questionSetCounter++}`;
@@ -246,7 +306,7 @@ MainApplication.NewRequestComponent.addQuestionSet = function () {
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 small-gap mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
             <div class="mt-2">
                 <label class="block text-sm font-medium text-blue-600 mb-2">Questions</label>
-                <textarea placeholder="Enter text here..." class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base"></textarea>
+                <textarea placeholder="Enter text here..." speed-validate-mode class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base"></textarea>
             </div>
             <div class="mt-2">
                 <label class="block text-sm font-medium text-blue-600 mb-2">Audit Finding</label>
@@ -402,7 +462,7 @@ MainApplication.NewRequestComponent.recoverListData = function () {
         "ID", "WorkflowRequestID", "Current_Approver", "Current_Approver_Code", "Approval_Status",
         "Created", "InitiatorEmailAddress", "InitiatorLogin", "Transaction_History", "ReturnForCorrection",
         "Modified", "PendingUserEmail", "PendingUserLogin", "Attachment_Folder", "AttachmentURL", "Author",
-        "AuditeesDetails", "QuestionsDetails"
+        "AuditeesDetails", "AuditorsDetails", "QuestionsDetails"
     ];
 
     speedctxRoot.getListToControl(globalDefinitions.stageDefinitions.listname, query, extraProperties, function (listProperties) {
@@ -419,9 +479,14 @@ MainApplication.NewRequestComponent.recoverListData = function () {
             listProperties.Transaction_History = $spcontext.JSONToObject(listProperties.Transaction_History);
             listProperties.AttachmentURL = $spcontext.JSONToObject(listProperties.AttachmentURL, 'object');
             listProperties.AuditeesDetails = $spcontext.JSONToObject(listProperties.AuditeesDetails);
+            listProperties.AuditorsDetails = $spcontext.JSONToObject(listProperties.AuditorsDetails);
             listProperties.QuestionsDetails = $spcontext.JSONToObject(listProperties.QuestionsDetails);
 
-            MainApplication.NewRequestComponent.displayAuditees(listProperties.AuditeesDetails);
+            // MainApplication.NewRequestComponent.displayAuditees(listProperties.AuditeesDetails);
+            console.log(listProperties);
+
+            MainApplication.displayPeople(listProperties.AuditeesDetails, "auditeesContainer", "auditees", "No Auditees found");
+            MainApplication.displayPeople(listProperties.AuditorsDetails, "auditorsContainer", "auditors", "No Auditors found");
             MainApplication.NewRequestComponent.displayQuestionSets(listProperties.QuestionsDetails);
 
 
@@ -495,7 +560,12 @@ MainApplication.NewRequestComponent.saveDataToList = function () {
     formData.InitiatorEmailAddress = CurrentUserProperties.email;
     formData.InitiatorName = CurrentUserProperties.title;
 
-    formData.AuditeesDetails = MainApplication.NewRequestComponent.getAllAuditeeData();
+    // formData.AuditeesDetails = MainApplication.NewRequestComponent.getAllAuditeeData();
+    // formData.AuditorsDetails = MainApplication.NewRequestComponent.getAllAuditorsData();
+
+    formData.AuditeesDetails = MainApplication.NewRequestComponent.getAllPersonData('auditeesContainer', 'auditees');
+
+    formData.AuditorsDetails = MainApplication.NewRequestComponent.getAllPersonData('auditorsContainer', 'auditors');
 
     formData.QuestionsDetails = MainApplication.NewRequestComponent.getAllQuestionsData();
 
@@ -504,10 +574,13 @@ MainApplication.NewRequestComponent.saveDataToList = function () {
 
 
     if ($spcontext.checkPassedValidation()) {
+        console.log("Validation Passed");
+        console.log("FormData before Stringyfying: ", formData);
         formData.Auditees = pickerValues.Auditees;
         formData.OtherAuditors = pickerValues.OtherAuditors;
 
         formData.AuditeesDetails = JSON.stringify(formData.AuditeesDetails);
+        formData.AuditorsDetails = JSON.stringify(formData.AuditorsDetails);
         formData.QuestionsDetails = JSON.stringify(formData.QuestionsDetails);
 
         globalDefinitions.callLoader();
@@ -539,7 +612,11 @@ MainApplication.NewRequestComponent.saveDataToListAsDraft = function () {
     formData.InitiatorEmailAddress = CurrentUserProperties.email;
     formData.InitiatorName = CurrentUserProperties.title;
 
-    formData.AuditeesDetails = MainApplication.NewRequestComponent.getAllAuditeeData() || {};
+    // formData.AuditeesDetails = MainApplication.NewRequestComponent.getAllAuditeeData() || {};
+    // formData.AuditorsDetails = MainApplication.NewRequestComponent.getAllAuditorsData() || {};
+    formData.AuditeesDetails = MainApplication.NewRequestComponent.getAllPersonData('auditeesContainer', 'auditees');
+
+    formData.AuditorsDetails = MainApplication.NewRequestComponent.getAllPersonData('auditorsContainer', 'auditors');
 
     formData.QuestionsDetails = MainApplication.NewRequestComponent.getAllQuestionsData() || {};
 
@@ -551,6 +628,7 @@ MainApplication.NewRequestComponent.saveDataToListAsDraft = function () {
     formData.OtherAuditors = pickerValues.OtherAuditors || {};
 
     formData.AuditeesDetails = JSON.stringify(formData.AuditeesDetails);
+    formData.AuditorsDetails = JSON.stringify(formData.AuditorsDetails);
     formData.QuestionsDetails = JSON.stringify(formData.QuestionsDetails);
 
 
@@ -623,47 +701,6 @@ MainApplication.NewRequestComponent.proceedToList = function (formData, saveMode
     }
 }
 
-
-MainApplication.NewRequestComponent.displayAuditees = function (auditees) {
-
-    const $displayContainer = $("#auditeesContainer");
-    $displayContainer.empty();
-
-    if (!auditees || auditees.length === 0) {
-        $displayContainer.append(`
-            <div class="text-center text-gray-500 mt-4">
-                No auditees to display.
-            </div>
-        `);
-        return;
-    }
-
-    auditees.forEach(person => {
-        const block = `
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 mt-4 person-block" data-id="${person.Email || ''}">
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Employee Name</label>
-                    <input id="auditeeName_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Title || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Employee ID</label>
-                    <input id="auditeeId_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.EmployeeId || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Email</label>
-                    <input id="auditeeMail_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Email || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Department</label>
-                    <input id="auditeeDepartment_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Department || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
-                </div>
-            </div>
-        `;
-        $displayContainer.append(block);
-    });
-};
-
-
 MainApplication.NewRequestComponent.displayQuestionSets = function (questionSets) {
     const $displayContainer = $("#questionsContainer");
     $displayContainer.empty();
@@ -679,6 +716,7 @@ MainApplication.NewRequestComponent.displayQuestionSets = function (questionSets
 
     questionSets.forEach((questionSet, index) => {
         const questionSetId = questionSet.id || `question-set-${index}`;
+        const isNonConformance = questionSet.AuditFinding === 'Non-Conformance';
         const block = `
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 small-gap mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
                 <div class="mt-2">
@@ -703,7 +741,7 @@ MainApplication.NewRequestComponent.displayQuestionSets = function (questionSets
                 </div>
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance Statement</label>
-                    <textarea class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.NonConformanceStatement || ''}</textarea>
+                    <textarea class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" ${isNonConformance ? '' : 'disabled'}>${questionSet.NonConformanceStatement || ''}</textarea>
                 </div>
                 <div class="mt-2 hidden">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Reference ID</label>
@@ -717,5 +755,29 @@ MainApplication.NewRequestComponent.displayQuestionSets = function (questionSets
             </div>
         `;
         $displayContainer.append(block);
+
+        // Add event listener to handle audit finding changes
+        const $auditFindingInput = $(`#questionsContainer .question-set[data-id="${questionSetId}"] .audit-finding-input`);
+        $auditFindingInput.off('change').on('change', function () {
+            const $questionSet = $(this).closest('.question-set');
+            const $nonConformanceInput = $questionSet.find('.non-conformance-input');
+            const $nonConformanceIdDiv = $questionSet.find('.non-conformance-id');
+
+            if ($(this).val() === 'Non-Conformance') {
+                $nonConformanceInput.prop('disabled', false);
+                $nonConformanceIdDiv.removeClass('hidden');
+                // Regenerate ID based on current time if needed
+                const newDateCreatedCode = $spcontext.stringnifyDate({
+                    includeTime: true,
+                    timeSpace: false,
+                    format: "dd-mm-yy HH:mm"
+                }).replace(/[-: ]/g, "");
+                const newNonConformanceId = `RSAUDNC${newDateCreatedCode}`;
+                $questionSet.find('.non-conformance-id-input').val(newNonConformanceId);
+            } else {
+                $nonConformanceInput.prop('disabled', true);
+                $nonConformanceIdDiv.addClass('hidden');
+            }
+        });
     });
 };

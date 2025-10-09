@@ -46,40 +46,25 @@ whenDashboardDependeciesLoaded = function () {
             }
         },
         "Modified": function (valueToEva) {
+            // var isActor = MainApplication.isUserAnActor;
+            let isActor = false;
+
+            try {
+            isActor = MainApplication.configuredTaskMembers[valueToEva.Current_Approver].belongs;
+            } catch (error) {}
+
             var approvalStr = `
                 <div class="flex space-x-1 sm:space-x-2">
-                    <a title="Approval" href="#/approverequest?itemId=${valueToEva.WorkflowRequestID}" class="p-1 sm:p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-100 transition-colors">
+                    ${isActor ? `
+                    <a title="Approval" href="#/approverequest?itemId=${valueToEva.WorkflowRequestID}" 
+                        class="p-1 sm:p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-100 transition-colors">
                         <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
                             <path fill-rule="evenodd" d="M11.986 3H12a2 2 0 0 1 2 2v6a2 2 0 0 1-1.5 1.937V7A2.5 2.5 0 0 0 10 4.5H4.063A2 2 0 0 1 6 3h.014A2.25 2.25 0 0 1 8.25 1h1.5a2.25 2.25 0 0 1 2.236 2ZM10.5 4v-.75a.75.75 0 0 0-.75-.75h-1.5a.75.75 0 0 0-.75.75V4h3Z" clip-rule="evenodd" />
                             <path fill-rule="evenodd" d="M3 6a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H3Zm1.75 2.5a.75.75 0 0 0 0 1.5h3.5a.75.75 0 0 0 0-1.5h-3.5ZM4 11.75a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 0 1.5h-3.5a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" />
                         </svg>
-                    </a>
-                    <a title="View" href="#/viewrequest?itemId=${valueToEva.WorkflowRequestID}" class="p-1 sm:p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 transition-colors">
-                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" />
-                            <path fill-rule="evenodd" d="M1.38 8.28a.87.87 0 0 1 0-.566 7.003 7.003 0 0 1 13.238.006.87.87 0 0 1 0 .566A7.003 7.003 0 0 1 1.379 8.28ZM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                </div>`;
-            var editStr = `
-                <div class="flex space-x-1 sm:space-x-2">
-                    <a title="Modify" href="#/newrequest?itemId=${valueToEva.WorkflowRequestID}" class="p-1 sm:p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                    </a>
-                </div>`;
-            var editDraftStr = `
-                <div class="flex space-x-1 sm:space-x-2">
-                    <a title="Modify" href="#/newrequest?itemId=${valueToEva.WorkflowRequestID}&mode=editdraft" class="p-1 sm:p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                    </a>
-                </div>`;
-            var viewStr = `
-                <div class="flex space-x-1 sm:space-x-2">
-                    <a title="View" href="#/viewrequest?itemId=${valueToEva.WorkflowRequestID}" class="p-1 sm:p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 transition-colors">
+                    </a>` : ''}
+                    <a title="View" href="#/viewrequest?itemId=${valueToEva.WorkflowRequestID}" 
+                        class="p-1 sm:p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 transition-colors">
                         <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
                             <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" />
                             <path fill-rule="evenodd" d="M1.38 8.28a.87.87 0 0 1 0-.566 7.003 7.003 0 0 1 13.238.006.87.87 0 0 1 0 .566A7.003 7.003 0 0 1 1.379 8.28ZM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" clip-rule="evenodd" />
@@ -87,7 +72,45 @@ whenDashboardDependeciesLoaded = function () {
                     </a>
                 </div>`;
 
-            if ((valueToEva.Approval_Status === "Pending" && valueToEva.Current_Approver === globalDefinitions.stageDefinitions.save)){
+            var editStr = `
+                <div class="flex space-x-1 sm:space-x-2">
+                    <a title="Modify" href="#/newrequest?itemId=${valueToEva.WorkflowRequestID}" 
+                        class="p-1 sm:p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414
+                                a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                    </a>
+                </div>`;
+
+            var editDraftStr = `
+                <div class="flex space-x-1 sm:space-x-2">
+                    <a title="Modify" href="#/newrequest?itemId=${valueToEva.WorkflowRequestID}&mode=editdraft" 
+                        class="p-1 sm:p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414
+                                a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                    </a>
+                </div>`;
+
+            var viewStr = `
+                <div class="flex space-x-1 sm:space-x-2">
+                    <a title="View" href="#/viewrequest?itemId=${valueToEva.WorkflowRequestID}" 
+                        class="p-1 sm:p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 transition-colors">
+                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" />
+                            <path fill-rule="evenodd" d="M1.38 8.28a.87.87 0 0 1 0-.566
+                                7.003 7.003 0 0 1 13.238.006.87.87 0 0 1 0 .566A7.003 
+                                7.003 0 0 1 1.379 8.28ZM11 8a3 3 0 1 1-6 0 
+                                3 3 0 0 1 6 0Z" clip-rule="evenodd" />
+                        </svg>
+                    </a>
+                </div>`;
+
+            if ((valueToEva.Approval_Status === "Pending" && valueToEva.Current_Approver === globalDefinitions.stageDefinitions.save)) {
                 return editDraftStr;
             } else if (valueToEva.Approval_Status === "Revise") {
                 return editStr;
@@ -97,6 +120,7 @@ whenDashboardDependeciesLoaded = function () {
                 return approvalStr;
             }
         }
+
     };
 
     $("#dashboard-tabs").empty();

@@ -111,6 +111,24 @@ export default class ViewRequest extends React.Component<{}, {}> {
                         </Link>
                     </div>
                 </div>
+
+                <div className="row mt-3">
+                    <h3>Audit History</h3>
+                    <table className="w-full table-mobile">
+                        <thead className="border-b border-gray-200">
+                            <tr>
+                                <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider" scope="col">Name</th>
+                                <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider" scope="col">Stage</th>
+                                <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider" scope="col">Action</th>
+                                <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider" scope="col">Comment</th>
+                                <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider" scope="col">Action Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs">
+
+                        </tbody>
+                    </table>
+                </div>
             </div>
         );
     }

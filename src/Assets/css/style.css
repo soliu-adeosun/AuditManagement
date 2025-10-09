@@ -1724,3 +1724,8 @@ textarea[readonly] {
 textarea {
     resize: none !important;
 }
+
+.required::after {
+  content: " *";
+  color: red;
+}

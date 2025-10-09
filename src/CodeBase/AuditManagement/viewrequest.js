@@ -64,7 +64,7 @@ MainApplication.ViewRequestComponent.recoverListData = function() {
             "ID", "WorkflowRequestID", "Current_Approver", "Current_Approver_Code", "Approval_Status",
             "Created", "InitiatorEmailAddress", "InitiatorLogin", "Transaction_History", "ReturnForCorrection",
             "Modified", "PendingUserEmail", "PendingUserLogin", "Attachment_Folder", "AttachmentURL","Author",
-            "AuditeesDetails", "QuestionsDetails"
+            "AuditeesDetails", "AuditorsDetails", "QuestionsDetails", "RiskAssessment", "Satisfactory"
         ];
 
         speedctxRoot.getListToControl(globalDefinitions.stageDefinitions.listname, query, extraProperties, function (listProperties) {
@@ -95,9 +95,12 @@ MainApplication.ViewRequestComponent.recoverListData = function() {
                             listProperties.Transaction_History = $spcontext.JSONToObject(listProperties.Transaction_History);
                             listProperties.AttachmentURL = $spcontext.JSONToObject(listProperties.AttachmentURL, 'object');
                             listProperties.AuditeesDetails = $spcontext.JSONToObject(listProperties.AuditeesDetails);
+                            listProperties.AuditorsDetails = $spcontext.JSONToObject(listProperties.AuditorsDetails);
                             listProperties.QuestionsDetails = $spcontext.JSONToObject(listProperties.QuestionsDetails);
 
-                            MainApplication.ViewRequestComponent.displayAuditees(listProperties.AuditeesDetails);
+                            MainApplication.displayPeople(listProperties.AuditeesDetails, "auditeesContainer", "auditees", "No Auditees found");
+                            MainApplication.displayPeople(listProperties.AuditorsDetails, "auditorsContainer", "auditors", "No Auditors found");
+
                             MainApplication.ViewRequestComponent.displayQuestionSets(listProperties.QuestionsDetails);
 
 
@@ -152,45 +155,6 @@ MainApplication.ViewRequestComponent.recoverListData = function() {
         $spcontext.redirect("#/", false);
     }
 }
-
-MainApplication.ViewRequestComponent.displayAuditees = function(auditees) {
-
-    const $displayContainer = $("#auditeesContainer");
-    $displayContainer.empty();
-
-    if (!auditees || auditees.length === 0) {
-        $displayContainer.append(`
-            <div class="text-center text-gray-500 mt-4">
-                No auditees to display.
-            </div>
-        `);
-        return;
-    }
-
-    auditees.forEach(person => {
-        const block = `
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 mt-4 person-block" data-id="${person.Email || ''}">
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Employee Name</label>
-                    <input id="auditeeName_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Title || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Employee ID</label>
-                    <input id="auditeeId_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.EmployeeId || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Email</label>
-                    <input id="auditeeMail_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Email || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Department</label>
-                    <input id="auditeeDepartment_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Department || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
-                </div>
-            </div>
-        `;
-        $displayContainer.append(block);
-    });
-};
 
 
 MainApplication.ViewRequestComponent.displayQuestionSets = function (questionSets) {

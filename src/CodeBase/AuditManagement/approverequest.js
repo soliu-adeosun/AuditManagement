@@ -114,7 +114,7 @@ MainApplication.ApproveRequestComponent.recoverListData = function() {
             "ID", "WorkflowRequestID", "Current_Approver", "Current_Approver_Code", "Approval_Status",
             "Created", "InitiatorEmailAddress", "InitiatorLogin", "Transaction_History", "ReturnForCorrection",
             "Modified", "PendingUserEmail", "PendingUserLogin", "Attachment_Folder", "AttachmentURL","Author",
-            "AuditeesDetails", "QuestionsDetails", "RiskAssessment", "Satisfactory"
+            "AuditeesDetails", "AuditorsDetails", "QuestionsDetails", "RiskAssessment", "Satisfactory"
         ];
 
         speedctxRoot.getListToControl(globalDefinitions.stageDefinitions.listname, query, extraProperties, function (listProperties) {
@@ -148,10 +148,13 @@ MainApplication.ApproveRequestComponent.recoverListData = function() {
                             listProperties.Transaction_History = $spcontext.JSONToObject(listProperties.Transaction_History);
                             listProperties.AttachmentURL = $spcontext.JSONToObject(listProperties.AttachmentURL, 'object');
                             listProperties.AuditeesDetails = $spcontext.JSONToObject(listProperties.AuditeesDetails);
+                            listProperties.AuditorsDetails = $spcontext.JSONToObject(listProperties.AuditorsDetails);
                             listProperties.QuestionsDetails = $spcontext.JSONToObject(listProperties.QuestionsDetails);
                             listProperties.RiskAssessment = $spcontext.JSONToObject(listProperties.RiskAssessment);
 
-                            MainApplication.ApproveRequestComponent.displayAuditees(listProperties.AuditeesDetails);
+                            MainApplication.displayPeople(listProperties.AuditeesDetails, "auditeesContainer", "auditees", "No Auditees found");
+                            MainApplication.displayPeople(listProperties.AuditorsDetails, "auditorsContainer", "auditors", "No Auditors found");
+
                             MainApplication.ApproveRequestComponent.displayQuestionSets(listProperties.QuestionsDetails);
 
 
@@ -299,44 +302,44 @@ MainApplication.ApproveRequestComponent.proceedToList = function(formData) {
         // })
 }
 
-MainApplication.ApproveRequestComponent.displayAuditees = function(auditees) {
+// MainApplication.ApproveRequestComponent.displayAuditees = function(auditees) {
 
-    const $displayContainer = $("#auditeesContainer");
-    $displayContainer.empty();
+//     const $displayContainer = $("#auditeesContainer");
+//     $displayContainer.empty();
 
-    if (!auditees || auditees.length === 0) {
-        $displayContainer.append(`
-            <div class="text-center text-gray-500 mt-4">
-                No auditees to display.
-            </div>
-        `);
-        return;
-    }
+//     if (!auditees || auditees.length === 0) {
+//         $displayContainer.append(`
+//             <div class="text-center text-gray-500 mt-4">
+//                 No auditees to display.
+//             </div>
+//         `);
+//         return;
+//     }
 
-    auditees.forEach(person => {
-        const block = `
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 mt-4 person-block" data-id="${person.Email || ''}">
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Employee Name</label>
-                    <input id="auditeeName_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Title || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Employee ID</label>
-                    <input id="auditeeId_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.EmployeeId || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Email</label>
-                    <input id="auditeeMail_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Email || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Department</label>
-                    <input id="auditeeDepartment_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Department || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
-                </div>
-            </div>
-        `;
-        $displayContainer.append(block);
-    });
-};
+//     auditees.forEach(person => {
+//         const block = `
+//             <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 mt-4 person-block" data-id="${person.Email || ''}">
+//                 <div class="mt-2">
+//                     <label class="block text-sm font-medium text-blue-600 mb-2">Employee Name</label>
+//                     <input id="auditeeName_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Title || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+//                 </div>
+//                 <div class="mt-2">
+//                     <label class="block text-sm font-medium text-blue-600 mb-2">Employee ID</label>
+//                     <input id="auditeeId_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.EmployeeId || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+//                 </div>
+//                 <div class="mt-2">
+//                     <label class="block text-sm font-medium text-blue-600 mb-2">Email</label>
+//                     <input id="auditeeMail_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Email || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+//                 </div>
+//                 <div class="mt-2">
+//                     <label class="block text-sm font-medium text-blue-600 mb-2">Department</label>
+//                     <input id="auditeeDepartment_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Department || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+//                 </div>
+//             </div>
+//         `;
+//         $displayContainer.append(block);
+//     });
+// };
 
 MainApplication.ApproveRequestComponent.displayQuestionSets = function (questionSets) {
     const $displayContainer = $("#questionsContainer");
@@ -407,7 +410,7 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
                         <tr class="bg-gray-100">
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC REF ID</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">ISO CLAUSE</th>
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC Statement</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">OCCURRENCE</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC RATING</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC CLASSIFICATION</th>
@@ -457,7 +460,7 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
                 <td class="px-2 py-2">
                     <select class="risk-impact-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
                         <option value="">Select</option>
-                        ${riskImpactOptions.map(option => `<option value="${option.value}" style="background-color: ${option.color}; color: white;">${option.title}</option>`).join('')}
+                        ${riskImpactOptions.map(option => `<option value="${option.value}" data-color="${option.color}" style="background-color: ${option.color}; color: white;">${option.title}</option>`).join('')}
                     </select>
                 </td>
                 <td class="px-2 py-2">
@@ -500,6 +503,14 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
             const riskImpactValue = parseFloat($riskImpactSelect.val()) || 0;
             const product = ncRatingValue * riskImpactValue;
             $overallRiskExposureInput.val(product || '');
+
+            // Update Risk Impact select background color
+            const selectedOption = $riskImpactSelect.find('option:selected');
+            const color = selectedOption.data('color') || '#ffffff'; // Fallback to white
+            $riskImpactSelect.css({
+                'background-color': color,
+                'color': '#ffffff' // Ensure text readability
+            });
         }
 
         $ncRatingSelect.on('change', updateNCClassificationAndRiskExposure);
@@ -509,8 +520,149 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
         updateNCClassificationAndRiskExposure();
     });
 
+    // Optional: Reset background color when "Select" is chosen
+    $container.find('.risk-impact-input').each(function () {
+        if ($(this).val() === '') {
+            $(this).css({
+                'background-color': '#ffffff',
+                'color': '#000000'
+            });
+        }
+    });
+
     return $container[0]; // Return as DOM element
 };
+
+// MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (questionsDetails) {
+//     // Predefined options for select fields
+//     const isoClauseOptions = MainApplication.isoClause || [];
+//     const occurrenceOptions = MainApplication.occurrence || [];
+//     const ncRatingOptions = MainApplication.NCRating || [];
+//     const riskImpactOptions = MainApplication.riskImpact || [];
+
+//     // Filter questionsDetails for Non-Conformance entries
+//     const nonConformanceData = questionsDetails.filter(data => data.AuditFinding === 'Non-Conformance');
+
+//     // If no non-conformance data, trigger management details and return
+//     if (nonConformanceData.length === 0) {
+//         AppRequest.isNonConformance = 0;
+//         return;
+//     }
+
+//     // Build Non-Conformance Risk Assessment table
+//     let html = `
+//         <div>
+//             <h2 class="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">NONCONFORMANCE RISK ASSESSMENT SECTION</h2>
+//             <div class="overflow-x-auto">
+//                 <table class="w-full table-auto border-collapse">
+//                     <thead>
+//                         <tr class="bg-gray-100">
+//                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC REF ID</th>
+//                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">ISO CLAUSE</th>
+//                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC Statement</th>
+//                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">OCCURRENCE</th>
+//                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC RATING</th>
+//                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC CLASSIFICATION</th>
+//                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">RISK IMPACT</th>
+//                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">OVERALL RISK EXPOSURE</th>
+//                         </tr>
+//                     </thead>
+//                     <tbody>
+//     `;
+
+//     // Add rows for each non-conformance entry
+//     nonConformanceData.forEach((data, index) => {
+//         // Sanitize data to prevent XSS
+//         const ncId = $('<div>').text(data.NonConformanceID || '').html();
+//         const ncStatement = $('<div>').text(data.NonConformanceStatement || '').html();
+//         const isoClause = $('<div>').text(data.ISOClause || '').html();
+
+//         html += `
+//             <tr class="border-b" data-nc-id="${ncId}">
+//                 <td class="px-2 py-2">
+//                     <input type="text" value="${ncId}" readonly class="nc-reference-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
+//                 </td>
+//                 <td class="px-2 py-2">
+//                     <select class="iso-clause-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
+//                         <option value="">Select</option>
+//                         ${isoClauseOptions.map(option => `<option value="${option}" ${option === isoClause ? 'selected' : ''}>${option}</option>`).join('')}
+//                     </select>
+//                 </td>
+//                 <td class="px-2 py-2">
+//                     <textarea readonly class="non-conformance-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm">${ncStatement || ''}</textarea>
+//                 </td>
+//                 <td class="px-2 py-2">
+//                     <select class="occurrence-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
+//                         <option value="">Select</option>
+//                         ${occurrenceOptions.map(option => `<option value="${option}">${option}</option>`).join('')}
+//                     </select>
+//                 </td>
+//                 <td class="px-2 py-2">
+//                     <select class="nc-rating-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
+//                         <option value="">Select</option>
+//                         ${ncRatingOptions.map(option => `<option value="${option.value}">${option.title}</option>`).join('')}
+//                     </select>
+//                 </td>
+//                 <td class="px-2 py-2">
+//                     <input type="text" readonly class="nc-classification-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
+//                 </td>
+//                 <td class="px-2 py-2">
+//                     <select class="risk-impact-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
+//                         <option value="">Select</option>
+//                         ${riskImpactOptions.map(option => `<option value="${option.value}" style="background-color: ${option.color}; color: white;">${option.title}</option>`).join('')}
+//                     </select>
+//                 </td>
+//                 <td class="px-2 py-2">
+//                     <input type="text" readonly class="overall-risk-exposure-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
+//                 </td>
+//             </tr>
+//         `;
+//     });
+
+//     html += `
+//                     </tbody>
+//                 </table>
+//             </div>
+//         </div>
+//     `;
+
+//     // Create DOM element and attach event listeners
+//     const $container = $('<div>').html(html);
+
+//     // Add event listeners for NC Rating and Risk Impact selects
+//     $container.find('tr').each(function () {
+//         const $row = $(this);
+//         const $ncRatingSelect = $row.find('.nc-rating-input');
+//         const $ncClassificationInput = $row.find('.nc-classification-input');
+//         const $riskImpactSelect = $row.find('.risk-impact-input');
+//         const $overallRiskExposureInput = $row.find('.overall-risk-exposure-input');
+
+//         function updateNCClassificationAndRiskExposure() {
+//             const ncRatingValue = parseFloat($ncRatingSelect.val()) || 0;
+//             // Set NC Classification based on NC Rating
+//             if (ncRatingValue >= 1 && ncRatingValue <= 4) {
+//                 $ncClassificationInput.val('Minor');
+//             } else if (ncRatingValue >= 5 && ncRatingValue <= 6) {
+//                 $ncClassificationInput.val('Major');
+//             } else {
+//                 $ncClassificationInput.val('');
+//             }
+
+//             // Update Overall Risk Exposure
+//             const riskImpactValue = parseFloat($riskImpactSelect.val()) || 0;
+//             const product = ncRatingValue * riskImpactValue;
+//             $overallRiskExposureInput.val(product || '');
+//         }
+
+//         $ncRatingSelect.on('change', updateNCClassificationAndRiskExposure);
+//         $riskImpactSelect.on('change', updateNCClassificationAndRiskExposure);
+
+//         // Initialize with current values
+//         updateNCClassificationAndRiskExposure();
+//     });
+
+//     return $container[0]; // Return as DOM element
+// };
 
 // Function to display the NC Risk Assessment section
 MainApplication.ApproveRequestComponent.displayNCRiskAssessment = function (questionsDetails) {
@@ -627,6 +779,15 @@ MainApplication.ApproveRequestComponent.getManagementDetailsData = function () {
     return managementData;
 };
 
+
+
+
+
+
+
+
+
+
 MainApplication.ApproveRequestComponent.displayNCRiskAssessmentReadOnly = function (ncRiskData) {
     // Log MainApplication.riskImpact for debugging
     console.log('MainApplication.riskImpact:', MainApplication.riskImpact);
@@ -650,7 +811,7 @@ MainApplication.ApproveRequestComponent.displayNCRiskAssessmentReadOnly = functi
                         <tr class="bg-gray-100">
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC REF ID</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">ISO CLAUSE</th>
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC Statement</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">OCCURRENCE</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC RATING</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC CLASSIFICATION</th>

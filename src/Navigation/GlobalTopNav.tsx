@@ -119,7 +119,7 @@ const GlobalTopNav: React.FC = () => {
                                 <span className="font-medium">Create Audit</span>
                             </Link>
                         </div>
-                        <div className="relative cursor-not-allowed">
+                        <div className="relative cursor-not-allowed hidden">
                             {activePath === "/approverequest" && <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500" />}
                             <div
                                 className={`w-full flex items-center px-6 py-4 text-left transition-all duration-200 hover:bg-slate-600 ${
@@ -137,7 +137,7 @@ const GlobalTopNav: React.FC = () => {
                                 <span className="font-medium">Approval</span>
                             </div>
                         </div>
-                        <div className="relative cursor-not-allowed">
+                        <div className="relative cursor-not-allowed hidden">
                             {activePath === "/viewrequest" && <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500" />}
                             <div
                                 className={`w-full flex items-center px-6 py-4 text-left transition-all duration-200 hover:bg-slate-600 ${
