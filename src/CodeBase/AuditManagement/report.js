@@ -198,7 +198,6 @@ MainApplication.ReportComponent.exportToExcel = function () {
     }
 
 MainApplication.ReportComponent.downloadData = function (excelname, data) {
-    //console.log(csvContent);
     if (navigator.msSaveOrOpenBlob) {
         var blobContent = data;
         // Works for Internet Explorer and Microsoft Edge

@@ -92,7 +92,7 @@ export default class ApproveRequest extends React.Component<{}, {}> {
                         </div>
 
                         <div id='satisfactoryDiv' className="w-full mt-2">
-                            <label className="block text-sm font-medium text-blue-600 mb-2 required">Status</label>
+                            <label className="block text-sm font-medium text-blue-600 mb-2">Status <span className="required">*</span></label>
                             <select id='satisfactory' className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
                                 <option value={""}>Select an option</option>
                                 <option value={"Satisfactory"}>Satisfactory</option>

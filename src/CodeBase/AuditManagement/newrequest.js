@@ -59,8 +59,6 @@ function whenNewRequestDependeciesLoaded() {
     PeoplePicker.defaultValues = {};
     PeoplePicker.initializePeoplePickers(MainApplication.staffList);
 
-    MainApplication.NewRequestComponent.updatePlaceholder("auditeesContainer", "auditees", "No Auditees selected...Please select an auditee from the people picker above");
-    MainApplication.NewRequestComponent.updatePlaceholder("auditorsContainer", "auditors", "No Auditors selected...Please select an auditor from the people picker above");
     MainApplication.NewRequestComponent.addQuestionSet();
 
     // Disable the button
@@ -203,6 +201,9 @@ MainApplication.NewRequestComponent.initializePeoplePicker = function (pickerId,
         const personData = MainApplication.NewRequestComponent.findPersonData(email);
         MainApplication.NewRequestComponent.addPersonBlock(personData, containerId, prefix);
     });
+
+    // Update placeholder after initial setup
+    MainApplication.NewRequestComponent.updatePlaceholder(containerId, `${prefix}-placeholder`, `No ${prefix}s selected. Please select from the picker above.`);
 
     // Handle select event
     $(`#${pickerId}`).on("select2:select", function (e) {
@@ -482,9 +483,6 @@ MainApplication.NewRequestComponent.recoverListData = function () {
             listProperties.AuditorsDetails = $spcontext.JSONToObject(listProperties.AuditorsDetails);
             listProperties.QuestionsDetails = $spcontext.JSONToObject(listProperties.QuestionsDetails);
 
-            // MainApplication.NewRequestComponent.displayAuditees(listProperties.AuditeesDetails);
-            console.log(listProperties);
-
             MainApplication.displayPeople(listProperties.AuditeesDetails, "auditeesContainer", "auditees", "No Auditees found");
             MainApplication.displayPeople(listProperties.AuditorsDetails, "auditorsContainer", "auditors", "No Auditors found");
             MainApplication.NewRequestComponent.displayQuestionSets(listProperties.QuestionsDetails);
@@ -559,6 +557,7 @@ MainApplication.NewRequestComponent.saveDataToList = function () {
     formData.InitiatorLogin = CurrentUserProperties.email;
     formData.InitiatorEmailAddress = CurrentUserProperties.email;
     formData.InitiatorName = CurrentUserProperties.title;
+    formData.Title = CurrentUserProperties.title;
 
     // formData.AuditeesDetails = MainApplication.NewRequestComponent.getAllAuditeeData();
     // formData.AuditorsDetails = MainApplication.NewRequestComponent.getAllAuditorsData();
@@ -574,8 +573,6 @@ MainApplication.NewRequestComponent.saveDataToList = function () {
 
 
     if ($spcontext.checkPassedValidation()) {
-        console.log("Validation Passed");
-        console.log("FormData before Stringyfying: ", formData);
         formData.Auditees = pickerValues.Auditees;
         formData.OtherAuditors = pickerValues.OtherAuditors;
 
@@ -587,7 +584,6 @@ MainApplication.NewRequestComponent.saveDataToList = function () {
         AppRequest.returned = AppRequest.requestDetails.ReturnForCorrection;
         // formData = customWorkflowEngine.routeEngine(customWorkflowEngine).requestHistoryHandler(formData, AppRequest.transactionHistory, { stage: "Auditor", action: "Audit Created" });
         if (AppRequest.returned === "Yes") {
-            console.log(AppRequest.returned);
             formData = customWorkflowEngine.routeEngine(customWorkflowEngine).requestHistoryHandler(formData, AppRequest.requestDetails.Transaction_History, { stage: "Auditor", action: "Audit Modified" });
             formData = customWorkflowEngine.routeEngine(customWorkflowEngine).runRouting(formData);
         }
@@ -611,6 +607,7 @@ MainApplication.NewRequestComponent.saveDataToListAsDraft = function () {
     formData.InitiatorLogin = CurrentUserProperties.email;
     formData.InitiatorEmailAddress = CurrentUserProperties.email;
     formData.InitiatorName = CurrentUserProperties.title;
+    formData.Title = CurrentUserProperties.title;
 
     // formData.AuditeesDetails = MainApplication.NewRequestComponent.getAllAuditeeData() || {};
     // formData.AuditorsDetails = MainApplication.NewRequestComponent.getAllAuditorsData() || {};
@@ -636,8 +633,6 @@ MainApplication.NewRequestComponent.saveDataToListAsDraft = function () {
     formData = customWorkflowEngine.routeEngine(customWorkflowEngine).runRouting(formData, AppRequest.defaultStage, globalDefinitions.stageDefinitions.save);
 
     globalDefinitions.onActionCompleted();
-
-    console.log(formData);
 
     MainApplication.NewRequestComponent.proceedToList(formData, true);
 }

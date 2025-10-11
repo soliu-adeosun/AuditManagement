@@ -37,7 +37,7 @@ export default class NewRequest extends React.Component<{}, {}> {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                     {/* Dropdown */}
                     <div className="mt-2">
-                        <label className="block text-sm font-medium text-blue-600 mb-2 required">Type of Audit</label>
+                        <label className="block text-sm font-medium text-blue-600 mb-2">Type of Audit <span className="required">*</span></label>
                         <select id="typeOfAudit" speed-bind-validate="TypeOfAudit" className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
                             <option disabled selected value="">Select an audit type</option>
                         </select>
@@ -45,18 +45,18 @@ export default class NewRequest extends React.Component<{}, {}> {
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                     <div className="mt-2">
-                        <label className="block text-sm font-medium text-blue-600 mb-2 required">Auditees</label>
+                        <label className="block text-sm font-medium text-blue-600 mb-2 ">Auditees <span className="required">*</span></label>
                         <CustomPeoplePicker validate-control="true" multiple custom-people="Auditees" validation-msg="Please select an auditee" />
                     </div>
                     {/* Dropdown */}
                     <div className="mt-2">
-                        <label className="block text-sm font-medium text-blue-600 mb-2 required">Other Auditors </label>
+                        <label className="block text-sm font-medium text-blue-600 mb-2">Other Auditors <span className="required">*</span></label>
                         <CustomPeoplePicker validate-control="true" multiple custom-people="OtherAuditors" validation-msg="Please select an auditor" />
                     </div>
                 </div>
                 <div style={{ marginTop: '2.2rem' }}>
                     <div>
-                        <label className="block text-sm font-medium text-blue-600 mb-2 required">Comments</label>
+                        <label className="block text-sm font-medium text-blue-600 mb-2">Comments <span className="required">*</span></label>
                         <textarea speed-bind-validate="InitiatorComment" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" defaultValue={""} />
                     </div>
                 </div>
@@ -72,13 +72,13 @@ export default class NewRequest extends React.Component<{}, {}> {
                     <h2 className="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">Audit Questions</h2>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                         <div className="mt-2">
-                            <label className="block text-sm font-medium text-blue-600 mb-2 required">Process</label>
+                            <label className="block text-sm font-medium text-blue-600 mb-2">Process <span className="required">*</span></label>
                             <select id="process" speed-bind-validate="Process" className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
                                 <option disabled selected value="" >Select a process</option>
                             </select>
                         </div>
                         <div className="mt-2">
-                            <label className="block text-sm font-medium text-blue-600 mb-2 required">Procedure</label>
+                            <label className="block text-sm font-medium text-blue-600 mb-2">Procedure <span className="required">*</span></label>
                             <select id="procedure" speed-bind-validate="Procedure" className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
                                 <option disabled selected value="" >Select a procedure</option>
                             </select>
