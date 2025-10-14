@@ -173,6 +173,7 @@ export default class ApproveRequest extends React.Component<{}, {}> {
                         </div> */}
                     {/* </div> */}
                     {/* NC RISK ASSESSMENT SECTION ENDS HERE */}
+                    <h2 id='executiveManagementSection' className="hidden text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">EXECUTIVE MANAGEMENT SECTION</h2>
                     <div style={{ marginTop: '2.2rem' }}>
                         <div>
                             <label className="block text-sm font-medium text-blue-600 mb-2">Comment</label>

@@ -17,7 +17,7 @@ export default class NewRequest extends React.Component<{}, {}> {
                     {/* Text Input */}
                     <div className="mt-2">
                         <label className="block text-sm font-medium text-blue-600 mb-2">Employee ID</label>
-                        <input readOnly speed-bind="EmployeeID" id="employeeId" type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+                        <input readOnly speed-bind="EmployeeID" speed-bind-class="SpeedData" id="employeeId" type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
                     </div>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
@@ -30,7 +30,7 @@ export default class NewRequest extends React.Component<{}, {}> {
                     {/* Text Input */}
                     <div className="mt-2">
                         <label className="block text-sm font-medium text-blue-600 mb-2">Division/Unit</label>
-                        <input readOnly speed-bind="Department" id="department" type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+                        <input readOnly speed-bind="Department" speed-bind-class="SpeedData" id="department" type="text" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
                     </div>
                     {/* Text Input */}
                 </div>
@@ -38,7 +38,7 @@ export default class NewRequest extends React.Component<{}, {}> {
                     {/* Dropdown */}
                     <div className="mt-2">
                         <label className="block text-sm font-medium text-blue-600 mb-2">Type of Audit <span className="required">*</span></label>
-                        <select id="typeOfAudit" speed-bind-validate="TypeOfAudit" className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
+                        <select id="typeOfAudit" speed-bind-validate="TypeOfAudit" speed-bind-class="SpeedData" className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
                             <option disabled selected value="">Select an audit type</option>
                         </select>
                     </div>
@@ -56,8 +56,8 @@ export default class NewRequest extends React.Component<{}, {}> {
                 </div>
                 <div style={{ marginTop: '2.2rem' }}>
                     <div>
-                        <label className="block text-sm font-medium text-blue-600 mb-2">Comments <span className="required">*</span></label>
-                        <textarea speed-bind-validate="InitiatorComment" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" defaultValue={""} />
+                        <label className="block text-sm font-medium text-blue-600 mb-2">Comments</label>
+                        <textarea speed-bind="InitiatorComment" speed-bind-class="SpeedData" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" defaultValue={""} />
                     </div>
                 </div>
                 <div>
@@ -73,13 +73,13 @@ export default class NewRequest extends React.Component<{}, {}> {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                         <div className="mt-2">
                             <label className="block text-sm font-medium text-blue-600 mb-2">Process <span className="required">*</span></label>
-                            <select id="process" speed-bind-validate="Process" className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
+                            <select id="process" speed-bind-validate="Process" speed-bind-class="SpeedData" className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
                                 <option disabled selected value="" >Select a process</option>
                             </select>
                         </div>
                         <div className="mt-2">
                             <label className="block text-sm font-medium text-blue-600 mb-2">Procedure <span className="required">*</span></label>
-                            <select id="procedure" speed-bind-validate="Procedure" className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
+                            <select id="procedure" speed-bind-validate="Procedure" speed-bind-class="SpeedData" className="w-full px-3 sm:px-4 py-2 sm:py-3  focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
                                 <option disabled selected value="" >Select a procedure</option>
                             </select>
                         </div>
@@ -94,7 +94,7 @@ export default class NewRequest extends React.Component<{}, {}> {
                     <div style={{ marginTop: '2.2rem' }}>
                         <div>
                             <label className="block text-sm font-medium text-blue-600 mb-2">Areas of Improvement</label>
-                            <textarea speed-bind="AreasOfImprovement" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" defaultValue={""} />
+                            <textarea speed-bind="AreasOfImprovement" speed-bind-class="SpeedData" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" defaultValue={""} />
                         </div>
                     </div>
 
@@ -102,7 +102,7 @@ export default class NewRequest extends React.Component<{}, {}> {
                     <div style={{ marginTop: '2.2rem' }} id='reviewerCommentDiv' className='hidden'>
                         <div>
                             <label className="block text-sm font-medium text-blue-600 mb-2">Comments</label>
-                            <textarea speed-bind-validate="Comment" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readOnly />
+                            <textarea speed-bind-validate="Comment" speed-bind-class="SpeedData" placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readOnly />
                         </div>
                     </div>
                     <div style={{ marginTop: '2rem' }}>

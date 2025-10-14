@@ -90,7 +90,7 @@ function whenLayoutLoaded() {
   $spcontext.loadSPDependencies(
     function () {
       var dependenciesCount = 0;
-      var expectedDepenciesCount = 12;
+      var expectedDepenciesCount = 11;
       // speedctxRoot = new Speed();
       globalDefinitions = new GlobalDefinitionsManager();
 
@@ -222,42 +222,39 @@ function whenLayoutLoaded() {
               checkAppDependency();
           })
 
-          speedctxRoot.getItem("Processes", speedctxRoot.camlBuilder(basicQuery), function (_spMeta) {
-              var listEnumerator = _spMeta.getEnumerator();
-              MainApplication.processes = [];
-              while (listEnumerator.moveNext()) {
-                  var title = listEnumerator.get_current().get_item("Title");
-                  MainApplication.processes.push(title);
-              }
-              checkAppDependency();
-          })
-
           var fieldProperties = {
-                ignoreThreshold: false,
-                merge: false,
-                data: ["ID","Title", "Processes"]
-            };
+              ignoreThreshold: false,
+              merge: false,
+              data: ["ID", "Title", "PROCEDURES"]
+          };
 
-            MainApplication.procedures = {};
-            MainApplication.proceduresInfo = {};
-            MainApplication.proceduresAtom = {};
-            speedctxRoot.getListToItems(
-                "Procedures",
-                basicQuery,
-                fieldProperties,
-                true,
-                function (item) {
-                    if (!MainApplication.proceduresInfo[item.Processes.value]) {
-                        MainApplication.proceduresInfo[item.Processes.value] = [];
-                    }
-                    MainApplication.proceduresInfo[item.Processes.value].push(item);
-                    return item;
-                },
-                function (items) {
-                    MainApplication.procedures = items;
-                    checkAppDependency();
-                }
-            );
+          MainApplication.procedures = {};
+          MainApplication.proceduresInfo = {};
+          MainApplication.processes = [];
+
+          rsBAContext.getListToItems(
+              "Procedure_process",
+              basicQuery,
+              fieldProperties,
+              true,
+              function (item) {
+                  // Use Title as the key to group PROCEDURES
+                  if (!MainApplication.proceduresInfo[item.Title]) {
+                      MainApplication.proceduresInfo[item.Title] = [];
+                      // Add unique Title to processes array
+                      MainApplication.processes.push(item.Title);
+                  }
+                  // Only push PROCEDURES if it's not already in the array to ensure distinct values
+                  if (!MainApplication.proceduresInfo[item.Title].includes(item.PROCEDURES)) {
+                      MainApplication.proceduresInfo[item.Title].push(item.PROCEDURES);
+                  }
+                  return item;
+              },
+              function (items) {
+                  MainApplication.procedures = items;
+                  checkAppDependency();
+              }
+          );
 
           rsBAContext.getItem("ISO CLAUSE", $spcontext.camlBuilder(isoQuery), function (_spMeta) {
               var listEnumerator = _spMeta.getEnumerator();

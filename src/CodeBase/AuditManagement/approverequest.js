@@ -54,6 +54,7 @@ whenApproveRequestDependeciesLoaded = function () {
         $("#satisfactoryDiv").hide();
         $("#managementRepContainer").show();
         $("#riskAssessmentContainer").show();
+        $("#executiveManagementSection").show();
     }
 
     if (MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.management].belongs){
@@ -65,20 +66,28 @@ whenApproveRequestDependeciesLoaded = function () {
 
 
     $("#satisfactory").on('change', function () {
-        if (this.value === "Satisfactory") {
-            if(AppRequest.isNonConformance === 0){
-                $("#riskAssessmentContainer").hide();
-                $("#managementRepContainer").show();
-            }else{
-                $("#riskAssessmentContainer").show();
-                $("#managementRepContainer").hide();
-            }
-            
+    const $riskAssessmentContainer = $("#riskAssessmentContainer");
+    const $managementRepContainer = $("#managementRepContainer");
+
+    if (this.value === "Satisfactory") {
+        if (AppRequest.isNonConformance === 0) {
+            $riskAssessmentContainer.hide();
+            $managementRepContainer.show();
         } else {
-            $("#riskAssessmentContainer").hide();
-            $("#managementRepContainer").hide();
+            $riskAssessmentContainer.show();
+            $managementRepContainer.hide();
+            // Ensure speed-bind-validate is present when Satisfactory is selected
+            $riskAssessmentContainer.find('.iso-clause-input, .occurrence-input, .nc-rating-input, .risk-impact-input')
+                .attr('speed-bind-validate', 'TempData');
         }
-    });
+    } else {
+        $riskAssessmentContainer.hide();
+        $managementRepContainer.hide();
+        // Remove speed-bind-validate when Not Satisfy is selected
+        $riskAssessmentContainer.find('.iso-clause-input, .occurrence-input, .nc-rating-input, .risk-impact-input')
+            .removeAttr('speed-bind-validate');
+    }
+});
     // $("#managementRepContainer").hide();
     // $("#riskAssessmentContainer").hide();
 
@@ -181,6 +190,7 @@ MainApplication.ApproveRequestComponent.recoverListData = function() {
                             PeoplePicker.initializePeoplePickers(MainApplication.staffList);
                             PeoplePicker.disablePicker("OtherAuditors");
                             PeoplePicker.disablePicker("Auditees");
+                            console.log(listProperties.QuestionsDetails);
 
                             // if (MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.management].belongs){
                                 MainApplication.ApproveRequestComponent.displayNCRiskAssessment(listProperties.QuestionsDetails);
@@ -267,7 +277,11 @@ MainApplication.ApproveRequestComponent.saveDataToList = function (actionTaken) 
                         NCRating: riskItem.NCRating,
                         NCClassification: riskItem.NCClassification,
                         RiskImpact: riskItem.RiskImpact,
-                        OverallRiskExposure: riskItem.OverallRiskExposure
+                        OverallRiskExposure: riskItem.OverallRiskExposure,
+                        ObjectiveEvidence: riskItem.ObjectiveEvidence,
+                        TypeOfAudit: AppRequest.requestDetails.TypeOfAudit,
+                        Procedure: AppRequest.requestDetails.Procedure,
+                        Process: AppRequest.requestDetails.Process
                     };
                     MainApplication.ApproveRequestComponent.createNonConformanceItem(nonConformanceData);
                 });
@@ -374,7 +388,7 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
 
     // Filter questionsDetails for Non-Conformance entries
     const nonConformanceData = questionsDetails.filter(data => data.AuditFinding === 'Non-Conformance');
-
+    console.log("NonConformanceData: ",nonConformanceData);
     // If no non-conformance data, trigger management details and return
     if (nonConformanceData.length === 0) {
         AppRequest.isNonConformance = 0;
@@ -384,19 +398,19 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
     // Build Non-Conformance Risk Assessment table
     let html = `
         <div>
-            <h2 class="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">NONCONFORMANCE RISK ASSESSMENT SECTION</h2>
+            <h2 class="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">Non-Conformance Risk Assessment Section</h2>
             <div class="overflow-x-auto">
                 <table class="w-full table-auto border-collapse">
                     <thead>
                         <tr class="bg-gray-100">
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC REF ID</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">ISO CLAUSE</th>
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC Statement</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC STATEMENT</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">OCCURRENCE</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC RATING</th>
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC CLASSIFICATION</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC CLASS</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">RISK IMPACT</th>
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">OVERALL RISK EXPOSURE</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">RISK EXPOSURE</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -408,6 +422,7 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
         const ncId = $('<div>').text(data.NonConformanceID || '').html();
         const ncStatement = $('<div>').text(data.NonConformanceStatement || '').html();
         const isoClause = $('<div>').text(data.ISOClause || '').html();
+        const objectiveEvidence = $('<div>').text(data.ObjectiveEvidence || '').html();
 
         html += `
             <tr class="border-b" data-nc-id="${ncId}">
@@ -415,7 +430,7 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
                     <input type="text" value="${ncId}" readonly class="nc-reference-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
                 </td>
                 <td class="px-2 py-2">
-                    <select class="iso-clause-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
+                    <select speed-bind-validate="TempData" class="iso-clause-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
                         <option value="">Select</option>
                         ${isoClauseOptions.map(option => `<option value="${option}" ${option === isoClause ? 'selected' : ''}>${option}</option>`).join('')}
                     </select>
@@ -424,13 +439,13 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
                     <textarea readonly class="non-conformance-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm">${ncStatement || ''}</textarea>
                 </td>
                 <td class="px-2 py-2">
-                    <select class="occurrence-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
+                    <select speed-bind-validate="TempData" class="occurrence-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
                         <option value="">Select</option>
                         ${occurrenceOptions.map(option => `<option value="${option}">${option}</option>`).join('')}
                     </select>
                 </td>
                 <td class="px-2 py-2">
-                    <select class="nc-rating-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
+                    <select speed-bind-validate="TempData" class="nc-rating-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
                         <option value="">Select</option>
                         ${ncRatingOptions.map(option => `<option value="${option.value}">${option.title}</option>`).join('')}
                     </select>
@@ -439,13 +454,16 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
                     <input type="text" readonly class="nc-classification-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
                 </td>
                 <td class="px-2 py-2">
-                    <select class="risk-impact-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
-                        <option value="">Select</option>
-                        ${riskImpactOptions.map(option => `<option value="${option.value}" data-color="${option.color}" style="background-color: ${option.color}; color: white;">${option.title}</option>`).join('')}
+                    <select speed-bind-validate="TempData" class="risk-impact-input w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 text-sm dropdown-arrow">
+                        <option value="" style="background-color: white; color: black;">Select</option>
+                        ${riskImpactOptions.map(option => `<option value="${option.value}" data-color="${option.color}" style="background-color: ${option.color}; color: black;">${option.title}</option>`).join('')}
                     </select>
                 </td>
                 <td class="px-2 py-2">
                     <input type="text" readonly class="overall-risk-exposure-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
+                </td>
+                <td class="px-2 py-2 hidden">
+                    <textarea readonly class="objective-evidence-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm">${objectiveEvidence || ''}</textarea>
                 </td>
             </tr>
         `;
@@ -490,7 +508,7 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
             const color = selectedOption.data('color') || '#ffffff'; // Fallback to white
             $riskImpactSelect.css({
                 'background-color': color,
-                'color': '#ffffff' // Ensure text readability
+                'color': 'black' // Ensure text readability
             });
         }
 
@@ -539,7 +557,8 @@ MainApplication.ApproveRequestComponent.getNCRiskAssessmentData = function () {
             NCRating: $row.find('.nc-rating-input').val() || '',
             NCClassification: $row.find('.nc-classification-input').val() || '',
             RiskImpact: $row.find('.risk-impact-input').val() || '',
-            OverallRiskExposure: $row.find('.overall-risk-exposure-input').val() || ''
+            OverallRiskExposure: $row.find('.overall-risk-exposure-input').val() || '',
+            ObjectiveEvidence: $row.find('.objective-evidence-input').val() || '',
         };
 
         // Only add to array if at least one field has a value
@@ -638,19 +657,19 @@ MainApplication.ApproveRequestComponent.displayNCRiskAssessmentReadOnly = functi
     // Build read-only table
     let html = `
         <div>
-            <h2 class="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">NONCONFORMANCE RISK ASSESSMENT SUMMARY</h2>
+            <h2 class="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">Non-Conformance Risk Assessment Section</h2>
             <div class="overflow-x-auto">
                 <table class="w-full table-auto border-collapse">
                     <thead>
                         <tr class="bg-gray-100">
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC REF ID</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">ISO CLAUSE</th>
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC Statement</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC STATEMENT</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">OCCURRENCE</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC RATING</th>
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC CLASSIFICATION</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC CLASS</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">RISK IMPACT</th>
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">OVERALL RISK EXPOSURE</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">RISK EXPOSURE</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -702,7 +721,7 @@ MainApplication.ApproveRequestComponent.displayNCRiskAssessmentReadOnly = functi
                     <input type="text" value="${ncClassification}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
                 </td>
                 <td class="px-2 py-2">
-                    <input type="text" value="${riskImpactTitle}" readonly class="w-full px-3 py-2 text-sm border-none focus:outline-none" style="background-color: ${riskImpactColor}; color: white;" />
+                    <input type="text" value="${riskImpactTitle}" readonly class="w-full px-3 py-2 text-sm border-none focus:outline-none" style="background-color: ${riskImpactColor}; color: black;" />
                 </td>
                 <td class="px-2 py-2">
                     <input type="text" value="${overallRiskExposure}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />

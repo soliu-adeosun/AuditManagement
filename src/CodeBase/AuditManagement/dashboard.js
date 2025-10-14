@@ -26,10 +26,11 @@ whenDashboardDependeciesLoaded = function () {
     speedctxRoot.DataForTable.paginationuId = "toppagination";
     
     speedctxRoot.DataForTable.propertiesHandler = {
-        "Created": function (valueToEva) {
+        "Modified": function (valueToEva) {
             return $spcontext.stringnifyDate({
                 value: valueToEva.Created,
-                includeTime: true
+                includeTime: false,
+                format: "dd/mm/yy"
             });
         },
         "Approval_Status": function (valueToEva) {
@@ -45,7 +46,7 @@ whenDashboardDependeciesLoaded = function () {
                 return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800">Revise</span>`;
             }
         },
-        "Modified": function (valueToEva) {
+        "Created": function (valueToEva) {
             // var isActor = MainApplication.isUserAnActor;
             let isActor = false;
 

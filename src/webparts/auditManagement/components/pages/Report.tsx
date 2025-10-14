@@ -91,13 +91,13 @@ export default class Report extends React.Component<{}, {}> {
                                 <thead className="border-b border-gray-200">
                                     <tr>
                                         <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">S/N</th>
-                                        <th speed-table-data="WorkflowRequestID" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">AUDIT REF ID</th>
-                                        <th speed-table-data="InitiatorName" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">INITIATOR</th>
-                                        <th speed-table-data="TypeOfAudit" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">TYPE</th>
-                                        <th speed-table-data="Approval_Status" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">STATUS</th>
-                                        <th speed-table-data="Current_Approver" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">NEXT APPROVER</th>
-                                        {/* <th speed-table-data="Created" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">DATE</th> */}
-                                        <th speed-table-data="Modified" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">Actions</th>
+                                        <th speed-table-data="WorkflowRequestID" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">AUDIT REF ID<span className="mdi mdi-unfold-more-horizontal"></span></th>
+                                        <th speed-table-data="InitiatorName" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">INITIATOR<span className="mdi mdi-unfold-more-horizontal"></span></th>
+                                        <th speed-table-data="TypeOfAudit" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">TYPE<span className="mdi mdi-unfold-more-horizontal"></span></th>
+                                        <th speed-table-data="Approval_Status" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">STATUS<span className="mdi mdi-unfold-more-horizontal"></span></th>
+                                        <th speed-table-data="Current_Approver" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">NEXT APPROVER<span className="mdi mdi-unfold-more-horizontal"></span></th>
+                                        <th speed-table-data="Modified" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">MODIFIED<span className="mdi mdi-unfold-more-horizontal"></span></th>
+                                        <th speed-table-data="Created" className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-blue-600 uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200" id="speed-data-table" />

@@ -83,11 +83,12 @@ function whenNewRequestDependeciesLoaded() {
 
     $("#process").on("change", function () {
         var selectedProcess = $(this).val();
+        console.log(selectedProcess);
         var procedures = MainApplication.proceduresInfo[selectedProcess] || [];
         $("#procedure").empty();
         $("#procedure").append('<option selected disabled value="">Select a Procedure</option>');
         procedures.forEach(function (item) {
-            $("#procedure").append(`<option value="${item.Title}">${item.Title}</option>`);
+            $("#procedure").append(`<option value="${item}">${item}</option>`);
         });
     });
 
@@ -303,30 +304,40 @@ MainApplication.NewRequestComponent.addQuestionSet = function () {
     }).replace(/[-: ]/g, ""); // e.g., 0510250936 for 05-10-25 09:36
     const nonConformanceId = `RSAUDNC${dateCreatedCode}`;
 
+        // Define audit finding options dynamically
+    const auditFindingOptions = [
+        { value: "Conformance", label: "Conformance" },
+        { value: "Non-Conformance", label: "Non-Conformance" }
+    ];
+
+    // Generate options HTML dynamically
+    const auditFindingOptionsHtml = auditFindingOptions
+        .map(option => `<option value="${option.value}">${option.label}</option>`)
+        .join('');
+
     const questionSetHtml = `
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 small-gap mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
             <div class="mt-2">
-                <label class="block text-sm font-medium text-blue-600 mb-2">Questions</label>
-                <textarea placeholder="Enter text here..." speed-validate-mode class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base"></textarea>
+                <label class="block text-sm font-medium text-blue-600 mb-2">Questions<span class="required">*</span></label>
+                <textarea placeholder="Enter text here..." speed-bind-validate='TempData' class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base"></textarea>
             </div>
             <div class="mt-2">
-                <label class="block text-sm font-medium text-blue-600 mb-2">Audit Finding</label>
-                <select class="audit-finding-input w-full px-3 sm:px-4 py-2 sm:py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
+                <label class="block text-sm font-medium text-blue-600 mb-2">Audit Finding<span class="required">*</span></label>
+                <select speed-bind-validate='TempData' class="audit-finding-input w-full px-3 sm:px-4 py-2 sm:py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
                     <option disabled selected>Select an option</option>
-                    <option value="Conformance">Conformance</option>
-                    <option value="Non-Conformance">Non-Conformance</option>
+                    ${auditFindingOptionsHtml}
                 </select>
             </div>
             <div class="mt-2">
-                <label class="block text-sm font-medium text-blue-600 mb-2">ISO Clause</label>
-                <textarea placeholder="Enter text here..." class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base"></textarea>
+                <label class="block text-sm font-medium text-blue-600 mb-2">ISO Clause<span class="required">*</span></label>
+                <textarea speed-bind-validate='TempData' placeholder="Enter text here..." class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base"></textarea>
             </div>
             <div class="mt-2">
-                <label class="block text-sm font-medium text-blue-600 mb-2">Objective Evidence</label>
-                <textarea placeholder="Enter text here..." class="objective-evidence-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base"></textarea>
+                <label class="block text-sm font-medium text-blue-600 mb-2">Objective Evidence<span class="required">*</span></label>
+                <textarea speed-bind-validate='TempData' placeholder="Enter text here..." class="objective-evidence-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base"></textarea>
             </div>
             <div class="mt-2">
-                <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance Statement</label>
+                <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance Statement<span class="ncrequired hidden required">*</span></label>
                 <textarea placeholder="Enter text here..." class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" disabled></textarea>
             </div>
             <div class="mt-2 non-conformance-id hidden">
@@ -348,11 +359,13 @@ MainApplication.NewRequestComponent.addQuestionSet = function () {
         const $questionSet = $(this).closest('.question-set');
         const $nonConformanceInput = $questionSet.find('.non-conformance-input');
         const $nonConformanceIdDiv = $questionSet.find('.non-conformance-id');
+        const $nonConformanceLabel = $questionSet.find('.ncrequired');
 
         if ($(this).val() === 'Non-Conformance') {
             $nonConformanceInput.prop('disabled', false);
-            // $nonConformanceIdDiv.removeClass('hidden');
-            // Regenerate ID based on current time if needed
+            $nonConformanceInput.attr("speed-bind-validate", "TempData");
+            $nonConformanceLabel.removeClass('hidden');
+            
             const newDateCreatedCode = $spcontext.stringnifyDate({
                 includeTime: true,
                 timeSpace: false,
@@ -362,7 +375,9 @@ MainApplication.NewRequestComponent.addQuestionSet = function () {
             $questionSet.find('.non-conformance-id-input').val(newNonConformanceId);
         } else {
             $nonConformanceInput.prop('disabled', true);
+            $nonConformanceInput.removeAttr("speed-bind-validate");
             $nonConformanceIdDiv.addClass('hidden');
+            $nonConformanceLabel.addClass('hidden');
         }
     });
 

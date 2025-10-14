@@ -10,6 +10,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import '../Assets/css/style.css';
 import '../Assets/css/dashboard.css';
 import '../Assets/css/sharepointuifix.css';
+// import "../Assets/libraries/mdi/css/materialdesignicons.min.css";
 
 
 

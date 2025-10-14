@@ -33,10 +33,11 @@ whenReportDependeciesLoaded = function () {
     speedctxRoot.DataForTable.paginationuId = "toppagination";
     
     speedctxRoot.DataForTable.propertiesHandler = {
-        "Created": function (valueToEva) {
+        "Modified": function (valueToEva) {
             return $spcontext.stringnifyDate({
                 value: valueToEva.Created,
-                includeTime: true
+                includeTime: false,
+                format: "dd/mm/yy"
             });
         },
         "Approval_Status": function (valueToEva) {
@@ -52,7 +53,7 @@ whenReportDependeciesLoaded = function () {
                 return `<span class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800">Revise</span>`;
             }
         },
-        "Modified": function (valueToEva) {
+        "Created": function (valueToEva) {
             var viewStr = `
                 <div class="flex space-x-1 sm:space-x-2">
                     <a href="#/viewrequest?itemId=${valueToEva.WorkflowRequestID}" class="p-1 sm:p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 transition-colors">
@@ -91,7 +92,7 @@ whenReportDependeciesLoaded = function () {
         MainApplication.ReportComponent.retrieveRequest();
     }
     else {
-        globalDefinitions.showCriticalErrorModal("You are not authorized to access this resource...");
+        globalDefinitions.HandlerError("You are not authorized to access this resource...");
         $spcontext.redirect("#/", false);
     }
 };
