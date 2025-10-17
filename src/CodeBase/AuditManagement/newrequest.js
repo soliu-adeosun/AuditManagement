@@ -144,7 +144,54 @@ MainApplication.NewRequestComponent.findPersonData = function (email) {
     };
 };
 
-// Generic function to add a person block to a specified container
+// Function to check if person is already selected in the other picker
+MainApplication.NewRequestComponent.isPersonSelectedInOtherPicker = function(email, currentPickerId) {
+    const otherPickerId = currentPickerId === 'auditees' ? 'otherauditors' : 'auditees';
+    const otherSelections = $(`#${otherPickerId}`).val() || [];
+    return otherSelections.includes(email);
+};
+
+MainApplication.NewRequestComponent.initializePeoplePicker = function (pickerId, containerId, prefix) {
+    // Initialize existing selections
+    const initialSelections = $(`#${pickerId}`).val() || [];
+    initialSelections.forEach(email => {
+        const personData = MainApplication.NewRequestComponent.findPersonData(email);
+        MainApplication.NewRequestComponent.addPersonBlock(personData, containerId, prefix);
+    });
+
+    // Update placeholder after initial setup
+    MainApplication.NewRequestComponent.updatePlaceholder(containerId, `${prefix}-placeholder`, `No ${prefix}s selected. Please select from the picker above.`);
+
+    // Handle select event
+    $(`#${pickerId}`).on("select2:select", function (e) {
+        const person = e.params.data;
+        const $option = $(person.element);
+        const email = $option.val();
+        
+        // Check if person is already selected in the other picker
+        if (MainApplication.NewRequestComponent.isPersonSelectedInOtherPicker(email, pickerId)) {
+            // Prevent selection and show alert
+            globalDefinitions.HandlerError('This person is already selected in the other picker.');
+            $(`#${pickerId}`).val(
+                $(`#${pickerId}`).val().filter(selectedEmail => selectedEmail !== email)
+            ).trigger('change');
+            return;
+        }
+
+        const personData = MainApplication.NewRequestComponent.findPersonData(email);
+        MainApplication.NewRequestComponent.addPersonBlock(personData, containerId, prefix);
+        MainApplication.NewRequestComponent.updatePlaceholder(containerId, `${prefix}-placeholder`, `No ${prefix}s selected. Please select an ${prefix} from the picker above.`);
+    });
+
+    // Handle unselect event
+    $(`#${pickerId}`).on("select2:unselect", function (e) {
+        const person = e.params.data;
+        const $option = $(person.element);
+        MainApplication.NewRequestComponent.removePersonBlock({ Email: $option.val() }, containerId);
+        MainApplication.NewRequestComponent.updatePlaceholder(containerId, `${prefix}-placeholder`, `No ${prefix}s selected. Please select an ${prefix} from the picker above.`);
+    });
+};
+
 MainApplication.NewRequestComponent.addPersonBlock = function (person, containerId, prefix) {
     const block = `
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 mt-4 person-block" data-id="${person.Email}">
@@ -192,36 +239,6 @@ MainApplication.NewRequestComponent.updatePlaceholder = function (containerId, p
     } else {
         $placeholder.remove();
     }
-};
-
-// Generic function to initialize a people picker
-MainApplication.NewRequestComponent.initializePeoplePicker = function (pickerId, containerId, prefix) {
-    // Initialize existing selections
-    const initialSelections = $(`#${pickerId}`).val() || [];
-    initialSelections.forEach(email => {
-        const personData = MainApplication.NewRequestComponent.findPersonData(email);
-        MainApplication.NewRequestComponent.addPersonBlock(personData, containerId, prefix);
-    });
-
-    // Update placeholder after initial setup
-    MainApplication.NewRequestComponent.updatePlaceholder(containerId, `${prefix}-placeholder`, `No ${prefix}s selected. Please select from the picker above.`);
-
-    // Handle select event
-    $(`#${pickerId}`).on("select2:select", function (e) {
-        const person = e.params.data;
-        const $option = $(person.element);
-        const personData = MainApplication.NewRequestComponent.findPersonData($option.val());
-        MainApplication.NewRequestComponent.addPersonBlock(personData, containerId, prefix);
-        MainApplication.NewRequestComponent.updatePlaceholder(containerId, `${prefix}-placeholder`, `No ${prefix}s selected. Please select an ${prefix} from the picker above.`);
-    });
-
-    // Handle unselect event
-    $(`#${pickerId}`).on("select2:unselect", function (e) {
-        const person = e.params.data;
-        const $option = $(person.element);
-        MainApplication.NewRequestComponent.removePersonBlock({ Email: $option.val() }, containerId);
-        MainApplication.NewRequestComponent.updatePlaceholder(containerId, `${prefix}-placeholder`, `No ${prefix}s selected. Please select an ${prefix} from the picker above.`);
-    });
 };
 
 

@@ -69,7 +69,7 @@ MainApplication.ViewRequestComponent.recoverListData = function() {
 
         speedctxRoot.getListToControl(globalDefinitions.stageDefinitions.listname, query, extraProperties, function (listProperties) {
             if ($.isEmptyObject(listProperties)) {
-                MainApplication.notyf.error("Request doesnt exist...");
+                MainApplication.notyf.error("Request does not exist...");
                 $spcontext.redirect("#/", false);
                 globalDefinitions.closeLoader();
                 
