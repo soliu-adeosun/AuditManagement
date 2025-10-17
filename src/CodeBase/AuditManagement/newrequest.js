@@ -170,8 +170,10 @@ MainApplication.NewRequestComponent.initializePeoplePicker = function (pickerId,
         
         // Check if person is already selected in the other picker
         if (MainApplication.NewRequestComponent.isPersonSelectedInOtherPicker(email, pickerId)) {
-            // Prevent selection and show alert
-            globalDefinitions.HandlerError('This person is already selected in the other picker.');
+            // Determine the role name for the alert
+            const otherRole = pickerId === 'auditees' ? 'Auditor' : 'Auditee';
+            // Prevent selection and show alert with specific role
+            globalDefinitions.HandlerError(`This person already exists as an ${otherRole}.`);
             $(`#${pickerId}`).val(
                 $(`#${pickerId}`).val().filter(selectedEmail => selectedEmail !== email)
             ).trigger('change');
