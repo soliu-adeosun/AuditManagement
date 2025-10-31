@@ -35,7 +35,7 @@ export const FilterBox = () => {
                             <select id="statusSelect" className="filter-select status-dropdown" speed-bind-query="Approval_Status" speed-operator="Eq">
                                 <option value="">Please select a status</option>
                                 <option value="Pending">Pending</option>
-                                <option value="Declined">Declined</option>
+                                <option value="Revise">Revise</option>
                                 <option value="Completed">Completed</option>
                             </select>
                         </div>

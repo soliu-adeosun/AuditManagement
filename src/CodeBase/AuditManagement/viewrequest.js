@@ -97,11 +97,12 @@ MainApplication.ViewRequestComponent.recoverListData = function() {
                             listProperties.AuditeesDetails = $spcontext.JSONToObject(listProperties.AuditeesDetails);
                             listProperties.AuditorsDetails = $spcontext.JSONToObject(listProperties.AuditorsDetails);
                             listProperties.QuestionsDetails = $spcontext.JSONToObject(listProperties.QuestionsDetails);
+                            listProperties.RiskAssessment = $spcontext.JSONToObject(listProperties.RiskAssessment);
 
                             MainApplication.displayPeople(listProperties.AuditeesDetails, "auditeesContainer", "auditees", "No Auditees found");
                             MainApplication.displayPeople(listProperties.AuditorsDetails, "auditorsContainer", "auditors", "No Auditors found");
 
-                            MainApplication.ViewRequestComponent.displayQuestionSets(listProperties.QuestionsDetails);
+                            MainApplication.displayQuestionSets(listProperties.QuestionsDetails);
 
 
                             AppRequest.FolderUrl = listProperties.Attachment_Folder;
@@ -127,6 +128,10 @@ MainApplication.ViewRequestComponent.recoverListData = function() {
                             PeoplePicker.initializePeoplePickers(MainApplication.staffList);
                             PeoplePicker.disablePicker("OtherAuditors");
                             PeoplePicker.disablePicker("Auditees");
+
+                            if (MainApplication.isUserAnActor){
+                                MainApplication.displayNCRiskAssessmentReadOnly(listProperties.RiskAssessment);
+                            }
 
                             $spcontext.htmlBind(listProperties);
                             
@@ -156,46 +161,3 @@ MainApplication.ViewRequestComponent.recoverListData = function() {
     }
 }
 
-
-MainApplication.ViewRequestComponent.displayQuestionSets = function (questionSets) {
-    const $displayContainer = $("#questionsContainer");
-    $displayContainer.empty();
-
-    if (!questionSets || questionSets.length === 0) {
-        $displayContainer.append(`
-            <div class="text-center text-gray-500 mt-4">
-                No question sets to display.
-            </div>
-        `);
-        return;
-    }
-
-    questionSets.forEach((questionSet, index) => {
-        const questionSetId = questionSet.id || `question-set-${index}`;
-        const block = `
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 small-gap mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Questions</label>
-                    <textarea readonly class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.Questions || ''}</textarea>
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Audit Finding</label>
-                    <input type="text" value="${questionSet.AuditFinding || ''}" class="audit-finding-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">ISO Clause</label>
-                    <textarea readonly class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.ISOClause || ''}</textarea>
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Objective Evidence</label>
-                    <textarea readonly class="objective-evidence-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.ObjectiveEvidence || ''}</textarea>
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance Statement</label>
-                    <textarea readonly class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.NonConformanceStatement || ''}</textarea>
-                </div>
-            </div>
-        `;
-        $displayContainer.append(block);
-    });
-};

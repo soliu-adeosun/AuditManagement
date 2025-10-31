@@ -436,27 +436,207 @@ MainApplication.displayPeople = function (people, containerId, prefix, placehold
         return;
     }
 
-    people.forEach(person => {
+    people.forEach((person, index) => {
         const block = `
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 mt-4 person-block" data-id="${person.Email || ''}">
                 <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Employee Name</label>
-                    <input id="${prefix}Name_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Title || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                    <label class="block text-sm font-medium text-blue-600 mb-2">
+                        <span class="index-number">${index + 1}.</span> Employee Name
+                    </label>
+                    <input id="${prefix}Name_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" 
+                           type="text" 
+                           value="${person.Title || ''}" 
+                           class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 
+                                  focus:outline-none focus:ring-2 focus:ring-primary-500 
+                                  focus:border-transparent transition-all text-sm sm:text-base" 
+                           readonly />
                 </div>
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Employee ID</label>
-                    <input id="${prefix}Id_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.EmployeeId || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                    <input id="${prefix}Id_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" 
+                           type="text" 
+                           value="${person.EmployeeId || ''}" 
+                           class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 
+                                  focus:outline-none focus:ring-2 focus:ring-primary-500 
+                                  focus:border-transparent transition-all text-sm sm:text-base" 
+                           readonly />
                 </div>
                 <div class="mt-2">
                     <label class="block text-sm font-medium text-blue-600 mb-2">Email</label>
-                    <input id="${prefix}Mail_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Email || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                    <input id="${prefix}Mail_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" 
+                           type="text" 
+                           value="${person.Email || ''}" 
+                           class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 
+                                  focus:outline-none focus:ring-2 focus:ring-primary-500 
+                                  focus:border-transparent transition-all text-sm sm:text-base" 
+                           readonly />
                 </div>
                 <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Department</label>
-                    <input id="${prefix}Department_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Department || ''}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                    <label class="block text-sm font-medium text-blue-600 mb-2">Division/Unit</label>
+                    <input id="${prefix}Department_${(person.Email || '').replace(/[^a-zA-Z0-9]/g, '_')}" 
+                           type="text" 
+                           value="${person.Department || ''}" 
+                           class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 
+                                  focus:outline-none focus:ring-2 focus:ring-primary-500 
+                                  focus:border-transparent transition-all text-sm sm:text-base" 
+                           readonly />
                 </div>
             </div>
         `;
         $displayContainer.append(block);
     });
+};
+
+MainApplication.displayQuestionSets = function (questionSets) {
+    const $displayContainer = $("#questionsContainer");
+    $displayContainer.empty();
+
+    if (!questionSets || questionSets.length === 0) {
+        $displayContainer.append(`
+            <div class="text-center text-gray-500 mt-4">
+                No question sets to display.
+            </div>
+        `);
+        return;
+    }
+
+    questionSets.forEach((questionSet, index) => {
+        const questionSetId = questionSet.id || `question-set-${index}`;
+        const block = `
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 small-gap mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
+                <div class="mt-2">
+                    
+                    <label class="block text-sm font-medium text-blue-600 mb-2"><span class="index-number">${index + 1}.</span> Questions</label>
+                    <textarea readonly class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.Questions || ''}</textarea>
+                </div>
+                <div class="mt-2">
+                    <label class="block text-sm font-medium text-blue-600 mb-2">Audit Finding</label>
+                    <input readonly type="text" value="${questionSet.AuditFinding || ''}" class="audit-finding-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
+                </div>
+                <div class="mt-2">
+                    <label class="block text-sm font-medium text-blue-600 mb-2">Procedure Section</label>
+                    <textarea readonly class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.ISOClause || ''}</textarea>
+                </div>
+                <div class="mt-2">
+                    <label class="block text-sm font-medium text-blue-600 mb-2">Objective Evidence</label>
+                    <textarea readonly class="objective-evidence-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.ObjectiveEvidence || ''}</textarea>
+                </div>
+                <div class="mt-2">
+                    <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance Statement</label>
+                    <textarea readonly class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.NonConformanceStatement || ''}</textarea>
+                </div>
+            </div>
+        `;
+        $displayContainer.append(block);
+    });
+};
+
+MainApplication.displayNCRiskAssessmentReadOnly = function (ncRiskData) {
+    // If no data, return empty container
+    if (typeof ncRiskData === 'string') {
+        try {
+            ncRiskData = JSON.parse(ncRiskData);
+        } catch (err) {
+            console.error("Error parsing ncRiskData:", err);
+            ncRiskData = [];
+        }
+    }
+
+    if (!Array.isArray(ncRiskData) || ncRiskData.length === 0) {
+        return $('#riskAssessmentContainer').html(
+            '<p class="text-gray-500 italic my-4 sm:my-6 text-center">No Non-Conformance Risk Assessment data available.</p>'
+        )[0];
+    }
+
+    // Build read-only table
+    let html = `
+        <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">Non-Conformance Risk Assessment Section</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full table-auto border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">S/N</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC REF ID</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">ISO CLAUSE</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC STATEMENT</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">OCCURRENCE</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC RATING</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC CLASS</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">RISK IMPACT</th>
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">RISK EXPOSURE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    `;
+
+    // Add rows for each data entry
+    ncRiskData.forEach((data, index) => {
+        // Sanitize data to prevent XSS
+        const ncId = $('<div>').text(data.NCReferenceNo || '').html();
+        const isoClause = $('<div>').text(data.ISOClause || '').html();
+        const ncStatement = $('<div>').text(data.NonConformance || '').html();
+        const occurrence = $('<div>').text(data.Occurrence || '').html();
+        const ncRating = $('<div>').text(data.NCRating || '').html();
+        const ncClassification = $('<div>').text(data.NCClassification || '').html();
+        const riskImpact = $('<div>').text(data.RiskImpact || '').html();
+
+        // Find the ColorCode for the RiskImpact value
+        const riskImpactValue = parseFloat(data.RiskImpact) || 0; // Convert to number for comparison
+        const riskImpactOption = Array.isArray(MainApplication.riskImpact)
+            ? MainApplication.riskImpact.find(option => parseFloat(option.value) === riskImpactValue) || {}
+            : {};
+        const riskImpactColor = riskImpactOption.color || '#f3f4f6'; // Use 'color' property
+        const riskImpactTitle = riskImpactOption.title || data.RiskImpact;
+        console.log(`Row ${index} RiskImpact:`, {
+            dataRiskImpact: data.RiskImpact,
+            riskImpactValue,
+            matchedOption: riskImpactOption,
+            colorCode: riskImpactColor
+        });
+
+        const overallRiskExposure = $('<div>').text(data.OverallRiskExposure || '').html();
+
+        html += `
+            <tr class="border-b">
+                <td class="px-2 py-2">
+                    <p>${index + 1}.</p>
+                </td>
+                <td class="px-2 py-2">
+                    <input type="text" value="${ncId}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
+                </td>
+                <td class="px-2 py-2">
+                    <input type="text" value="${isoClause}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
+                </td>
+                <td class="px-2 py-2">
+                    <textarea readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none">${ncStatement}</textarea>
+                </td>
+                <td class="px-2 py-2">
+                    <input type="text" value="${occurrence}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
+                </td>
+                <td class="px-2 py-2">
+                    <input type="text" value="${ncRating}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
+                </td>
+                <td class="px-2 py-2">
+                    <input type="text" value="${ncClassification}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
+                </td>
+                <td class="px-2 py-2">
+                    <input type="text" value="${riskImpactTitle}" readonly class="w-full px-3 py-2 text-sm border-none focus:outline-none" style="background-color: ${riskImpactColor}; color: black;" />
+                </td>
+                <td class="px-2 py-2">
+                    <input type="text" value="${overallRiskExposure}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+
+    // Create and return DOM element
+    return $('#riskAssessmentContainer').html(html)[0];
 };

@@ -83,7 +83,6 @@ function whenNewRequestDependeciesLoaded() {
 
     $("#process").on("change", function () {
         var selectedProcess = $(this).val();
-        console.log(selectedProcess);
         var procedures = MainApplication.proceduresInfo[selectedProcess] || [];
         $("#procedure").empty();
         $("#procedure").append('<option selected disabled value="">Select a Procedure</option>');
@@ -194,33 +193,86 @@ MainApplication.NewRequestComponent.initializePeoplePicker = function (pickerId,
     });
 };
 
+// MainApplication.NewRequestComponent.addPersonBlock = function (person, containerId, prefix) {
+//     const block = `
+//         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 mt-4 person-block" data-id="${person.Email}">
+//             <div class="mt-2">
+//                 <label class="block text-sm font-medium text-blue-600 mb-2">Employee Name</label>
+//                 <input id="${prefix}Name_${person.Email.replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Title}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+//             </div>
+//             <div class="mt-2">
+//                 <label class="block text-sm font-medium text-blue-600 mb-2">Employee ID</label>
+//                 <input id="${prefix}Id_${person.Email.replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.EmployeeId}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+//             </div>
+//             <div class="mt-2">
+//                 <label class="block text-sm font-medium text-blue-600 mb-2">Email</label>
+//                 <input id="${prefix}Mail_${person.Email.replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Email}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+//             </div>
+//             <div class="mt-2">
+//                 <label class="block text-sm font-medium text-blue-600 mb-2">Division/Unit</label>
+//                 <input id="${prefix}Department_${person.Email.replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Department}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+//             </div>
+//         </div>
+//     `;
+//     $(`#${containerId}`).append(block);
+// };
+
 MainApplication.NewRequestComponent.addPersonBlock = function (person, containerId, prefix) {
+    const safeEmail = person.Email.replace(/[^a-zA-Z0-9]/g, '_');
+
     const block = `
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 mt-4 person-block" data-id="${person.Email}">
+            
             <div class="mt-2">
-                <label class="block text-sm font-medium text-blue-600 mb-2">Employee Name</label>
-                <input id="${prefix}Name_${person.Email.replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Title}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                <label class="block text-sm font-medium text-blue-600 mb-2"><span class"index-column"></span> Employee Name</label>
+                <input id="${prefix}Name_${safeEmail}" type="text" value="${person.Title}" 
+                    class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 
+                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent 
+                    transition-all text-sm sm:text-base" readonly />
             </div>
             <div class="mt-2">
                 <label class="block text-sm font-medium text-blue-600 mb-2">Employee ID</label>
-                <input id="${prefix}Id_${person.Email.replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.EmployeeId}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                <input id="${prefix}Id_${safeEmail}" type="text" value="${person.EmployeeId}" 
+                    class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 
+                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent 
+                    transition-all text-sm sm:text-base" readonly />
             </div>
             <div class="mt-2">
                 <label class="block text-sm font-medium text-blue-600 mb-2">Email</label>
-                <input id="${prefix}Mail_${person.Email.replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Email}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                <input id="${prefix}Mail_${safeEmail}" type="text" value="${person.Email}" 
+                    class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 
+                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent 
+                    transition-all text-sm sm:text-base" readonly />
             </div>
             <div class="mt-2">
-                <label class="block text-sm font-medium text-blue-600 mb-2">Department</label>
-                <input id="${prefix}Department_${person.Email.replace(/[^a-zA-Z0-9]/g, '_')}" type="text" value="${person.Department}" class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly />
+                <label class="block text-sm font-medium text-blue-600 mb-2">Division/Unit</label>
+                <input id="${prefix}Department_${safeEmail}" type="text" value="${person.Department}" 
+                    class="w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 
+                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent 
+                    transition-all text-sm sm:text-base" readonly />
             </div>
         </div>
     `;
-    $(`#${containerId}`).append(block);
+
+    const container = $(`#${containerId}`);
+    container.append(block);
+
+    // ✅ Re-index all after adding
+    MainApplication.NewRequestComponent.reindexPersonBlocks(containerId);
+};
+
+
+// Helper function to renumber all blocks
+MainApplication.NewRequestComponent.reindexPersonBlocks = function (containerId) {
+    $(`#${containerId} .person-block`).each(function (i) {
+        $(this).find('div span').text(`${i + 1}.`);
+    });
 };
 
 // Generic function to remove a person block from a specified container
 MainApplication.NewRequestComponent.removePersonBlock = function (person, containerId) {
     $(`#${containerId} .person-block[data-id="${person.Email}"]`).remove();
+    MainApplication.NewRequestComponent.reindexPersonBlocks(containerId);
 };
 
 // Generic function to update placeholder visibility
@@ -267,69 +319,23 @@ MainApplication.NewRequestComponent.getAllPersonData = function (containerId, pr
     return personData;
 };
 
-// MainApplication.NewRequestComponent.getAllAuditeeData = function () {
-//     const $container = $('#auditeesContainer');
-//     const $blocks = $container.find('.person-block');
-//     const auditeeData = [];
-
-//     $blocks.each(function () {
-//         const $block = $(this);
-//         const email = $block.data('id');
-//         if (!email) return;
-
-//         const personData = {
-//             Title: $block.find(`input[id*="auditeeName_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || '',
-//             Email: email,
-//             EmployeeId: $block.find(`input[id*="auditeeId_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || '',
-//             Department: $block.find(`input[id*="auditeeDepartment_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || ''
-//         };
-
-//         auditeeData.push(personData);
-//     });
-
-//     return auditeeData;
-// };
-
-// MainApplication.NewRequestComponent.getAllAuditorsData = function () {
-//     const $container = $('#auditorsContainer');
-//     const $blocks = $container.find('.person-block');
-//     const auditorData = [];
-
-//     $blocks.each(function () {
-//         const $block = $(this);
-//         const email = $block.data('id');
-//         if (!email) return;
-
-//         const personData = {
-//             Title: $block.find(`input[id*="auditorName_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || '',
-//             Email: email,
-//             EmployeeId: $block.find(`input[id*="auditorId_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || '',
-//             Department: $block.find(`input[id*="auditorDepartment_${email.replace(/[^a-zA-Z0-9]/g, '_')}"]`).val() || ''
-//         };
-
-//         auditorData.push(personData);
-//     });
-
-//     return auditorData;
-// };
 
 MainApplication.NewRequestComponent.addQuestionSet = function () {
     const questionSetId = `question-set-${AppRequest.questionSetCounter++}`;
-    // Generate nonConformanceId using date and time
+
+    // Generate Non-Conformance ID
     const dateCreatedCode = $spcontext.stringnifyDate({
         includeTime: true,
         timeSpace: false,
         format: "dd-mm-yy HH:mm"
-    }).replace(/[-: ]/g, ""); // e.g., 0510250936 for 05-10-25 09:36
+    }).replace(/[-: ]/g, "");
     const nonConformanceId = `RSAUDNC${dateCreatedCode}`;
 
-        // Define audit finding options dynamically
     const auditFindingOptions = [
         { value: "Conformance", label: "Conformance" },
         { value: "Non-Conformance", label: "Non-Conformance" }
     ];
 
-    // Generate options HTML dynamically
     const auditFindingOptionsHtml = auditFindingOptions
         .map(option => `<option value="${option.value}">${option.label}</option>`)
         .join('');
@@ -337,42 +343,70 @@ MainApplication.NewRequestComponent.addQuestionSet = function () {
     const questionSetHtml = `
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 small-gap mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
             <div class="mt-2">
-                <label class="block text-sm font-medium text-blue-600 mb-2">Questions<span class="required">*</span></label>
-                <textarea placeholder="Enter text here..." speed-bind-validate='TempData' class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base"></textarea>
+                <label class="block text-sm font-medium text-blue-600 mb-2 index-column">
+                    <span class="text-blue-600 font-semibold text-sm sm:text-base mr-1"></span>
+                    Questions<span class="required">*</span>
+                </label>
+                <textarea placeholder="Enter text here..." speed-bind-validate='TempData'
+                    class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400
+                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
+                    transition-all text-sm sm:text-base"></textarea>
             </div>
             <div class="mt-2">
                 <label class="block text-sm font-medium text-blue-600 mb-2">Audit Finding<span class="required">*</span></label>
-                <select speed-bind-validate='TempData' class="audit-finding-input w-full px-3 sm:px-4 py-2 sm:py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
+                <select speed-bind-validate='TempData'
+                    class="audit-finding-input w-full px-3 sm:px-4 py-2 sm:py-3
+                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
+                    transition-all appearance-none bg-no-repeat bg-right pr-8 sm:pr-10 text-sm sm:text-base dropdown-arrow">
                     <option disabled selected>Select an option</option>
                     ${auditFindingOptionsHtml}
                 </select>
             </div>
             <div class="mt-2">
-                <label class="block text-sm font-medium text-blue-600 mb-2">ISO Clause<span class="required">*</span></label>
-                <textarea speed-bind-validate='TempData' placeholder="Enter text here..." class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base"></textarea>
+                <label class="block text-sm font-medium text-blue-600 mb-2">Procedure Section<span class="required">*</span></label>
+                <textarea speed-bind-validate='TempData' placeholder="Enter text here..."
+                    class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400
+                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
+                    transition-all text-sm sm:text-base"></textarea>
             </div>
             <div class="mt-2">
                 <label class="block text-sm font-medium text-blue-600 mb-2">Objective Evidence<span class="required">*</span></label>
-                <textarea speed-bind-validate='TempData' placeholder="Enter text here..." class="objective-evidence-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base"></textarea>
+                <textarea speed-bind-validate='TempData' placeholder="Enter text here..."
+                    class="objective-evidence-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400
+                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
+                    transition-all text-sm sm:text-base"></textarea>
             </div>
             <div class="mt-2">
-                <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance Statement<span class="ncrequired hidden required">*</span></label>
-                <textarea placeholder="Enter text here..." class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" disabled></textarea>
+                <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance Statement
+                    <span class="ncrequired hidden required">*</span>
+                </label>
+                <textarea placeholder="Enter text here..." class="non-conformance-input
+                    w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400
+                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
+                    transition-all text-sm sm:text-base" disabled></textarea>
             </div>
             <div class="mt-2 non-conformance-id hidden">
                 <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance ID</label>
-                <textarea class="non-conformance-id-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" readonly>${nonConformanceId}</textarea>
+                <textarea class="non-conformance-id-input
+                    w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400
+                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
+                    transition-all text-sm sm:text-base" readonly>${nonConformanceId}</textarea>
             </div>
-            <div class="absolute right-0">
-                <button class="remove-question-set p-1 sm:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors" data-id="${questionSetId}">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            <div class="absolute right-0 top-0">
+                <button class="remove-question-set p-1 sm:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                    data-id="${questionSetId}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
                 </button>
             </div>
         </div>
     `;
+
     $('#questionsContainer').append(questionSetHtml);
 
-    // Add event listener with prevention of duplicates
+    // Bind audit finding logic
     const $auditFindingInput = $(`#questionsContainer .question-set[data-id="${questionSetId}"] .audit-finding-input`);
     $auditFindingInput.off('change').on('change', function () {
         const $questionSet = $(this).closest('.question-set');
@@ -381,40 +415,49 @@ MainApplication.NewRequestComponent.addQuestionSet = function () {
         const $nonConformanceLabel = $questionSet.find('.ncrequired');
 
         if ($(this).val() === 'Non-Conformance') {
-            $nonConformanceInput.prop('disabled', false);
-            $nonConformanceInput.attr("speed-bind-validate", "TempData");
+            $nonConformanceInput.prop('disabled', false).attr("speed-bind-validate", "TempData");
             $nonConformanceLabel.removeClass('hidden');
-            
-            const newDateCreatedCode = $spcontext.stringnifyDate({
+
+            const newCode = $spcontext.stringnifyDate({
                 includeTime: true,
                 timeSpace: false,
                 format: "dd-mm-yy HH:mm"
             }).replace(/[-: ]/g, "");
-            const newNonConformanceId = `RSAUDNC${newDateCreatedCode}`;
-            $questionSet.find('.non-conformance-id-input').val(newNonConformanceId);
+            $questionSet.find('.non-conformance-id-input').val(`RSAUDNC${newCode}`);
         } else {
-            $nonConformanceInput.prop('disabled', true);
-            $nonConformanceInput.removeAttr("speed-bind-validate");
+            $nonConformanceInput.prop('disabled', true).removeAttr("speed-bind-validate");
             $nonConformanceIdDiv.addClass('hidden');
             $nonConformanceLabel.addClass('hidden');
         }
     });
 
+    // ✅ Reindex after adding
+    MainApplication.NewRequestComponent.reindexQuestionSets();
     MainApplication.NewRequestComponent.updateQuestionsPlaceholder();
 };
 
-// Function to remove a question set with animation
+// Reindex all question sets
+MainApplication.NewRequestComponent.reindexQuestionSets = function () {
+    $('#questionsContainer .question-set').each(function (i) {
+        $(this).find('.index-column span:first').text(`${i + 1}.`);
+
+    });
+};
+
+// Remove question set
 MainApplication.NewRequestComponent.removeQuestionSet = function (questionSetId) {
-    AppRequest.questionSetCounter--;
     const $questionSet = $(`#questionsContainer .question-set[data-id="${questionSetId}"]`);
     if ($questionSet.length) {
         $questionSet.addClass('opacity-0').css('transition', 'opacity 0.3s ease');
         setTimeout(() => {
             $questionSet.remove();
+            MainApplication.NewRequestComponent.reindexQuestionSets();
             MainApplication.NewRequestComponent.updateQuestionsPlaceholder();
-        }, 300); // Match animation duration
+        }, 300);
     }
-}
+};
+
+
 
 // Function to update placeholder visibility
 MainApplication.NewRequestComponent.updateQuestionsPlaceholder = function () {
@@ -497,7 +540,7 @@ MainApplication.NewRequestComponent.recoverListData = function () {
         "ID", "WorkflowRequestID", "Current_Approver", "Current_Approver_Code", "Approval_Status",
         "Created", "InitiatorEmailAddress", "InitiatorLogin", "Transaction_History", "ReturnForCorrection",
         "Modified", "PendingUserEmail", "PendingUserLogin", "Attachment_Folder", "AttachmentURL", "Author",
-        "AuditeesDetails", "AuditorsDetails", "QuestionsDetails"
+        "AuditeesDetails", "AuditorsDetails", "QuestionsDetails", "Process", "Procedure"
     ];
 
     speedctxRoot.getListToControl(globalDefinitions.stageDefinitions.listname, query, extraProperties, function (listProperties) {
@@ -550,12 +593,17 @@ MainApplication.NewRequestComponent.recoverListData = function () {
             var selectedProcedure = AppRequest.requestDetails.Procedure || "";
 
             $("#procedure").empty();
-            $("#procedure").append('<option value="" disabled selected>Select a procedure</option>');
+            $("#procedure").append('<option value="" disabled>Select a procedure</option>');
 
             procedures.forEach(function (item) {
-                var isSelected = item.Title === selectedProcedure ? "selected" : "";
-                $("#procedure").append(`<option value="${item.Title}" ${isSelected}>${item.Title}</option>`);
+                var isSelected = item === selectedProcedure ? "selected" : "";
+                $("#procedure").append(`<option value="${item}" ${isSelected}>${item}</option>`);
             });
+
+            if (!selectedProcedure) {
+                $("#procedure").val("");
+            }
+
 
             globalDefinitions.closeLoader();
         }
@@ -749,7 +797,7 @@ MainApplication.NewRequestComponent.displayQuestionSets = function (questionSets
         const block = `
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 small-gap mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
                 <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Questions</label>
+                    <label class="block text-sm font-medium text-blue-600 mb-2"><span class="index-number">${index + 1}.</span> Questions</label>
                     <textarea class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.Questions || ''}</textarea>
                 </div>
                 <div class="mt-2">
@@ -761,7 +809,7 @@ MainApplication.NewRequestComponent.displayQuestionSets = function (questionSets
                     </select>
                 </div>
                 <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">ISO Clause</label>
+                    <label class="block text-sm font-medium text-blue-600 mb-2">Procedure Section</label>
                     <textarea class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.ISOClause || ''}</textarea>
                 </div>
                 <div class="mt-2">

@@ -105,6 +105,8 @@ export default class ViewRequest extends React.Component<{}, {}> {
                             <textarea placeholder="Enter text here..." className="w-full px-3 sm:px-4 py-2 sm:py-3  placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" defaultValue={""} />
                         </div>
                     </div> */}
+
+                    <div id="riskAssessmentContainer" />
                     <div className="action-btns flex justify-center items-center gap-3" style={{ marginTop: '2rem' }}>
                         <Link to="/" className="px-4 py-2 bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">
                             Cancel
@@ -113,7 +115,7 @@ export default class ViewRequest extends React.Component<{}, {}> {
                 </div>
 
                 <div className="row mt-3">
-                    <h3>Audit History</h3>
+                    <h3>Audit Log</h3>
                     <table className="w-full table-mobile">
                         <thead className="border-b border-gray-200">
                             <tr>

@@ -198,7 +198,7 @@ export default class ApproveRequest extends React.Component<{}, {}> {
                 </div>
 
                 <div className="row mt-3">
-                    <h3>Audit History</h3>
+                    <h3>Audit Log</h3>
                     <table className="w-full table-mobile">
                         <thead className="border-b border-gray-200">
                             <tr>

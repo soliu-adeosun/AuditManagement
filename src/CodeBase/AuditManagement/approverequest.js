@@ -164,7 +164,7 @@ MainApplication.ApproveRequestComponent.recoverListData = function() {
                             MainApplication.displayPeople(listProperties.AuditeesDetails, "auditeesContainer", "auditees", "No Auditees found");
                             MainApplication.displayPeople(listProperties.AuditorsDetails, "auditorsContainer", "auditors", "No Auditors found");
 
-                            MainApplication.ApproveRequestComponent.displayQuestionSets(listProperties.QuestionsDetails);
+                            MainApplication.displayQuestionSets(listProperties.QuestionsDetails);
 
 
                             AppRequest.FolderUrl = listProperties.Attachment_Folder;
@@ -190,14 +190,13 @@ MainApplication.ApproveRequestComponent.recoverListData = function() {
                             PeoplePicker.initializePeoplePickers(MainApplication.staffList);
                             PeoplePicker.disablePicker("OtherAuditors");
                             PeoplePicker.disablePicker("Auditees");
-                            console.log(listProperties.QuestionsDetails);
 
                             // if (MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.management].belongs){
                                 MainApplication.ApproveRequestComponent.displayNCRiskAssessment(listProperties.QuestionsDetails);
                             // }
 
                             if (MainApplication.configuredTaskMembers[globalDefinitions.stageDefinitions.ceo].belongs){
-                                MainApplication.ApproveRequestComponent.displayNCRiskAssessmentReadOnly(listProperties.RiskAssessment);
+                                MainApplication.displayNCRiskAssessmentReadOnly(listProperties.RiskAssessment);
                             }
 
                             
@@ -336,49 +335,6 @@ MainApplication.ApproveRequestComponent.createNonConformanceItem = function(nonC
     });
 }
 
-MainApplication.ApproveRequestComponent.displayQuestionSets = function (questionSets) {
-    const $displayContainer = $("#questionsContainer");
-    $displayContainer.empty();
-
-    if (!questionSets || questionSets.length === 0) {
-        $displayContainer.append(`
-            <div class="text-center text-gray-500 mt-4">
-                No question sets to display.
-            </div>
-        `);
-        return;
-    }
-
-    questionSets.forEach((questionSet, index) => {
-        const questionSetId = questionSet.id || `question-set-${index}`;
-        const block = `
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 small-gap mt-2 question-set border-2 p-2 relative" data-id="${questionSetId}">
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Questions</label>
-                    <textarea readonly class="question-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.Questions || ''}</textarea>
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Audit Finding</label>
-                    <input readonly type="text" value="${questionSet.AuditFinding || ''}" class="audit-finding-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base" />
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">ISO Clause</label>
-                    <textarea readonly class="iso-clause-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.ISOClause || ''}</textarea>
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Objective Evidence</label>
-                    <textarea readonly class="objective-evidence-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.ObjectiveEvidence || ''}</textarea>
-                </div>
-                <div class="mt-2">
-                    <label class="block text-sm font-medium text-blue-600 mb-2">Non-conformance Statement</label>
-                    <textarea readonly class="non-conformance-input w-full px-3 sm:px-4 py-2 sm:py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm sm:text-base">${questionSet.NonConformanceStatement || ''}</textarea>
-                </div>
-            </div>
-        `;
-        $displayContainer.append(block);
-    });
-};
-
 MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (questionsDetails) {
     // Predefined options for select fields
     const isoClauseOptions = MainApplication.isoClause || [];
@@ -388,7 +344,6 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
 
     // Filter questionsDetails for Non-Conformance entries
     const nonConformanceData = questionsDetails.filter(data => data.AuditFinding === 'Non-Conformance');
-    console.log("NonConformanceData: ",nonConformanceData);
     // If no non-conformance data, trigger management details and return
     if (nonConformanceData.length === 0) {
         AppRequest.isNonConformance = 0;
@@ -403,6 +358,7 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
                 <table class="w-full table-auto border-collapse">
                     <thead>
                         <tr class="bg-gray-100">
+                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">S/N</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC REF ID</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">ISO CLAUSE</th>
                             <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC STATEMENT</th>
@@ -426,6 +382,9 @@ MainApplication.ApproveRequestComponent.createNCRiskAssessment = function (quest
 
         html += `
             <tr class="border-b" data-nc-id="${ncId}">
+                <td class="px-2 py-2">
+                    <p>${index + 1}.</p>
+                </td>
                 <td class="px-2 py-2">
                     <input type="text" value="${ncId}" readonly class="nc-reference-input w-full px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-sm" />
                 </td>
@@ -645,98 +604,4 @@ MainApplication.ApproveRequestComponent.getManagementDetailsData = function () {
     });
 
     return managementData;
-};
-
-
-MainApplication.ApproveRequestComponent.displayNCRiskAssessmentReadOnly = function (ncRiskData) {
-    // If no data, return empty container
-    if (ncRiskData.length === 0) {
-        return $('#riskAssessmentContainer').html('<p class="text-gray-500 italic my-4 sm:my-6 text-center">No Non-Conformance Risk Assessment data available.</p>')[0];
-    }
-
-    // Build read-only table
-    let html = `
-        <div>
-            <h2 class="text-xl sm:text-2xl font-bold text-navy-900 my-4 sm:my-6">Non-Conformance Risk Assessment Section</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full table-auto border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC REF ID</th>
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">ISO CLAUSE</th>
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC STATEMENT</th>
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">OCCURRENCE</th>
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC RATING</th>
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">NC CLASS</th>
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">RISK IMPACT</th>
-                            <th class="px-2 py-2 text-left text-sm font-medium text-blue-600">RISK EXPOSURE</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-    `;
-
-    // Add rows for each data entry
-    ncRiskData.forEach((data, index) => {
-        // Sanitize data to prevent XSS
-        const ncId = $('<div>').text(data.NCReferenceNo || '').html();
-        const isoClause = $('<div>').text(data.ISOClause || '').html();
-        const ncStatement = $('<div>').text(data.NonConformance || '').html();
-        const occurrence = $('<div>').text(data.Occurrence || '').html();
-        const ncRating = $('<div>').text(data.NCRating || '').html();
-        const ncClassification = $('<div>').text(data.NCClassification || '').html();
-        const riskImpact = $('<div>').text(data.RiskImpact || '').html();
-
-        // Find the ColorCode for the RiskImpact value
-        const riskImpactValue = parseFloat(data.RiskImpact) || 0; // Convert to number for comparison
-        const riskImpactOption = MainApplication.riskImpact.find(option => parseFloat(option.value) === riskImpactValue) || {};
-        const riskImpactColor = riskImpactOption.color || '#f3f4f6'; // Use 'color' property
-        const riskImpactTitle = riskImpactOption.title || data.RiskImpact;
-        console.log(`Row ${index} RiskImpact:`, {
-            dataRiskImpact: data.RiskImpact,
-            riskImpactValue,
-            matchedOption: riskImpactOption,
-            colorCode: riskImpactColor
-        });
-
-        const overallRiskExposure = $('<div>').text(data.OverallRiskExposure || '').html();
-
-        html += `
-            <tr class="border-b">
-                <td class="px-2 py-2">
-                    <input type="text" value="${ncId}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
-                </td>
-                <td class="px-2 py-2">
-                    <input type="text" value="${isoClause}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
-                </td>
-                <td class="px-2 py-2">
-                    <textarea readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none">${ncStatement}</textarea>
-                </td>
-                <td class="px-2 py-2">
-                    <input type="text" value="${occurrence}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
-                </td>
-                <td class="px-2 py-2">
-                    <input type="text" value="${ncRating}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
-                </td>
-                <td class="px-2 py-2">
-                    <input type="text" value="${ncClassification}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
-                </td>
-                <td class="px-2 py-2">
-                    <input type="text" value="${riskImpactTitle}" readonly class="w-full px-3 py-2 text-sm border-none focus:outline-none" style="background-color: ${riskImpactColor}; color: black;" />
-                </td>
-                <td class="px-2 py-2">
-                    <input type="text" value="${overallRiskExposure}" readonly class="w-full px-3 py-2 bg-gray-100 text-sm border-none focus:outline-none" />
-                </td>
-            </tr>
-        `;
-    });
-
-    html += `
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    `;
-
-    // Create and return DOM element
-    return $('#riskAssessmentContainer').html(html)[0];
 };
