@@ -330,7 +330,7 @@ MainApplication.ApproveRequestComponent.proceedToList = function(formData) {
 MainApplication.ApproveRequestComponent.createNonConformanceItem = function(nonConformanceData) {
     speedctxRoot.createItems([nonConformanceData], "NonConformanceRegister", function() {
         globalDefinitions.AuditLogManager_SaveLog({
-            Action: `created non-conformance item for request ${nonConformanceData.WorkfloRequestID}`
+            Action: `created non-conformance item for request ${nonConformanceData.Title}`
         });
     });
 }

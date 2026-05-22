@@ -262,3 +262,13 @@ MainApplication.ReportComponent.updateDateConstraints = function () {
         $("#requeststrDate").removeAttr("max");
     }
 }
+
+
+MainApplication.ReportComponent.deleteWorkflow = function (listName, id, successCallback, errorCallback) {
+  speedctxRoot.deleteItems(
+    listName,
+    id,
+    successCallback,
+    errorCallback
+  );
+};
