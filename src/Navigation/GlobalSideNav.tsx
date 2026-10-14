@@ -24,8 +24,8 @@ const GlobalSideNav: React.FC = () => {
                     <div className="p-6 border-b border-slate-600">
                         <div className="flex gap-3 items-center">
                             <img
-                                src={require("../Assets/img/rslogo_mono.png")}
-                                style={{ marginLeft: '-10px', maxWidth: '100%' }}
+                                src={require("../Assets/img/arridex.png")}
+                                style={{ marginLeft: '-10px', width: '40px' }}
                                 alt="logo"
                             />
                             <h2 className="text-xl font-semibold text-white">
