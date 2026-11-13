@@ -30,13 +30,21 @@ export const FilterBox = () => {
                         </div>
                     </div>
                     <div className="filter-row">
-                        <div className="filter-item full-width">
+                        <div className="filter-item">
                             <label className="filter-label" htmlFor="statusSelect">Please select a status</label>
                             <select id="statusSelect" className="filter-select status-dropdown" speed-bind-query="Approval_Status" speed-operator="Eq">
                                 <option value="">Please select a status</option>
                                 <option value="Pending">Pending</option>
                                 <option value="Revise">Revise</option>
                                 <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                        <div className="filter-item">
+                            <label className="filter-label" htmlFor="typeSelect">Non-Conformance</label>
+                            <select id="ncFilter" className="filter-select status-dropdown">
+                                <option value="all">All</option>
+                                <option value="yes">Has Non-Conformance</option>
+                                <option value="no">No Non-Conformance</option>
                             </select>
                         </div>
                     </div>

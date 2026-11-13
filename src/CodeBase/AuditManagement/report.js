@@ -66,6 +66,14 @@ whenReportDependeciesLoaded = function () {
 
             return viewStr;
             
+        },
+        "RiskAssessment": function (valueToEva) {
+            var label = MainApplication.ReportComponent.getNonConformanceLabel(valueToEva);
+
+            if (label !== "None") {
+                return `<span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded">${label}</span>`;
+            }
+            return `<span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">${label}</span>`;
         }
     };
 
@@ -86,6 +94,20 @@ whenReportDependeciesLoaded = function () {
 
     $("#filter-btn, #closesearchfilter").click(() => {
         $(".sort-box").toggleClass("hidden");
+    });
+
+    // Example: filter dropdown change
+    $("#ncFilter").on("change", function () {
+        var mode = $(this).val(); // "all" | "yes" | "no"
+        var data = AppRequest.fullTableData || [];
+
+        var filtered = data.filter(function (item) {
+            if (mode === "yes") return itemHasNonConformance(item);
+            if (mode === "no")  return !itemHasNonConformance(item);
+            return true;
+        });
+
+        MainApplication.ReportComponent.showTableData(filtered);
     });
 
     if (MainApplication.cachedState.isReportAdmin) {
@@ -135,7 +157,7 @@ MainApplication.ReportComponent.retrieveRequest = function () {
             "ID", "WorkflowRequestID", "Current_Approver", "Current_Approver_Code", "Approval_Status",
             "Created", "InitiatorEmailAddress", "InitiatorLogin", "Transaction_History", "ReturnForCorrection",
             "Modified", "PendingUserEmail", "PendingUserLogin", "Attachment_Folder", "AttachmentURL", "Author",
-            "AuditeesDetails", "QuestionsDetails"
+            "AuditeesDetails", "QuestionsDetails", "TypeOfAudit", "RiskAssessment"
         ]
     };
 
@@ -175,7 +197,7 @@ MainApplication.ReportComponent.showTableData = function (tableData) {
 MainApplication.ReportComponent.exportToExcel = function () {
         var excelName = "AuditReport" + $spcontext.stringnifyDate() + ".csv";
         var dataStringHeader = [
-            "Date", "Audit Reference ID", "Initiator", "Type", "Status", "Next Approver"
+            "Date", "Audit Reference ID", "Initiator", "Type", "Non-Conformance", "Status", "Next Approver"
         ];
 
         var excelData = dataStringHeader.toString() + "\n";
@@ -186,6 +208,7 @@ MainApplication.ReportComponent.exportToExcel = function () {
             dataString.push(itemProperties.WorkflowRequestID);
             dataString.push(MainApplication.ReportComponent.validateCSVContent(itemProperties.InitiatorName));
             dataString.push(MainApplication.ReportComponent.validateCSVContent(itemProperties.TypeOfAudit));
+            dataString.push(MainApplication.ReportComponent.getNonConformanceLabel(itemProperties));
             dataString.push(itemProperties.Approval_Status);
             dataString.push(MainApplication.ReportComponent.validateCSVContent(itemProperties.PendingUserLogin));
             dataString.push(itemProperties.Year);
@@ -271,4 +294,29 @@ MainApplication.ReportComponent.deleteWorkflow = function (listName, id, success
     successCallback,
     errorCallback
   );
+};
+
+function itemHasNonConformance(item) {
+    var ra = item.RiskAssessment;
+    if (typeof ra === "string") {
+        try { ra = $spcontext.JSONToObject(ra); } catch (e) { return false; }
+    }
+    return Array.isArray(ra) && ra.length > 0;
+}
+
+MainApplication.ReportComponent.getNonConformanceLabel = function (item) {
+    var ra = item && item.RiskAssessment;
+
+    if (typeof ra === "string") {
+        try {
+            ra = $spcontext.JSONToObject(ra);
+        } catch (e) {
+            ra = [];
+        }
+    }
+    if (!Array.isArray(ra)) {
+        ra = [];
+    }
+
+    return ra.length > 0 ? ("NC (" + ra.length + ")") : "None";
 };
